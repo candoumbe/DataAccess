@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.1;netstandard1.3</TargetFrameworks>
+    <AssemblyName>MedEasy.DAL</AssemblyName>
+    <PackageId>MedEasy.DAL</PackageId>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.1' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.3' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MedEasy.Tools\MedEasy.Tools.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="1.4.36" />
+  </ItemGroup>
+
+</Project>
