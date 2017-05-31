@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MedEasy.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 #if NETSTANDARD1_3
 using Z.EntityFramework.Plus;
 #endif
@@ -13,7 +14,7 @@ namespace MedEasy.DAL.Repositories
 {
     public class Repository<TEntry> : RepositoryBase<TEntry>, IRepository<TEntry> where TEntry : class
     {
-         protected DbSet<TEntry> Entries { get; set; }
+        protected DbSet<TEntry> Entries { get; set; }
 
         /// <summary>
         /// Builds a new <see cref="Repository{TEntry}"/> instance
@@ -26,18 +27,18 @@ namespace MedEasy.DAL.Repositories
         }
 
 
-        
-        
-        public virtual async Task<IPagedResult<TEntry>> ReadPageAsync(IEnumerable<OrderClause<TEntry>> orderBy, int pageSize, int page)
+
+
+        public virtual async Task<IPagedResult<TEntry>> ReadPageAsync(IEnumerable<OrderClause<TEntry>> orderBy, int pageSize, int page, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await ReadPageAsync(item => item, pageSize, page, orderBy)
+            return await ReadPageAsync(item => item, pageSize, page, orderBy, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public virtual async Task<IPagedResult<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector, int pageSize, int page, IEnumerable<OrderClause<TResult>> orderBy)
+        public virtual async Task<IPagedResult<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector, int pageSize, int page, IEnumerable<OrderClause<TResult>> orderBy, CancellationToken cancellationToken = default(CancellationToken))
         {
 
-            
+
             IQueryable<TResult> resultQuery = Entries.Select(selector);
 
             if (orderBy != null)
@@ -45,39 +46,45 @@ namespace MedEasy.DAL.Repositories
                 resultQuery = resultQuery.OrderBy(orderBy);
             }
 
-            
+
 
             IEnumerable<TResult> results = await resultQuery
                 .Skip(page < 1 ? 0 : (page - 1) * pageSize)
                 .Take(pageSize)
-                .ToArrayAsync()
+                .ToArrayAsync(cancellationToken)
                 .ConfigureAwait(false);
-            
-            IPagedResult<TResult> pageResult = new PagedResult<TResult>(results, await Entries.CountAsync().ConfigureAwait(false), pageSize);
+
+            IPagedResult<TResult> pageResult = new PagedResult<TResult>(results, await Entries.CountAsync(cancellationToken).ConfigureAwait(false), pageSize);
 
             return pageResult;
         }
-        
 
-        public virtual async Task<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector)
+
+        public virtual async Task<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.Select(selector).ToArrayAsync().ConfigureAwait(false);
+            return await Entries.Select(selector).ToArrayAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        public virtual async Task<IEnumerable<TEntry>> ReadAllAsync()
+        public virtual async Task<IEnumerable<TEntry>> ReadAllAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await ReadAllAsync(item => item).ConfigureAwait(false);
+            return await ReadAllAsync(item => item, cancellationToken).ConfigureAwait(false);
         }
-        
-        public virtual async Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate)
+
+        public virtual async Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.Where(predicate).Select(selector)
-                .ToArrayAsync()
+            return await Entries
+                .Where(predicate)
+                .Select(selector)
+                .ToArrayAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
 
-        public async Task<IEnumerable<TResult>> WhereAsync<TKey, TResult>(Expression<Func<TEntry, bool>> predicate, Expression<Func<TEntry, TKey>> keySelector, Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupBySelector)
+        public async Task<IEnumerable<TResult>> WhereAsync<TKey, TResult>(
+            Expression<Func<TEntry, bool>> predicate,
+            Expression<Func<TEntry, TKey>> keySelector,
+            Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupBySelector,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
 
             if (predicate == null)
@@ -98,37 +105,45 @@ namespace MedEasy.DAL.Repositories
                     .Where(predicate)
                     .GroupBy(keySelector)
                     .Select(groupBySelector)
-                    .ToArrayAsync()
+                    .ToArrayAsync(cancellationToken)
                     .ConfigureAwait(false);
-            
+
             return results;
         }
 
 
 
-        public virtual async Task<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate)
+        public virtual async Task<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await WhereAsync(item => item, predicate);
+            return await WhereAsync(item => item, predicate, cancellationToken);
 
         }
 
-        public virtual async Task<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<OrderClause<TEntry>> orderBy = null, IEnumerable<IncludeClause<TEntry>> includedProperties = null)
+        public virtual async Task<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate,
+            IEnumerable<OrderClause<TEntry>> orderBy = null,
+            IEnumerable<IncludeClause<TEntry>> includedProperties = null,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await WhereAsync(item => item, predicate, orderBy, includedProperties).ConfigureAwait(false);
+            return await WhereAsync(item => item, predicate, orderBy, includedProperties, cancellationToken).ConfigureAwait(false);
         }
 
-        public virtual async Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, IEnumerable<OrderClause<TResult>> orderBy = null, IEnumerable<IncludeClause<TEntry>> includedProperties = null)
+        public virtual async Task<IEnumerable<TResult>> WhereAsync<TResult>(
+            Expression<Func<TEntry, TResult>> selector,
+            Expression<Func<TEntry, bool>> predicate,
+            IEnumerable<OrderClause<TResult>> orderBy = null,
+            IEnumerable<IncludeClause<TEntry>> includedProperties = null,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             return await Entries
                 .Where(predicate)
                 .Include(includedProperties)
                 .Select(selector)
                 .OrderBy(orderBy)
-                .ToArrayAsync()
+                .ToArrayAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public async Task<IPagedResult<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<OrderClause<TEntry>> orderBy, int pageSize, int page)
+        public async Task<IPagedResult<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<OrderClause<TEntry>> orderBy, int pageSize, int page, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (orderBy == null)
             {
@@ -141,14 +156,31 @@ namespace MedEasy.DAL.Repositories
                 .Take(pageSize);
 
             //we compute both task
-            IEnumerable<TEntry> result = await query.ToListAsync();
-            int total = await CountAsync(predicate);
-            IPagedResult<TEntry> pagedResult = new PagedResult<TEntry>(result, total, pageSize);
+            IPagedResult<TEntry> pagedResult;
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                pagedResult = PagedResult<TEntry>.Default;
+            }
+            else
+            {
+                IEnumerable<TEntry> result = await query.ToListAsync(cancellationToken);
+                int total = await CountAsync(predicate, cancellationToken);
+                pagedResult = new PagedResult<TEntry>(result, total, pageSize);
+
+            }
+
 
             return pagedResult;
         }
 
-        public async Task<IPagedResult<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, IEnumerable<OrderClause<TResult>> orderBy, int pageSize, int page)
+        public async Task<IPagedResult<TResult>> WhereAsync<TResult>(
+            Expression<Func<TEntry, TResult>> selector, 
+            Expression<Func<TEntry, bool>> predicate, 
+            IEnumerable<OrderClause<TResult>> orderBy, 
+            int pageSize, 
+            int page, 
+            CancellationToken cancellationToken = default(CancellationToken))
         {
 
             if (orderBy == null)
@@ -170,7 +202,13 @@ namespace MedEasy.DAL.Repositories
             return pagedResult;
         }
 
-        public async Task<IPagedResult<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, IEnumerable<OrderClause<TResult>> orderBy, int pageSize, int page)
+        public async Task<IPagedResult<TResult>> WhereAsync<TResult>(
+            Expression<Func<TEntry, TResult>> selector, 
+            Expression<Func<TResult, bool>> predicate, 
+            IEnumerable<OrderClause<TResult>> orderBy, 
+            int pageSize, 
+            int page, 
+            CancellationToken cancellationToken = default(CancellationToken))
         {
 
             if (orderBy == null)
@@ -185,162 +223,171 @@ namespace MedEasy.DAL.Repositories
                 .Take(pageSize);
 
             //we compute both task
-            IEnumerable<TResult> result = await query.ToListAsync();
-            int total = await Entries.Select(selector).CountAsync(predicate);
-            IPagedResult<TResult> pagedResult = new PagedResult<TResult>(result, total, pageSize);
+            IPagedResult<TResult> pagedResult;
+            if (! cancellationToken.IsCancellationRequested)
+            {
+                IEnumerable<TResult> result = await query.ToListAsync();
+                int total = await Entries.Select(selector).CountAsync(predicate);
+                pagedResult = new PagedResult<TResult>(result, total, pageSize);
+
+            }
+            else
+            {
+                pagedResult = PagedResult<TResult>.Default;
+            }
 
             return pagedResult;
         }
 
-        public async Task<bool> AnyAsync()
+        public async Task<bool> AnyAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.AnyAsync().ConfigureAwait(false);
+            return await Entries.AnyAsync(cancellationToken).ConfigureAwait(false);
         }
 
 
-        public async Task<TResult> MaxAsync<TResult>(Expression<Func<TEntry, TResult>> selector)
+        public async Task<TResult> MaxAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.MaxAsync(selector);
+            return await Entries.MaxAsync(selector, cancellationToken);
         }
 
 
-        public async Task<TResult> MinAsync<TResult>(Expression<Func<TEntry, TResult>> selector)
+        public async Task<TResult> MinAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.MinAsync(selector).ConfigureAwait(false);
+            return await Entries.MinAsync(selector, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<bool> AnyAsync(Expression<Func<TEntry, bool>> predicate)
+        public async Task<bool> AnyAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.AnyAsync(predicate).ConfigureAwait(false);
+            return await Entries.AnyAsync(predicate, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<int> CountAsync()
+        public async Task<int> CountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.CountAsync().ConfigureAwait(false);
+            return await Entries.CountAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<int> CountAsync(Expression<Func<TEntry, bool>> predicate)
+        public async Task<int> CountAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.CountAsync(predicate)
+            return await Entries.CountAsync(predicate, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public async Task<TEntry> SingleAsync()
+        public async Task<TEntry> SingleAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.SingleAsync()
+            return await Entries.SingleAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public async Task<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate)
+        public async Task<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.SingleAsync(predicate)
+            return await Entries.SingleAsync(predicate, cancellationToken)
                 .ConfigureAwait(false);
         }
 
 
-        public async Task<TResult> SingleAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate)
+        public async Task<TResult> SingleAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await Entries.Where(predicate).Select(selector)
-                .SingleAsync()
+                .SingleAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
-        
-        public async Task<TEntry> SingleOrDefaultAsync()
+
+        public async Task<TEntry> SingleOrDefaultAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.SingleOrDefaultAsync()
+            return await Entries.SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public async Task<TEntry> SingleOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties)
-        {
-            return await Entries
-                .Include(includedProperties)
-                .SingleOrDefaultAsync()
-                .ConfigureAwait(false);
-        }
-
-
-        public async Task<TEntry> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate)
-        {
-            return await Entries.SingleOrDefaultAsync(predicate)
-                .ConfigureAwait(false);
-        }
-
-
-
-        public async Task<TEntry> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties)
+        public async Task<TEntry> SingleOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await Entries
                 .Include(includedProperties)
-                .SingleOrDefaultAsync(predicate)
+                .SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public async Task<TResult> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate)
+
+        public async Task<TEntry> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await Entries.SingleOrDefaultAsync(predicate, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+
+
+        public async Task<TEntry> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await Entries
+                .Include(includedProperties)
+                .SingleOrDefaultAsync(predicate, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        public async Task<TResult> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await Entries.Where(predicate)
                 .Select(selector)
-                .SingleOrDefaultAsync()
+                .SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public async Task<TResult> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate)
+        public async Task<TResult> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await Entries
                 .Select(selector)
-                .SingleOrDefaultAsync(predicate)
+                .SingleOrDefaultAsync(predicate, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public async Task<TEntry> FirstAsync()
+        public async Task<TEntry> FirstAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.FirstAsync()
+            return await Entries.FirstAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public async Task<TEntry> FirstOrDefaultAsync()
+        public async Task<TEntry> FirstOrDefaultAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.FirstOrDefaultAsync()
+            return await Entries.FirstOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
 
-        public async Task<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate)
+        public async Task<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.FirstAsync(predicate)
+            return await Entries.FirstAsync(predicate, cancellationToken)
                 .ConfigureAwait(false);
         }
 
         public void Delete(Expression<Func<TEntry, bool>> predicate)
         {
             IEnumerable<TEntry> entries = Entries.Where(predicate);
-            Entries.RemoveRange(entries); 
+            Entries.RemoveRange(entries);
         }
 
 
-        public async Task<TResult> FirstAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate)
+        public async Task<TResult> FirstAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await Entries
                 .Where(predicate)
                 .Select(selector)
-                .FirstAsync()
+                .FirstAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public async Task<TResult> FirstOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate)
+        public async Task<TResult> FirstOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await Entries.Where(predicate).Select(selector)
-                .FirstOrDefaultAsync()
+                .FirstOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public async Task<TEntry> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate)
+        public async Task<TEntry> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await Entries.FirstOrDefaultAsync(predicate)
+            return await Entries.FirstOrDefaultAsync(predicate, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        
+
         public TEntry Create(TEntry entry)
         {
             if (entry == null)
@@ -358,18 +405,18 @@ namespace MedEasy.DAL.Repositories
             return entries;
         }
 
-        public async Task<bool> AllAsync(Expression<Func<TEntry, bool>> predicate)
+        public async Task<bool> AllAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await Entries
-                .AllAsync(predicate)
+                .AllAsync(predicate, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public async Task<bool> AllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate)
+        public async Task<bool> AllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await Entries
                 .Select(selector)
-                .AllAsync(predicate)
+                .AllAsync(predicate, cancellationToken)
                 .ConfigureAwait(false);
         }
     }

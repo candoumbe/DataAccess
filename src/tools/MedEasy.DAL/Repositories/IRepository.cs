@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MedEasy.DAL.Repositories
@@ -22,21 +23,28 @@ namespace MedEasy.DAL.Repositories
         /// <param name="pageSize">Size of the page.</param>
         /// <param name="page">Index of the page.</param>
         /// <returns><see cref="IPagedResult{T}"/> which holds the result</returns>
-        Task<IPagedResult<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector, int pageSize, int page, IEnumerable<OrderClause<TResult>> orderBy = null);
+        Task<IPagedResult<TResult>> ReadPageAsync<TResult>(
+            Expression<Func<TEntry, TResult>> selector, 
+            int pageSize, 
+            int page, 
+            IEnumerable<OrderClause<TResult>> orderBy = null, 
+            CancellationToken cancellationToken = default(CancellationToken));
         
         /// <summary>
         /// Gets all entries of the repository
         /// </summary>
+        /// <param name="cancellationToken">Token permettant d'annuler l'exécution de la requête</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        Task<IEnumerable<TEntry>> ReadAllAsync();
+        Task<IEnumerable<TEntry>> ReadAllAsync(CancellationToken cancellationToken = default(CancellationToken));
         
         /// <summary>
         /// Gets all entries of the repository after applying <paramref name="selector"/>
         /// </summary>
         /// <typeparam name="TResult">Type of the result</typeparam>
         /// <param name="selector">projection to apply before retrieving the result.</param>
+        /// <param name="cancellationToken">Token to stop query from running</param>
         /// <returns></returns>
-        Task<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector);
+        Task<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken));
 
         //IEnumerable<GroupedResult<TKey, TEntry>>  GroupBy<TKey>(Expression<Func<TEntry, TKey>> keySelector);
 
@@ -50,8 +58,9 @@ namespace MedEasy.DAL.Repositories
         /// Gets entries of the repository that satisfied the specified <paramref name="predicate"/>
         /// </summary>
         /// <param name="predicate">Filter the entries to retrieve</param>
+        /// <param name="cancellationToken"></param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        Task<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate);
+        Task<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets entries of the repository that satisfied the specified <paramref name="predicate"/>
@@ -60,7 +69,7 @@ namespace MedEasy.DAL.Repositories
         /// <param name="selector"></param>
         /// <param name="predicate"></param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate);
+        Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Retrieves entries grouped using the <see cref="keySelector"/>
@@ -73,7 +82,7 @@ namespace MedEasy.DAL.Repositories
         Task<IEnumerable<TResult>> WhereAsync<TKey, TResult>(
             Expression<Func<TEntry, bool>> predicate, 
             Expression<Func<TEntry, TKey>> keySelector, 
-            Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupSelector);
+            Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupSelector, CancellationToken cancellationToken = default(CancellationToken));
 
 
         /// <summary>
@@ -86,7 +95,7 @@ namespace MedEasy.DAL.Repositories
         Task<IEnumerable<TEntry>> WhereAsync(
             Expression<Func<TEntry, bool>> predicate, 
             IEnumerable<OrderClause<TEntry>> orderBy = null, 
-            IEnumerable<IncludeClause<TEntry>> includedProperties = null);
+            IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken cancellationToken = default(CancellationToken));
         
         /// <summary>
         /// Gets results that satisfied the <paramref name="predicate"/>
@@ -104,7 +113,7 @@ namespace MedEasy.DAL.Repositories
             Expression<Func<TEntry, TResult>> selector, 
             Expression<Func<TEntry, bool>> predicate, 
             IEnumerable<OrderClause<TResult>> orderBy = null, 
-            IEnumerable<IncludeClause<TEntry>> includedProperties = null);
+            IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken cancellationToken = default(CancellationToken));
         
         //Task<IEnumerable<TResult>> WhereAsync<TResult, TKey>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, Expression<Func<TResult, TKey>> keySelector, IEnumerable<OrderClause<TResult>> orderBy = null);
 
@@ -120,7 +129,7 @@ namespace MedEasy.DAL.Repositories
             Expression<Func<TEntry, bool>> predicate,  
             IEnumerable<OrderClause<TEntry>> orderBy, 
             int pageSize, 
-            int page);
+            int page, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// gets a <see cref="IPagedResult{T}"/> of entries that satisfied the <paramref name="predicate"/>
@@ -141,7 +150,7 @@ namespace MedEasy.DAL.Repositories
             Expression<Func<TEntry, bool>> predicate, 
             IEnumerable<OrderClause<TResult>> orderBy, 
             int pageSize, 
-            int page);
+            int page, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// gets a <see cref="IPagedResult{T}"/> of entries that satisfied the <paramref name="predicate"/>
@@ -160,7 +169,7 @@ namespace MedEasy.DAL.Repositories
         Task<IPagedResult<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector, 
             Expression<Func<TResult, bool>> predicate, 
-            IEnumerable<OrderClause<TResult>> orderBy, int pageSize, int page);
+            IEnumerable<OrderClause<TResult>> orderBy, int pageSize, int page, CancellationToken cancellationToken = default(CancellationToken));
 
 
 
@@ -185,7 +194,7 @@ namespace MedEasy.DAL.Repositories
         /// <typeparam name="TResult"></typeparam>
         /// <param name="selector"></param>
         /// <returns></returns>
-        Task<TResult> MaxAsync<TResult>(Expression<Func<TEntry, TResult>> selector);
+        Task<TResult> MaxAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken));
         
         /// <summary>
         /// Gets the mininum value after applying the <paramref name="selector"/>
@@ -193,7 +202,7 @@ namespace MedEasy.DAL.Repositories
         /// <typeparam name="TResult"></typeparam>
         /// <param name="selector">The projection to make before getting the minimum</param>
         /// <returns>The minimum value</returns>
-        Task<TResult> MinAsync<TResult>(Expression<Func<TEntry, TResult>> selector);
+        Task<TResult> MinAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken));
 
 
         
@@ -203,7 +212,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns>
         ///     <code>true</code> if the repository contains at least one element or <code>false</code> otherwise
         /// </returns>
-        Task<bool> AnyAsync();
+        Task<bool> AnyAsync(CancellationToken cancellationToken = default(CancellationToken));
 
         
         /// <summary>
@@ -213,7 +222,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns>
         ///     <code>true</code> if the repository contains at least one element or <code>false</code> otherwise
         /// </returns>
-        Task<bool> AnyAsync(Expression<Func<TEntry, bool>> predicate);
+        Task<bool> AnyAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
         
         /// <summary>
@@ -222,7 +231,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns>
         ///     the number of entries in the repository
         /// </returns>
-        Task<int> CountAsync();
+        Task<int> CountAsync(CancellationToken cancellationToken = default(CancellationToken));
         
         /// <summary>
         /// Gets the number of entries in the repository that honor the <paramref name="predicate"/>.
@@ -231,7 +240,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns>
         ///     the number of entries in the repository
         /// </returns>
-        Task<int> CountAsync(Expression<Func<TEntry, bool>> predicate);
+        Task<int> CountAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
         
         /// <summary>
@@ -240,7 +249,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns>
         /// the single entry of the repository
         /// </returns>
-        Task<TEntry> SingleAsync();
+        Task<TEntry> SingleAsync(CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets the single entry that corresponds to the specified <paramref name="predicate"/>.
@@ -248,7 +257,7 @@ namespace MedEasy.DAL.Repositories
         /// <param name="predicate">Filter to match</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
-        Task<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate);
+        Task<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets the single entry that matches <paramref name="predicate"/>.
@@ -259,7 +268,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns>The entry that matches <paramref name="predicate"/>.</returns>
         /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/> is <c>null</c></exception>
-        Task<TResult> SingleAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate);
+        Task<TResult> SingleAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets the single <see cref="TEntry"/> of the repository.
@@ -267,7 +276,7 @@ namespace MedEasy.DAL.Repositories
         /// </summary>
         /// <returns><c>null</c> if there no entry in the repository</returns>
         /// <exception cref="InvalidOperationException">if more than one entry matches <paramref name="predicate"/>.</exception>
-        Task<TEntry> SingleOrDefaultAsync();
+        Task<TEntry> SingleOrDefaultAsync(CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets the single <see cref="TEntry"/> of the repository.
@@ -276,7 +285,7 @@ namespace MedEasy.DAL.Repositories
         /// <param name="includedProperties">Properties to eagerly fetch and load</param>
         /// <returns><c>null</c> if there no entry in the repository</returns>
         /// <exception cref="InvalidOperationException">if more than one entry matches <paramref name="predicate"/>.</exception>
-        Task<TEntry> SingleOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties);
+        Task<TEntry> SingleOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default(CancellationToken));
 
 
 
@@ -287,7 +296,7 @@ namespace MedEasy.DAL.Repositories
         /// <param name="predicate">Predicate which should gets one result at most</param>
         /// <returns>the corresponding entry or <code>null</code> if no entry found</returns>
         /// <exception cref="InvalidOperationException">if more than one entry matches <paramref name="predicate"/>.</exception>
-        Task<TEntry> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate);
+        Task<TEntry> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets the single <see cref="TEntry"/> element of the repository that fullfill the 
@@ -298,7 +307,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns>the corresponding entry or <code>null</code> if no entry found</returns>
         /// <exception cref="InvalidOperationException">if more than one entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if either <paramref name="predicate"/> or <paramref name="includedProperties"/> is <c>null</c></exception>
-        Task<TEntry> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties);
+        Task<TEntry> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default(CancellationToken));
 
 
         /// <summary>
@@ -313,7 +322,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns>The entry that matches <paramref name="predicate"/> or <c>null</c> if no matches found</returns>
         /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/> is <c>null</c></exception>
-        Task<TResult> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate);
+        Task<TResult> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets the one and only entry that match <paramref name="predicate"/>.
@@ -327,7 +336,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns>The entry that matches <paramref name="predicate"/> or <c>null</c> if no matches found</returns>
         /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/> is <c>null</c></exception>
-        Task<TResult> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate);
+        Task<TResult> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
 
         /// <summary>
@@ -335,13 +344,13 @@ namespace MedEasy.DAL.Repositories
         /// </summary>
         /// <returns>The first entry of the repository</returns>
         /// <exception cref="InvalidOperationException">if no entry found.</exception>
-        Task<TEntry> FirstAsync();
+        Task<TEntry> FirstAsync(CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets the first entry of the repository
         /// </summary>
         /// <returns>The first entry or <c>null</c> if there's no entry.</returns>
-        Task<TEntry> FirstOrDefaultAsync();
+        Task<TEntry> FirstOrDefaultAsync(CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets the first entry of the repository that fullfill the specified <paramref name="predicate"/>
@@ -350,7 +359,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns>The first entry that mat</returns>
         /// <exception cref="InvalidOperationException">if no entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <c>null</c></exception>
-        Task<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate);
+        Task<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
 
         /// <summary>
@@ -360,7 +369,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns>The first entry that mat</returns>
         /// <exception cref="InvalidOperationException">if no entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <c>null</c></exception>
-        Task<TEntry> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate);
+        Task<TEntry> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
         void Delete(Expression<Func<TEntry, bool>> predicate);
 
@@ -372,7 +381,7 @@ namespace MedEasy.DAL.Repositories
         /// <param name="predicate">Filter to match</param>
         /// <returns>The entry that matches <paramref name="predicate"/>.</returns>
         /// <exception cref="InvalidOperationException">if the repository is empty or no entry matches <paramref name="predicate"/></exception>
-        Task<TResult> FirstAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate);
+        Task<TResult> FirstAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
 
         /// <summary>
@@ -382,7 +391,7 @@ namespace MedEasy.DAL.Repositories
         /// <param name="selector">Projection to apply to the entry found</param>
         /// <param name="predicate">Filter to match</param>
         /// <returns>The entry that matches <paramref name="predicate"/> or <c>null</c> if no entry found.</returns>
-        Task<TResult> FirstOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate);
+        Task<TResult> FirstOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Creates the specified entry
@@ -403,7 +412,7 @@ namespace MedEasy.DAL.Repositories
         /// Checks if all entries of the repository matches the specified <paramref name="predicate"/>
         /// </summary>
         /// <returns><c>true</c> if all entries matches <param name="predicate" /> and <c>false</c> otherwise.</returns>
-        Task<bool> AllAsync(Expression<Func<TEntry, bool>> predicate);
+        Task<bool> AllAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
 
 
         /// <summary>
@@ -414,6 +423,6 @@ namespace MedEasy.DAL.Repositories
         /// <param name="predicate">predicate to evaluate all the entries against</param>
         /// <param name="selector">projection before testing the <paramref name="predicate"/></param>
         /// <returns><c>true</c> if all entries statifies the <param name="predicate" /> and <c>false</c> otherwise</returns>
-        Task<bool> AllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate);
+        Task<bool> AllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

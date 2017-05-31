@@ -11,15 +11,9 @@ namespace MedEasy.DAL.Interfaces
         /// <summary>
         /// Asynchronously saves changes made to the context
         /// </summary>
-        /// <returns>Task</returns>
-        Task<int> SaveChangesAsync();
-
-        /// <summary>
-        /// Asynchronously saves changes
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        Task<int> SaveChangesAsync(CancellationToken token);
+        /// <param name="cancellationToken"></param>
+        /// <returns>the number of elements modified</returns>
+       Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Retrieves the repository
