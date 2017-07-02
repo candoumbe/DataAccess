@@ -13,7 +13,7 @@ namespace MedEasy.DAL.Repositories
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns>The number of changes successfully commited</returns>
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
+        ValueTask<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
         
     }
 }

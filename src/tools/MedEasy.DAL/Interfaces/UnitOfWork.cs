@@ -61,9 +61,9 @@ namespace MedEasy.DAL.Interfaces
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns>The number of objects in an Added, Modified, or Deleted state</returns>
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken)) 
-            => await _context
-                .SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        public async ValueTask<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken)) 
+            => await _context.SaveChangesAsync(cancellationToken)
+            .ConfigureAwait(false);
 
         
         public void Dispose()
