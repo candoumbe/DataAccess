@@ -11,9 +11,13 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <LangVersion>latest</LangVersion>
+    <Description>Couche d'accès aux données MedEasy.</Description>
+    <RepositoryType>Github</RepositoryType>
+    <PackageTags>DAL, EF, Entity</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MedEasy.Data\MedEasy.Data.csproj" />
     <ProjectReference Include="..\MedEasy.Tools\MedEasy.Tools.csproj" />
   </ItemGroup>
 

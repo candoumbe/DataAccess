@@ -23,7 +23,7 @@ namespace MedEasy.DAL.Tests
         public void CtorWithNullEntriesShouldThrowArgumentNullException()
         {
             //Act
-            Action action = () => new PagedResult<object>(null, 0, 0);
+            Action action = () => new Page<object>(null, 0, 0);
 
             //Assert
             ArgumentNullException exception = action.ShouldThrow<ArgumentNullException>().Which;
@@ -34,7 +34,7 @@ namespace MedEasy.DAL.Tests
         public void Default()
         {
             //Act
-            IPagedResult<object> pagedResult = PagedResult<object>.Default;
+            IPagedResult<object> pagedResult = Page<object>.Default;
 
             //Assert
             pagedResult.Should().NotBeNull();
@@ -53,7 +53,7 @@ namespace MedEasy.DAL.Tests
         {
             _outputTestHelper.WriteLine($"Page size : {pageSize}");
 
-            Action action = () => new PagedResult<object>(Enumerable.Empty<object>(), 0, pageSize);
+            Action action = () => new Page<object>(Enumerable.Empty<object>(), 0, pageSize);
             
             action.ShouldThrow<ArgumentOutOfRangeException>().Which
                 .ParamName.Should()
@@ -68,7 +68,7 @@ namespace MedEasy.DAL.Tests
             _outputTestHelper.WriteLine($"{nameof(IPagedResult<object>.Total)} : {total}");
 
             //Act
-            Action action = () => new PagedResult<object>(Enumerable.Empty<object>(), total, 1);
+            Action action = () => new Page<object>(Enumerable.Empty<object>(), total, 1);
 
             // Assert
             action.ShouldThrow<ArgumentOutOfRangeException>().Which
@@ -85,7 +85,7 @@ namespace MedEasy.DAL.Tests
         public void CheckPageCount(int total, int pageSize, int expectedPageCount)
         {
             //Act
-            IPagedResult<object> pagedResult = new PagedResult<object>(Enumerable.Empty<object>(), total, pageSize);
+            IPagedResult<object> pagedResult = new Page<object>(Enumerable.Empty<object>(), total, pageSize);
 
             //Assert
             pagedResult.PageCount.Should().Be(expectedPageCount);

@@ -51,7 +51,7 @@ namespace MedEasy.DAL.Repositories
                 .ToArrayAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            IPagedResult<TResult> pageResult = new PagedResult<TResult>(results, await Entries.CountAsync(cancellationToken).ConfigureAwait(false), pageSize);
+            IPagedResult<TResult> pageResult = new Page<TResult>(results, await Entries.CountAsync(cancellationToken).ConfigureAwait(false), pageSize);
 
             return pageResult;
         }
@@ -157,13 +157,13 @@ namespace MedEasy.DAL.Repositories
 
             if (cancellationToken.IsCancellationRequested)
             {
-                pagedResult = PagedResult<TEntry>.Default;
+                pagedResult = Page<TEntry>.Default;
             }
             else
             {
                 IEnumerable<TEntry> result = await query.ToListAsync(cancellationToken);
                 int total = await CountAsync(predicate, cancellationToken);
-                pagedResult = new PagedResult<TEntry>(result, total, pageSize);
+                pagedResult = new Page<TEntry>(result, total, pageSize);
 
             }
 
@@ -193,7 +193,7 @@ namespace MedEasy.DAL.Repositories
             //we compute both ValueTask
             IEnumerable<TResult> result = await query.ToListAsync();
             int total = await CountAsync(predicate);
-            IPagedResult<TResult> pagedResult = new PagedResult<TResult>(result, total, pageSize);
+            IPagedResult<TResult> pagedResult = new Page<TResult>(result, total, pageSize);
 
             return pagedResult;
         }
@@ -224,12 +224,12 @@ namespace MedEasy.DAL.Repositories
             {
                 IEnumerable<TResult> result = await query.ToListAsync();
                 int total = await Entries.Select(selector).CountAsync(predicate);
-                pagedResult = new PagedResult<TResult>(result, total, pageSize);
+                pagedResult = new Page<TResult>(result, total, pageSize);
 
             }
             else
             {
-                pagedResult = PagedResult<TResult>.Default;
+                pagedResult = Page<TResult>.Default;
             }
 
             return pagedResult;

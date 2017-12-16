@@ -25,24 +25,15 @@ namespace System.Linq
                 switch (orderClause.Direction)
                 {
                     case SortDirection.Ascending:
-                        if (previousClause != null)
-                        {
-                            entries = Queryable.ThenBy(entries, (dynamic)orderClause.Expression);
-                        }
-                        else
-                        {
-                            entries = Queryable.OrderBy(entries, (dynamic)orderClause.Expression);
-                        }
+                        entries = previousClause != null
+                            ? Queryable.ThenBy(entries, (dynamic)orderClause.Expression)
+                            : Queryable.OrderBy(entries, (dynamic)orderClause.Expression);
+
                         break;
                     case SortDirection.Descending:
-                        if (previousClause != null)
-                        {
-                            entries = Queryable.ThenByDescending(entries, (dynamic)orderClause.Expression);
-                        }
-                        else
-                        {
-                            entries = Queryable.OrderByDescending(entries, (dynamic)orderClause.Expression);
-                        }
+                        entries = previousClause != null
+                            ? Queryable.ThenByDescending(entries, (dynamic)orderClause.Expression) 
+                            : Queryable.OrderByDescending(entries, (dynamic)orderClause.Expression);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
