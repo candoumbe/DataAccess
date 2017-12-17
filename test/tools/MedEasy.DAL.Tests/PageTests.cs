@@ -9,11 +9,11 @@ using Xunit.Abstractions;
 
 namespace MedEasy.DAL.Tests
 {
-    public class PagedResultTests
+    public class PageTests
     {
         private ITestOutputHelper _outputTestHelper;
 
-        public PagedResultTests(ITestOutputHelper outputHelper)
+        public PageTests(ITestOutputHelper outputHelper)
         {
             _outputTestHelper = outputHelper;
         }
@@ -23,7 +23,9 @@ namespace MedEasy.DAL.Tests
         public void CtorWithNullEntriesShouldThrowArgumentNullException()
         {
             //Act
+#pragma warning disable IDE0039 // Utiliser une fonction locale
             Action action = () => new Page<object>(null, 0, 0);
+#pragma warning restore IDE0039 // Utiliser une fonction locale
 
             //Assert
             ArgumentNullException exception = action.ShouldThrow<ArgumentNullException>().Which;
@@ -34,12 +36,12 @@ namespace MedEasy.DAL.Tests
         public void Default()
         {
             //Act
-            IPagedResult<object> pagedResult = Page<object>.Default;
+            Page<object> pagedResult = Page<object>.Default;
 
             //Assert
             pagedResult.Should().NotBeNull();
-            pagedResult.PageSize.Should().Be(0);
-            pagedResult.PageCount.Should().Be(0);
+            pagedResult.Size.Should().Be(0);
+            pagedResult.Count.Should().Be(0);
             pagedResult.Total.Should().Be(0);
             pagedResult.Entries.Should().BeEmpty();
 
@@ -53,11 +55,13 @@ namespace MedEasy.DAL.Tests
         {
             _outputTestHelper.WriteLine($"Page size : {pageSize}");
 
+#pragma warning disable IDE0039 // Utiliser une fonction locale
             Action action = () => new Page<object>(Enumerable.Empty<object>(), 0, pageSize);
-            
+#pragma warning restore IDE0039 // Utiliser une fonction locale
+
             action.ShouldThrow<ArgumentOutOfRangeException>().Which
                 .ParamName.Should()
-                    .BeEquivalentTo($"{nameof(IPagedResult<object>.PageSize)}");
+                    .BeEquivalentTo($"{nameof(Page<object>.Size)}");
         }
 
         [Theory]
@@ -65,15 +69,17 @@ namespace MedEasy.DAL.Tests
         [InlineData(int.MinValue)]
         public void CtorWithNegativeTotalShouldThrowArgumentOutOfRangeException(int total)
         {
-            _outputTestHelper.WriteLine($"{nameof(IPagedResult<object>.Total)} : {total}");
+            _outputTestHelper.WriteLine($"{nameof(Page<object>.Total)} : {total}");
 
             //Act
+#pragma warning disable IDE0039 // Utiliser une fonction locale
             Action action = () => new Page<object>(Enumerable.Empty<object>(), total, 1);
+#pragma warning restore IDE0039 // Utiliser une fonction locale
 
             // Assert
             action.ShouldThrow<ArgumentOutOfRangeException>().Which
                 .ParamName.Should()
-                    .BeEquivalentTo($"{nameof(IPagedResult<object>.Total)}");
+                    .BeEquivalentTo($"{nameof(Page<object>.Total)}");
         }
 
         [Theory]
@@ -85,10 +91,10 @@ namespace MedEasy.DAL.Tests
         public void CheckPageCount(int total, int pageSize, int expectedPageCount)
         {
             //Act
-            IPagedResult<object> pagedResult = new Page<object>(Enumerable.Empty<object>(), total, pageSize);
+            Page<object> page = new Page<object>(Enumerable.Empty<object>(), total, pageSize);
 
             //Assert
-            pagedResult.PageCount.Should().Be(expectedPageCount);
+            page.Count.Should().Be(expectedPageCount);
         }
     }
 }

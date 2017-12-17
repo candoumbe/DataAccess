@@ -8,7 +8,7 @@ namespace MedEasy.DAL.Repositories
     /// Helper to encapsulates a page of results.
     /// </summary>
     /// <typeparam name="T">Type of elements the page will contains.</typeparam>
-    public sealed class Page<T> : IPagedResult<T>
+    public sealed class Page<T> 
     {
         /// <summary>
         /// Items of the current page
@@ -16,50 +16,49 @@ namespace MedEasy.DAL.Repositories
         public IEnumerable<T> Entries { get; }
 
         /// <summary>
-        /// 
+        /// Number of items the result that the current <see cref="Page{T}"/>
         /// </summary>
         public int Total { get; }
 
         /// <summary>
-        /// Number of pages
+        /// Number of pages the result that produces the current <see cref="Page{T}"/> contains.
         /// </summary>
-        public int PageCount { get; }
+        public int Count { get; }
 
         
         /// <summary>
-        /// Number of items per page
+        /// Number of items per <see cref="Page{T}"/>
         /// </summary>
-        public int PageSize { get; }
+        public int Size { get; }
 
         /// <summary>
         /// Builds a new <see cref="Page{T}"/> instances
         /// </summary>
         /// <param name="entries">Items of the current page</param>
         /// <param name="total">Number of items</param>
-        /// <param name="pageSize">Number of items per page.</param>
-        /// <exception cref="ArgumentOutOfRangeException">if either<paramref name="total"/> or <paramref name="pageSize"/> are negative</exception>
+        /// <param name="size">Number of items per page.</param>
+        /// <exception cref="ArgumentOutOfRangeException">if either<paramref name="total"/> or <paramref name="size"/> are negative</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="entries"/> is <c>null</c></exception>
-        public Page(IEnumerable<T> entries, int total, int pageSize)
+        public Page(IEnumerable<T> entries, int total, int size)
         {
             if (total < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(total));
             }
 
-            if (pageSize < 0)
+            if (size < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(pageSize));
+                throw new ArgumentOutOfRangeException(nameof(size));
             }
 
             Entries = entries ?? throw new ArgumentNullException(nameof(entries));
             Total = total;
-            PageSize = pageSize;
-            PageCount = PageSize >= 1 
-                ? (int) Math.Ceiling(Total / (decimal)pageSize) 
+            Size = size;
+            Count = Size >= 1 
+                ? (int) Math.Ceiling(Total / (decimal)size) 
                 : 0;
         }
 
-        private static object Lock => new object();
         /// <summary>
         /// Lazy initialization of the Default value
         /// </summary>

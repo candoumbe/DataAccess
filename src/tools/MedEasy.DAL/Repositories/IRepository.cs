@@ -23,8 +23,8 @@ namespace MedEasy.DAL.Repositories
         /// <param name="orderBy">The order by.</param>
         /// <param name="pageSize">Size of the page.</param>
         /// <param name="page">Index of the page.</param>
-        /// <returns><see cref="IPagedResult{T}"/> which holds the result</returns>
-        ValueTask<IPagedResult<TResult>> ReadPageAsync<TResult>(
+        /// <returns><see cref="Page{T}"/> which holds the result</returns>
+        ValueTask<Page<TResult>> ReadPageAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector, 
             int pageSize, 
             int page, 
@@ -119,21 +119,21 @@ namespace MedEasy.DAL.Repositories
         //ValueTask<IEnumerable<TResult>> WhereAsync<TResult, TKey>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, Expression<Func<TResult, TKey>> keySelector, IEnumerable<OrderClause<TResult>> orderBy = null);
 
         /// <summary>
-        /// gets a <see cref="IPagedResult{T}"/>.
+        /// gets a <see cref="Page{T}"/>.
         /// </summary>
         /// <param name="predicate">predicate to apply</param>
         /// <param name="orderBy">order to apply to the result</param>
         /// <param name="pageSize">number of items one page can contain at most</param>
         /// <param name="page">the page of result to get (1 for the page, 2 for the second, ...)</param>
-        /// <returns><see cref="IPagedResult{T}"/> which holds the </returns>
-        ValueTask<IPagedResult<TEntry>> WhereAsync(
+        /// <returns><see cref="Page{T}"/> which holds the </returns>
+        ValueTask<Page<TEntry>> WhereAsync(
             Expression<Func<TEntry, bool>> predicate,  
             IEnumerable<OrderClause<TEntry>> orderBy, 
             int pageSize, 
             int page, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// gets a <see cref="IPagedResult{T}"/> of entries that satisfied the <paramref name="predicate"/>
+        /// gets a <see cref="Page{T}"/> of entries that satisfied the <paramref name="predicate"/>
         /// </summary>
         /// <remarks>
         /// The <paramref name="predicate"/> is apply <strong>BEFORE</strong> <paramref name="selector"/> is applied.
@@ -146,7 +146,7 @@ namespace MedEasy.DAL.Repositories
         /// <param name="pageSize">number of items a page can holds at most</param>
         /// <param name="page">the page of result to get.</param>
         /// <returns></returns>
-        ValueTask<IPagedResult<TResult>> WhereAsync<TResult>(
+        ValueTask<Page<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector, 
             Expression<Func<TEntry, bool>> predicate, 
             IEnumerable<OrderClause<TResult>> orderBy, 
@@ -154,7 +154,7 @@ namespace MedEasy.DAL.Repositories
             int page, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// gets a <see cref="IPagedResult{T}"/> of entries that satisfied the <paramref name="predicate"/>
+        /// gets a <see cref="Page{T}"/> of entries that satisfied the <paramref name="predicate"/>
         /// </summary>
         /// <remarks>
         /// The <paramref name="predicate"/> is apply <strong>AFTER</strong> <paramref name="selector"/> is applied.
@@ -167,7 +167,7 @@ namespace MedEasy.DAL.Repositories
         /// <param name="pageSize">number of items a page can holds at most</param>
         /// <param name="page">the page of result to get.</param>
         /// <returns></returns>
-        ValueTask<IPagedResult<TResult>> WhereAsync<TResult>(
+        ValueTask<Page<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector, 
             Expression<Func<TResult, bool>> predicate, 
             IEnumerable<OrderClause<TResult>> orderBy, int pageSize, int page, CancellationToken cancellationToken = default);
