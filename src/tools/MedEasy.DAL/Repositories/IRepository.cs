@@ -115,7 +115,25 @@ namespace MedEasy.DAL.Repositories
             Expression<Func<TEntry, bool>> predicate, 
             IEnumerable<OrderClause<TResult>> orderBy = null, 
             IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken cancellationToken = default);
-        
+
+        /// <summary>
+        /// Gets results that satisfied the <paramref name="predicate"/>
+        /// </summary>
+        /// <remarks>
+        /// The <paramref name="orderBy"/> is applied <strong>AFTER</strong> the <paramref name="selector"/> and <paramref name="predicate"/>.
+        /// </remarks>
+        /// <typeparam name="TResult">Type of result's items</typeparam>
+        /// <param name="selector">Expression to convert from <see cref="TEntry"/> to <typeparamref name="TResult"/></param>
+        /// <param name="predicate">Filter to match AFTER <paramref name="selector"/> has been applied.</param>
+        /// <param name="orderBy">Collection of <see cref="OrderClause{T}"/> to apply to the collection of <typeparamref name="TResult"/>.</param>
+        /// <param name="includedProperties">Collection of <see cref="IncludeClause{T}"/> that describes properties to eagerly fetch for each item in the result</param>
+        /// <returns></returns>
+        ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(
+           Expression<Func<TEntry, TResult>> selector,
+           Expression<Func<TResult, bool>> predicate,
+           IEnumerable<OrderClause<TResult>> orderBy = null,
+           CancellationToken cancellationToken = default);
+
         //ValueTask<IEnumerable<TResult>> WhereAsync<TResult, TKey>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, Expression<Func<TResult, TKey>> keySelector, IEnumerable<OrderClause<TResult>> orderBy = null);
 
         /// <summary>
