@@ -28,7 +28,7 @@ namespace MedEasy.DAL.Tests
 #pragma warning restore IDE0039 // Utiliser une fonction locale
 
             //Assert
-            ArgumentNullException exception = action.ShouldThrow<ArgumentNullException>().Which;
+            ArgumentNullException exception = action.Should().Throw<ArgumentNullException>().Which;
             exception.ParamName.Should().NotBeNullOrWhiteSpace();
         }
 
@@ -59,7 +59,7 @@ namespace MedEasy.DAL.Tests
             Action action = () => new Page<object>(Enumerable.Empty<object>(), 0, pageSize);
 #pragma warning restore IDE0039 // Utiliser une fonction locale
 
-            action.ShouldThrow<ArgumentOutOfRangeException>().Which
+            action.Should().Throw<ArgumentOutOfRangeException>().Which
                 .ParamName.Should()
                     .BeEquivalentTo($"{nameof(Page<object>.Size)}");
         }
@@ -77,7 +77,7 @@ namespace MedEasy.DAL.Tests
 #pragma warning restore IDE0039 // Utiliser une fonction locale
 
             // Assert
-            action.ShouldThrow<ArgumentOutOfRangeException>().Which
+            action.Should().Throw<ArgumentOutOfRangeException>().Which
                 .ParamName.Should()
                     .BeEquivalentTo($"{nameof(Page<object>.Total)}");
         }
