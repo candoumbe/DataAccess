@@ -21,7 +21,7 @@ namespace MedEasy.DAL.Context
         /// <summary>
         /// Builds a new <see cref="EFUnitOfWorkFactory"/> instance
         /// </summary>
-        /// <param name="options">options that will be used by the <see cref="EFUnitOfWork"/> returned by calling <see cref="New"/></param>
+        /// <param name="options">options that will be used by the <see cref="EFUnitOfWork"/> returned by calling <see cref="NewUnitOfWork"/></param>
         public EFUnitOfWorkFactory(DbContextOptions<TContext> options, Func<DbContextOptions<TContext>, TContext> contextGenerator)
         {
             Options = options;
@@ -36,6 +36,6 @@ namespace MedEasy.DAL.Context
         /// that can safely be used in multithreaded fashion.
         /// </remarks>
         /// <returns><see cref="EFUnitOfWork"/> instance</returns>
-        public override IUnitOfWork New() => new EFUnitOfWork<TContext>(ContextGenerator(Options));
+        public override IUnitOfWork NewUnitOfWork() => new EFUnitOfWork<TContext>(ContextGenerator(Options));
     }
 }

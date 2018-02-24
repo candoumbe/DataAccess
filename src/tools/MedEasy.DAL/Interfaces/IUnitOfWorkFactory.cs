@@ -6,6 +6,6 @@ namespace MedEasy.DAL.Interfaces
         /// Creates a new UnitOfWork
         /// </summary>
         /// <returns></returns>
-        IUnitOfWork New();
+        IUnitOfWork NewUnitOfWork();
     }
 }
