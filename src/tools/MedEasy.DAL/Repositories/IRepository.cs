@@ -23,29 +23,30 @@ namespace MedEasy.DAL.Repositories
         /// <param name="orderBy">The order by.</param>
         /// <param name="pageSize">Size of the page.</param>
         /// <param name="page">Index of the page.</param>
+        /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
         ValueTask<Page<TResult>> ReadPageAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector, 
             int pageSize, 
             int page, 
             IEnumerable<OrderClause<TResult>> orderBy = null, 
-            CancellationToken cancellationToken = default);
+            CancellationToken ct = default);
         
         /// <summary>
         /// Gets all entries of the repository
         /// </summary>
-        /// <param name="cancellationToken">Token permettant d'annuler l'exécution de la requête</param>
+        /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        ValueTask<IEnumerable<TEntry>> ReadAllAsync(CancellationToken cancellationToken = default);
+        ValueTask<IEnumerable<TEntry>> ReadAllAsync(CancellationToken ct = default);
         
         /// <summary>
         /// Gets all entries of the repository after applying <paramref name="selector"/>
         /// </summary>
         /// <typeparam name="TResult">Type of the result</typeparam>
         /// <param name="selector">projection to apply before retrieving the result.</param>
-        /// <param name="cancellationToken">Token to stop query from running</param>
+        /// <param name="ct">Token to stop query from running</param>
         /// <returns></returns>
-        ValueTask<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default);
+        ValueTask<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken ct = default);
 
         //IEnumerable<GroupedResult<TKey, TEntry>>  GroupBy<TKey>(Expression<Func<TEntry, TKey>> keySelector);
 
@@ -59,9 +60,9 @@ namespace MedEasy.DAL.Repositories
         /// Gets entries of the repository that satisfied the specified <paramref name="predicate"/>
         /// </summary>
         /// <param name="predicate">Filter the entries to retrieve</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="ct"></param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        ValueTask<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        ValueTask<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
 
         /// <summary>
         /// Gets entries of the repository that satisfied the specified <paramref name="predicate"/>
@@ -69,8 +70,9 @@ namespace MedEasy.DAL.Repositories
         /// <typeparam name="TResult"></typeparam>
         /// <param name="selector"></param>
         /// <param name="predicate"></param>
+        /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves entries grouped using the <see cref="keySelector"/>
@@ -79,11 +81,12 @@ namespace MedEasy.DAL.Repositories
         /// <typeparam name="TResult">Type of the group result</typeparam>
         /// <param name="keySelector">Selector which defines how results should be grouped</param>
         /// <param name="predicate">Predicate that will be used to filter groups</param>
+        /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
         ValueTask<IEnumerable<TResult>> WhereAsync<TKey, TResult>(
             Expression<Func<TEntry, bool>> predicate, 
             Expression<Func<TEntry, TKey>> keySelector, 
-            Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupSelector, CancellationToken cancellationToken = default);
+            Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupSelector, CancellationToken ct = default);
 
 
         /// <summary>
@@ -92,12 +95,13 @@ namespace MedEasy.DAL.Repositories
         /// <param name="predicate">predicate to apply</param>
         /// <param name="orderBy">order to apply to the result</param>
         /// <param name="includedProperties">Properties to include in each object</param>
+        /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="IEnumerable{T}"/> which holds the resu;t</returns>
         ValueTask<IEnumerable<TEntry>> WhereAsync(
             Expression<Func<TEntry, bool>> predicate, 
             IEnumerable<OrderClause<TEntry>> orderBy = null, 
-            IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken cancellationToken = default);
-        
+            IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken ct = default);
+
         /// <summary>
         /// Gets results that satisfied the <paramref name="predicate"/>
         /// </summary>
@@ -109,12 +113,13 @@ namespace MedEasy.DAL.Repositories
         /// <param name="predicate">Filter to match</param>
         /// <param name="orderBy">Collection of <see cref="OrderClause{T}"/> to apply.</param>
         /// <param name="includedProperties">Collection of <see cref="IncludeClause{T}"/> that describes properties to eagerly fetch for each item in the result</param>
-        /// <returns></returns>
+        /// <param name="ct">Notifies to cancel the execution of the request</param>
+        /// <returns>Collection of <typeparamref name="TResult"/> </returns>
         ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector, 
             Expression<Func<TEntry, bool>> predicate, 
             IEnumerable<OrderClause<TResult>> orderBy = null, 
-            IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken cancellationToken = default);
+            IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken ct = default);
 
         /// <summary>
         /// Gets results that satisfied the <paramref name="predicate"/>
