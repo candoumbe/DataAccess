@@ -39,7 +39,7 @@ namespace MedEasy.DAL.Tests
             //Assert
             pagedResult.Should().NotBeNull();
             pagedResult.Size.Should().Be(0);
-            pagedResult.Count.Should().Be(0);
+            pagedResult.Count.Should().Be(1);
             pagedResult.Total.Should().Be(0);
             pagedResult.Entries.Should().BeEmpty();
 
@@ -81,18 +81,19 @@ namespace MedEasy.DAL.Tests
         }
 
         [Theory]
-        [InlineData(0, 0, 0)]
-        [InlineData(1, 30, 1)]
-        [InlineData(10, 5, 2)]
-        [InlineData(12, 5, 3)]
-        [InlineData(400, 30, 14)]
-        public void CheckPageCount(int total, int pageSize, int expectedPageCount)
+        [InlineData(0, 0, 1, "page size is set to 0 and number of element is also 0")]
+        [InlineData(1, 30, 1, "page size is set to 30 and number of element is 1")]
+        [InlineData(10, 5, 2, "page size is set to 5 and number of element is 10")]
+        [InlineData(12, 5, 3, "page size is set to 5 and number of element 12")]
+        [InlineData(400, 30, 14, "page size is set to 30 and number of element is 400")]
+        [InlineData(0, 30, 1, "page size is set to 0 and number of element is 0")]
+        public void CheckPageCount(int total, int pageSize, int expectedPageCount, string reason)
         {
             //Act
             Page<object> page = new Page<object>(Enumerable.Empty<object>(), total, pageSize);
 
             //Assert
-            page.Count.Should().Be(expectedPageCount);
+            page.Count.Should().Be(expectedPageCount, reason);
         }
     }
 }

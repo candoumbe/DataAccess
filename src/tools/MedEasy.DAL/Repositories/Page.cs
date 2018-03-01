@@ -54,9 +54,21 @@ namespace MedEasy.DAL.Repositories
             Entries = entries ?? throw new ArgumentNullException(nameof(entries));
             Total = total;
             Size = size;
-            Count = Size >= 1 
-                ? (int) Math.Ceiling(Total / (decimal)size) 
-                : 0;
+            if (Size >= 1)
+            {
+                if (Total > 0)
+                {
+                    Count = (int)Math.Ceiling(Total / (decimal)Size);
+                }
+                else
+                {
+                    Count = 1;
+                }
+            }
+            else
+            {
+                Count = 1;
+            }
         }
 
         /// <summary>
