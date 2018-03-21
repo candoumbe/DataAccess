@@ -16,12 +16,12 @@ namespace MedEasy.DAL.Repositories
         public IEnumerable<T> Entries { get; }
 
         /// <summary>
-        /// Number of items the result that the current <see cref="Page{T}"/>
+        /// Number of items the result that the current <see cref="Page{T}"/> contains
         /// </summary>
         public int Total { get; }
 
         /// <summary>
-        /// Number of pages the result that produces the current <see cref="Page{T}"/> contains.
+        /// Number of pages of result the current <see cref="Page{T}"/> is a part of.
         /// </summary>
         public int Count { get; }
 
