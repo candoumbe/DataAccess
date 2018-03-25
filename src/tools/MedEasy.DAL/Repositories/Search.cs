@@ -21,9 +21,6 @@ namespace MedEasy.DAL.Repositories
         public IEnumerable<OrderClause<T>> Sorts { get; set; }
 
 
-        public Search()
-        {
-            Sorts = Enumerable.Empty<OrderClause<T>>();
-        }
+        public Search() => Sorts = Enumerable.Empty<OrderClause<T>>();
     }
 }

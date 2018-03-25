@@ -4,9 +4,12 @@ using System;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Categories;
 
 namespace MedEasy.DAL.Tests
 {
+    [Feature("DAL")]
+    [UnitTest]
     public class PageTests
     {
         private ITestOutputHelper _outputTestHelper;
