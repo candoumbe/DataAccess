@@ -1,7 +1,7 @@
 ﻿
 using MedEasy.DAL.Interfaces;
 
-namespace MedEasy.DAL.Context
+namespace MedEasy.DAL.EFStore
 {
     /// <summary>
     /// Unit of work implementation that relies on Entity Framework.

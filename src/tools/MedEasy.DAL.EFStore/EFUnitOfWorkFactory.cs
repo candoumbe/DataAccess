@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace MedEasy.DAL.Context
+namespace MedEasy.DAL.EFStore
 {
     /// <summary>
     /// Defines a unit of work factory wrapper around Entity Framework
