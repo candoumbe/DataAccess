@@ -1,6 +1,7 @@
 ﻿using MedEasy.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Threading.Tasks;
 
 namespace MedEasy.DAL.EFStore
 {
@@ -22,11 +23,13 @@ namespace MedEasy.DAL.EFStore
         /// Builds a new <see cref="EFUnitOfWorkFactory"/> instance
         /// </summary>
         /// <param name="options">options that will be used by the <see cref="EFUnitOfWork"/> returned by calling <see cref="NewUnitOfWork"/></param>
+        /// <param name="contextGenerator"></param>
         public EFUnitOfWorkFactory(DbContextOptions<TContext> options, Func<DbContextOptions<TContext>, TContext> contextGenerator)
         {
             Options = options;
             ContextGenerator = contextGenerator ?? throw new ArgumentNullException(nameof(contextGenerator));
         }
+
 
         /// <summary>
         /// Creates new <see cref="EFUnitOfWork"/> instances.

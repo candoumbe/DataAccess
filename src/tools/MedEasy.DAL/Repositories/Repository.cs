@@ -30,8 +30,6 @@ namespace MedEasy.DAL.Repositories
 
 
 
-        public virtual async ValueTask<Page<TEntry>> ReadPageAsync(IEnumerable<OrderClause<TEntry>> orderBy, int pageSize, int page, CancellationToken cancellationToken = default) => await ReadPageAsync(item => item, pageSize, page, orderBy, cancellationToken)
-                .ConfigureAwait(false);
 
         public virtual async ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector, int pageSize, int page, IEnumerable<OrderClause<TResult>> orderBy, CancellationToken cancellationToken = default)
         {
@@ -45,6 +43,27 @@ namespace MedEasy.DAL.Repositories
             IEnumerable<TResult> results = await resultQuery
                 .Skip(page < 1 ? 0 : (page - 1) * pageSize)
                 .Take(pageSize)
+                .ToArrayAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            Page<TResult> pageResult = new Page<TResult>(results, await Entries.CountAsync(cancellationToken).ConfigureAwait(false), pageSize);
+
+            return pageResult;
+        }
+
+        public virtual async ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector, int pageSize, int page, IEnumerable<OrderClause<TEntry>> orderBy, CancellationToken cancellationToken = default)
+        {
+            IQueryable<TEntry> resultQuery = Entries
+                .Skip(page < 1 ? 0 : (page - 1) * pageSize)
+                .Take(pageSize);
+
+            if (orderBy != default)
+            {
+                resultQuery = resultQuery.OrderBy(orderBy);
+            }
+                
+            IEnumerable<TResult> results =    await resultQuery
+                .Select(selector)
                 .ToArrayAsync(cancellationToken)
                 .ConfigureAwait(false);
 

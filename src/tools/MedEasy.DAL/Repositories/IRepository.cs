@@ -20,7 +20,7 @@ namespace MedEasy.DAL.Repositories
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="selector">The selector.</param>
-        /// <param name="orderBy">The order by.</param>
+        /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
         /// <param name="pageSize">Size of the page.</param>
         /// <param name="page">Index of the page.</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
@@ -31,7 +31,30 @@ namespace MedEasy.DAL.Repositories
             int page, 
             IEnumerable<OrderClause<TResult>> orderBy = null, 
             CancellationToken ct = default);
-        
+
+        /// <summary>
+        /// <para>
+        ///     Reads all entries from the repository.
+        /// </para>
+        /// <para>
+        ///     
+        /// </para>
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="selector">The selector.</param>
+        /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
+        /// <param name="pageSize">Size of the page.</param>
+        /// <param name="page">Index of the page.</param>
+        /// <param name="ct">Notifies to cancel the execution of the request</param>
+        /// <returns><see cref="Page{T}"/> which holds the result</returns>
+        ValueTask<Page<TResult>> ReadPageAsync<TResult>(
+            Expression<Func<TEntry, TResult>> selector,
+            int pageSize,
+            int page,
+            IEnumerable<OrderClause<TEntry>> orderBy = null,
+            CancellationToken ct = default);
+
+
         /// <summary>
         /// Gets all entries of the repository
         /// </summary>
