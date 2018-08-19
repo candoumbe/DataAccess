@@ -425,6 +425,11 @@ namespace MedEasy.DAL.Repositories
         void Delete(Expression<Func<TEntry, bool>> predicate);
 
         /// <summary>
+        /// Delete all entries of the underlying datastore
+        /// </summary>
+        void Clear();
+
+        /// <summary>
         /// Gets the first entry that matches <paramref name="predicate"/>
         /// </summary>
         /// <typeparam name="TResult">Type of the result</typeparam>

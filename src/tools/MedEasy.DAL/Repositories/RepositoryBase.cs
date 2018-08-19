@@ -15,7 +15,8 @@ namespace MedEasy.DAL.Repositories
         protected RepositoryBase(IDbContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
-        } 
+        }
+        
     }
 
     

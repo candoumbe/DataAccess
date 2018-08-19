@@ -32,7 +32,7 @@ namespace System.Linq
                         break;
                     case SortDirection.Descending:
                         entries = previousClause != null
-                            ? Queryable.ThenByDescending(entries, (dynamic)orderClause.Expression) 
+                            ? Queryable.ThenByDescending(entries, (dynamic)orderClause.Expression)
                             : Queryable.OrderByDescending(entries, (dynamic)orderClause.Expression);
                         break;
                     default:
