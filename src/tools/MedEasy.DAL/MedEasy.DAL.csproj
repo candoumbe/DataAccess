@@ -4,9 +4,6 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>MedEasy.DAL</AssemblyName>
     <PackageId>MedEasy.DAL</PackageId>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <LangVersion>latest</LangVersion>
     <Description>Couche d'accès aux données MedEasy.</Description>
     <RepositoryType>Github</RepositoryType>
@@ -19,13 +16,13 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.2" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.2" />
     <PackageReference Include="Optional" Version="4.0.0" />
     <PackageReference Include="Roslynator.Analyzers" Version="1.9.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.4.0" />
-    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="1.7.14" />
   </ItemGroup>
 </Project>
