@@ -27,8 +27,6 @@ namespace MedEasy.DAL.Repositories
             Entries = Context.Set<TEntry>();
         }
 
-
-
         public void Clear() => Delete(x => true);
 
         public virtual async ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector, int pageSize, int page, IEnumerable<OrderClause<TResult>> orderBy, CancellationToken ct = default)
@@ -61,7 +59,7 @@ namespace MedEasy.DAL.Repositories
             {
                 resultQuery = resultQuery.OrderBy(orderBy);
             }
-                
+
             IEnumerable<TResult> results =    await resultQuery
                 .Select(selector)
                 .ToArrayAsync(ct)
@@ -71,7 +69,6 @@ namespace MedEasy.DAL.Repositories
 
             return pageResult;
         }
-
 
         public virtual async ValueTask<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken ct = default) => await Entries.Select(selector).ToArrayAsync(ct).ConfigureAwait(false);
 
@@ -83,14 +80,12 @@ namespace MedEasy.DAL.Repositories
                 .ToArrayAsync(ct)
                 .ConfigureAwait(false);
 
-
         public async ValueTask<IEnumerable<TResult>> WhereAsync<TKey, TResult>(
             Expression<Func<TEntry, bool>> predicate,
             Expression<Func<TEntry, TKey>> keySelector,
             Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupBySelector,
             CancellationToken ct = default)
         {
-
             if (predicate == null)
             {
                 throw new ArgumentNullException(nameof(predicate));
@@ -114,8 +109,6 @@ namespace MedEasy.DAL.Repositories
 
             return results;
         }
-
-
 
         public virtual async ValueTask<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default) => await WhereAsync(item => item, predicate, ct);
 
@@ -174,21 +167,19 @@ namespace MedEasy.DAL.Repositories
                 IEnumerable<TEntry> result = await query.ToListAsync(ct);
                 int total = await CountAsync(predicate, ct);
                 pagedResult = new Page<TEntry>(result, total, pageSize);
-
             }
 
             return pagedResult;
         }
 
         public async ValueTask<Page<TResult>> WhereAsync<TResult>(
-            Expression<Func<TEntry, TResult>> selector, 
-            Expression<Func<TEntry, bool>> predicate, 
-            IEnumerable<OrderClause<TResult>> orderBy, 
-            int pageSize, 
-            int page, 
+            Expression<Func<TEntry, TResult>> selector,
+            Expression<Func<TEntry, bool>> predicate,
+            IEnumerable<OrderClause<TResult>> orderBy,
+            int pageSize,
+            int page,
             CancellationToken ct = default)
         {
-
             if (orderBy == null)
             {
                 throw new ArgumentNullException(nameof(orderBy), $"{nameof(orderBy)} expression must be set");
@@ -209,14 +200,13 @@ namespace MedEasy.DAL.Repositories
         }
 
         public async ValueTask<Page<TResult>> WhereAsync<TResult>(
-            Expression<Func<TEntry, TResult>> selector, 
-            Expression<Func<TResult, bool>> predicate, 
-            IEnumerable<OrderClause<TResult>> orderBy, 
-            int pageSize, 
-            int page, 
+            Expression<Func<TEntry, TResult>> selector,
+            Expression<Func<TResult, bool>> predicate,
+            IEnumerable<OrderClause<TResult>> orderBy,
+            int pageSize,
+            int page,
             CancellationToken ct = default)
         {
-
             if (orderBy == null)
             {
                 throw new ArgumentNullException(nameof(orderBy), $"{nameof(orderBy)} expression must be set");
@@ -229,7 +219,7 @@ namespace MedEasy.DAL.Repositories
                 .Take(pageSize);
 
             //we compute both ValueTask
-            
+
             IEnumerable<TResult> result = await query.ToListAsync(ct)
                 .ConfigureAwait(false);
             int total = await Entries.Select(selector).CountAsync(predicate, ct)
@@ -241,10 +231,8 @@ namespace MedEasy.DAL.Repositories
 
         public async ValueTask<bool> AnyAsync(CancellationToken ct = default) => await Entries.AnyAsync(ct).ConfigureAwait(false);
 
-
         public async ValueTask<TResult> MaxAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken ct = default) => await Entries.MaxAsync(selector, ct)
             .ConfigureAwait(false);
-
 
         public async ValueTask<TResult> MinAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken ct = default) => await Entries.MinAsync(selector, ct).ConfigureAwait(false);
 
@@ -261,7 +249,6 @@ namespace MedEasy.DAL.Repositories
         public async ValueTask<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default) => await Entries.SingleAsync(predicate, ct)
                 .ConfigureAwait(false);
 
-
         public async ValueTask<TResult> SingleAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default) => await Entries.Where(predicate).Select(selector)
                 .SingleAsync(ct)
                 .ConfigureAwait(false);
@@ -276,12 +263,9 @@ namespace MedEasy.DAL.Repositories
                 .ConfigureAwait(false))
                 .NoneWhen(result => Equals(default, result));
 
-
         public async ValueTask<Option<TEntry>> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default) => (await Entries.SingleOrDefaultAsync(predicate, ct)
                 .ConfigureAwait(false))
                 .NoneWhen(result => Equals(default, result));
-
-
 
         public async ValueTask<Option<TEntry>> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken ct = default) => (await Entries
                 .Include(includedProperties)
@@ -308,7 +292,6 @@ namespace MedEasy.DAL.Repositories
                 .ConfigureAwait(false))
                 .NoneWhen(result => Equals(default, result));
 
-
         public async ValueTask<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default) => await Entries.FirstAsync(predicate, ct)
                 .ConfigureAwait(false);
 
@@ -317,7 +300,6 @@ namespace MedEasy.DAL.Repositories
             IEnumerable<TEntry> entries = Entries.Where(predicate);
             Entries.RemoveRange(entries);
         }
-
 
         public async ValueTask<TResult> FirstAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default) => await Entries
                 .Where(predicate)
@@ -333,7 +315,6 @@ namespace MedEasy.DAL.Repositories
         public async ValueTask<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default) => (await Entries.FirstOrDefaultAsync(predicate, ct)
                 .ConfigureAwait(false))
                 .NoneWhen(result => Equals(default, result));
-
 
         public TEntry Create(TEntry entry)
         {

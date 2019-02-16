@@ -39,6 +39,6 @@ namespace MedEasy.DAL.EFStore
         /// that can safely be used in multithreaded fashion.
         /// </remarks>
         /// <returns><see cref="EFUnitOfWork"/> instance</returns>
-        public override IUnitOfWork NewUnitOfWork() => new EFUnitOfWork<TContext>(ContextGenerator(Options));
+        public override IUnitOfWork NewUnitOfWork() => new EFUnitOfWork<TContext>(ContextGenerator.Invoke(Options));
     }
 }

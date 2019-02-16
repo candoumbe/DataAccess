@@ -19,7 +19,6 @@ namespace MedEasy.DAL.Tests
             _outputTestHelper = outputHelper;
         }
 
-
         [Fact]
         public void CtorWithNullEntriesShouldThrowArgumentNullException()
         {
@@ -45,9 +44,7 @@ namespace MedEasy.DAL.Tests
             pagedResult.Count.Should().Be(1);
             pagedResult.Total.Should().Be(0);
             pagedResult.Entries.Should().BeEmpty();
-
         }
-
 
         [Theory]
         [InlineData(-1)]

@@ -13,6 +13,5 @@ namespace MedEasy.DAL.EFStore
         /// </summary>
         /// <param name="context">The context used by this unit of work instance.</param>
         public EFUnitOfWork(TContext context) : base(context) {}
-        
     }
 }

@@ -7,7 +7,6 @@ namespace MedEasy.DAL.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        
         /// <summary>
         /// Asynchronously saves changes made to the context
         /// </summary>
@@ -21,8 +20,6 @@ namespace MedEasy.DAL.Interfaces
         /// <typeparam name="TEntry"></typeparam>
         /// <returns></returns>
         IRepository<TEntry> Repository<TEntry>() where TEntry : class;
-
-
 
     }
 }

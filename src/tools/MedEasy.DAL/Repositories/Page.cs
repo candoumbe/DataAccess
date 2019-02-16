@@ -8,7 +8,7 @@ namespace MedEasy.DAL.Repositories
     /// Helper to encapsulates a page of results.
     /// </summary>
     /// <typeparam name="T">Type of elements the page will contains.</typeparam>
-    public sealed class Page<T> 
+    public sealed class Page<T>
     {
         /// <summary>
         /// Items of the current page
@@ -25,7 +25,6 @@ namespace MedEasy.DAL.Repositories
         /// </summary>
         public int Count { get; }
 
-        
         /// <summary>
         /// Number of items per <see cref="Page{T}"/>
         /// </summary>
@@ -80,6 +79,5 @@ namespace MedEasy.DAL.Repositories
         /// Gets the default <see cref="Page{T}"/> instance for the specified type
         /// </summary>
         public static Page<T> Default => _lazy.Value;
-
     }
 }

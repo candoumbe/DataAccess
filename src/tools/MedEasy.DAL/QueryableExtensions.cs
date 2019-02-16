@@ -9,7 +9,6 @@ namespace System.Linq
     /// </summary>
     public static class QueryableExtensions
     {
-
         /// <summary>
         /// Orders the <paramref name="entries"/>.
         /// </summary>
@@ -28,7 +27,6 @@ namespace System.Linq
                         entries = previousClause != null
                             ? Queryable.ThenBy(entries, (dynamic)orderClause.Expression)
                             : Queryable.OrderBy(entries, (dynamic)orderClause.Expression);
-
                         break;
                     case SortDirection.Descending:
                         entries = previousClause != null
@@ -63,5 +61,4 @@ namespace System.Linq
             return entries;
         }
     }
-
 }

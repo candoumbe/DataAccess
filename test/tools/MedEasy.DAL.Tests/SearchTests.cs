@@ -15,7 +15,6 @@ namespace MedEasy.DAL.Tests
             public string Lastname { get; set; }
 
             public DateTime BirthDate { get; set; }
-
         }
 
         public class SuperHero : Person
