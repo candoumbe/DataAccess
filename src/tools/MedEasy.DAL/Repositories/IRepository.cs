@@ -422,6 +422,7 @@ namespace MedEasy.DAL.Repositories
         /// Delete all entries that match <paramref name="predicate"/>
         /// </summary>
         /// <param name="predicate"></param>
+        /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <c>nuull</c></exception>
         void Delete(Expression<Func<TEntry, bool>> predicate);
 
         /// <summary>
