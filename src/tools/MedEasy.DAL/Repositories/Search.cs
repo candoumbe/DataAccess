@@ -1,6 +1,5 @@
-﻿using MedEasy.Data;
-using System.Collections.Generic;
-using System.Linq;
+﻿using DataFilters;
+using DataFilters.Expressions;
 
 namespace MedEasy.DAL.Repositories
 {
@@ -13,14 +12,12 @@ namespace MedEasy.DAL.Repositories
         /// <summary>
         /// Filter to apply
         /// </summary>
-        public IDataFilter Filter { get; set; }
+        public IFilter Filter { get; set; }
 
         /// <summary>
         /// <see cref="OrderClause{T}"/> that can be applied to the result of the search.
         /// </summary>
-        public IEnumerable<OrderClause<T>> Sorts { get; set; }
+        public ISort<T> Sort { get; set; }
 
-
-        public Search() => Sorts = Enumerable.Empty<OrderClause<T>>();
     }
 }

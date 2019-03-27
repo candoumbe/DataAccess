@@ -10,39 +10,6 @@ namespace System.Linq
     public static class QueryableExtensions
     {
         /// <summary>
-        /// Orders the <paramref name="entries"/>.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="entries"></param>
-        /// <param name="orderBy">List of <see cref="OrderClause{T}"/></param>
-        /// <returns></returns>
-        public static IQueryable<T> OrderBy<T>(this IQueryable<T> entries, IEnumerable<OrderClause<T>> orderBy)
-        {
-            OrderClause<T> previousClause = null;
-            foreach (OrderClause<T> orderClause in orderBy)
-            {
-                switch (orderClause.Direction)
-                {
-                    case SortDirection.Ascending:
-                        entries = previousClause != null
-                            ? Queryable.ThenBy(entries, (dynamic)orderClause.Expression)
-                            : Queryable.OrderBy(entries, (dynamic)orderClause.Expression);
-                        break;
-                    case SortDirection.Descending:
-                        entries = previousClause != null
-                            ? Queryable.ThenByDescending(entries, (dynamic)orderClause.Expression)
-                            : Queryable.OrderByDescending(entries, (dynamic)orderClause.Expression);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                previousClause = orderClause;
-            }
-            return entries;
-        }
-
-        /// <summary>
         /// Include a list of properties in a strongly type manner.
         /// </summary>
         /// <typeparam name="T">Type of the <see cref="IQueryable{T}"/> items</typeparam>

@@ -43,9 +43,8 @@ namespace MedEasy.DAL.Tests
             // Assert
             search.Filter.Should()
                 .BeNull();
-            search.Sorts.Should()
-                .BeAssignableTo<IEnumerable<OrderClause<Henchman>>>().And
-                .BeEmpty();
+            search.Sort.Should()
+                .BeNull();
         }
     }
 }

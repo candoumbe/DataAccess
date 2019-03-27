@@ -36,7 +36,7 @@ namespace MedEasy.DAL.Tests
         public void Default()
         {
             //Act
-            Page<object> pagedResult = Page<object>.Default;
+            Page<object> pagedResult = Page<object>.Empty;
 
             //Assert
             pagedResult.Should().NotBeNull();

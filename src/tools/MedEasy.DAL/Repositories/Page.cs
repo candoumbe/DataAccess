@@ -76,8 +76,8 @@ namespace MedEasy.DAL.Repositories
         private static readonly Lazy<Page<T>> _lazy = new Lazy<Page<T>>(() => new Page<T>(Enumerable.Empty<T>(), 0, 0));
 
         /// <summary>
-        /// Gets the default <see cref="Page{T}"/> instance for the specified type
+        /// Gets an empty <see cref="Page{T}"/> instance.
         /// </summary>
-        public static Page<T> Default => _lazy.Value;
+        public static Page<T> Empty => _lazy.Value;
     }
 }
