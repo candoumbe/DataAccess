@@ -10,12 +10,9 @@
     <PackageTags>DAL, EF, Entity</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MedEasy.Data\MedEasy.Data.csproj" />
-  </ItemGroup>
-
 
   <ItemGroup>
+    <PackageReference Include="Datafilters.Expressions" Version="2019.3.27.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.2" />
     <PackageReference Include="Optional" Version="4.0.0" />
