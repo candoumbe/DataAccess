@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using DataFilters;
 using DataFilters.Expressions;
 using Optional;
 
@@ -30,7 +31,7 @@ namespace MedEasy.DAL.Repositories
             Expression<Func<TEntry, TResult>> selector,
             int pageSize,
             int page,
-            IEnumerable<OrderClause<TResult>> orderBy = null,
+            ISort<TResult> orderBy = null,
             CancellationToken ct = default);
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace MedEasy.DAL.Repositories
             Expression<Func<TEntry, TResult>> selector,
             int pageSize,
             int page,
-            IEnumerable<OrderClause<TEntry>> orderBy = null,
+            ISort<TEntry> orderBy = null,
             CancellationToken ct = default);
 
         /// <summary>
@@ -121,7 +122,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns><see cref="IEnumerable{T}"/> which holds the resu;t</returns>
         ValueTask<IEnumerable<TEntry>> WhereAsync(
             Expression<Func<TEntry, bool>> predicate,
-            IEnumerable<OrderClause<TEntry>> orderBy = null,
+            ISort<TEntry> orderBy = null,
             IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken ct = default);
 
         /// <summary>
@@ -133,14 +134,14 @@ namespace MedEasy.DAL.Repositories
         /// <typeparam name="TResult">Type of result's items</typeparam>
         /// <param name="selector">Expression to convert from <see cref="TEntry"/> to <typeparamref name="TResult"/></param>
         /// <param name="predicate">Filter to match</param>
-        /// <param name="orderBy">Collection of <see cref="OrderClause{T}"/> to apply.</param>
+        /// <param name="orderBy">Sort to apply.</param>
         /// <param name="includedProperties">Collection of <see cref="IncludeClause{T}"/> that describes properties to eagerly fetch for each item in the result</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns>Collection of <typeparamref name="TResult"/> </returns>
         ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector,
             Expression<Func<TEntry, bool>> predicate,
-            IEnumerable<OrderClause<TResult>> orderBy = null,
+            ISort<TResult> orderBy = null,
             IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken ct = default);
 
         /// <summary>
@@ -152,13 +153,13 @@ namespace MedEasy.DAL.Repositories
         /// <typeparam name="TResult">Type of result's items</typeparam>
         /// <param name="selector">Expression to convert from <see cref="TEntry"/> to <typeparamref name="TResult"/></param>
         /// <param name="predicate">Filter to match AFTER <paramref name="selector"/> has been applied.</param>
-        /// <param name="orderBy">Collection of <see cref="OrderClause{T}"/> to apply to the collection of <typeparamref name="TResult"/>.</param>
+        /// <param name="orderBy">Sort expression to apply to the collection of <typeparamref name="TResult"/>.</param>
         /// <param name="includedProperties">Collection of <see cref="IncludeClause{T}"/> that describes properties to eagerly fetch for each item in the result</param>
         /// <returns></returns>
         ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(
            Expression<Func<TEntry, TResult>> selector,
            Expression<Func<TResult, bool>> predicate,
-           IEnumerable<OrderClause<TResult>> orderBy = null,
+           ISort<TResult> orderBy = null,
            CancellationToken cancellationToken = default);
 
         //ValueTask<IEnumerable<TResult>> WhereAsync<TResult, TKey>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, Expression<Func<TResult, TKey>> keySelector, IEnumerable<OrderClause<TResult>> orderBy = null);
@@ -173,7 +174,7 @@ namespace MedEasy.DAL.Repositories
         /// <returns><see cref="Page{T}"/> which holds the </returns>
         ValueTask<Page<TEntry>> WhereAsync(
             Expression<Func<TEntry, bool>> predicate,
-            IEnumerable<OrderClause<TEntry>> orderBy,
+            ISort<TEntry> orderBy,
             int pageSize,
             int page, CancellationToken cancellationToken = default);
 
@@ -191,10 +192,13 @@ namespace MedEasy.DAL.Repositories
         /// <param name="pageSize">number of items a page can holds at most</param>
         /// <param name="page">the page of result to get.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/>
+        ///  or <paramref name="orderBy"/> is <c>null</c>.
+        /// </exception>
         ValueTask<Page<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector,
             Expression<Func<TEntry, bool>> predicate,
-            IEnumerable<OrderClause<TResult>> orderBy,
+            ISort<TResult> orderBy,
             int pageSize,
             int page, CancellationToken cancellationToken = default);
 
@@ -215,7 +219,7 @@ namespace MedEasy.DAL.Repositories
         ValueTask<Page<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector,
             Expression<Func<TResult, bool>> predicate,
-            IEnumerable<OrderClause<TResult>> orderBy, int pageSize, int page, CancellationToken cancellationToken = default);
+            ISort<TResult> orderBy, int pageSize, int page, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the max value of the selected element
