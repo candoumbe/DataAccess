@@ -32,15 +32,18 @@ namespace MedEasy.DAL.Tests
             exception.ParamName.Should().NotBeNullOrWhiteSpace();
         }
 
-        [Fact]
-        public void Default()
+        [Theory]
+        [InlineData(10)]
+        [InlineData(20)]
+        [InlineData(long.MaxValue)]
+        public void Default(long pageSize)
         {
             //Act
-            Page<object> pagedResult = Page<object>.Empty;
+            Page<object> pagedResult = Page<object>.Empty(pageSize);
 
             //Assert
             pagedResult.Should().NotBeNull();
-            pagedResult.Size.Should().Be(0);
+            pagedResult.Size.Should().Be(pageSize);
             pagedResult.Count.Should().Be(1);
             pagedResult.Total.Should().Be(0);
             pagedResult.Entries.Should().BeEmpty();

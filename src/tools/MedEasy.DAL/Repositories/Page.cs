@@ -18,17 +18,17 @@ namespace MedEasy.DAL.Repositories
         /// <summary>
         /// Number of items the result that the current <see cref="Page{T}"/> contains
         /// </summary>
-        public int Total { get; }
+        public long Total { get; }
 
         /// <summary>
         /// Number of pages of result the current <see cref="Page{T}"/> is a part of.
         /// </summary>
-        public int Count { get; }
+        public long Count { get; }
 
         /// <summary>
         /// Number of items per <see cref="Page{T}"/>
         /// </summary>
-        public int Size { get; }
+        public long Size { get; }
 
         /// <summary>
         /// Builds a new <see cref="Page{T}"/> instances
@@ -38,7 +38,7 @@ namespace MedEasy.DAL.Repositories
         /// <param name="size">Number of items per page.</param>
         /// <exception cref="ArgumentOutOfRangeException">if either<paramref name="total"/> or <paramref name="size"/> are negative</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="entries"/> is <c>null</c></exception>
-        public Page(IEnumerable<T> entries, int total, int size)
+        public Page(IEnumerable<T> entries, long total, long size)
         {
             if (total < 0)
             {
@@ -71,13 +71,8 @@ namespace MedEasy.DAL.Repositories
         }
 
         /// <summary>
-        /// Lazy initialization of the Default value
-        /// </summary>
-        private static readonly Lazy<Page<T>> _lazy = new Lazy<Page<T>>(() => new Page<T>(Enumerable.Empty<T>(), 0, 0));
-
-        /// <summary>
         /// Gets an empty <see cref="Page{T}"/> instance.
         /// </summary>
-        public static Page<T> Empty => _lazy.Value;
+        public static Page<T> Empty(in long pageSize) => new Page<T>(Enumerable.Empty<T>(), 0, pageSize);
     }
 }

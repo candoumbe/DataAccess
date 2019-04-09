@@ -36,7 +36,7 @@ namespace MedEasy.DAL.Repositories
             IQueryable<TResult> resultQuery = Entries.Select(selector);
 
             int total = await Entries.CountAsync(ct).ConfigureAwait(false);
-            Page<TResult> pageOfResult = Page<TResult>.Empty;
+            Page<TResult> pageOfResult = Page<TResult>.Empty(pageSize);
             if (total > 0)
             {
                 IEnumerable<TResult> results = await resultQuery
@@ -85,7 +85,7 @@ namespace MedEasy.DAL.Repositories
         public async ValueTask<IEnumerable<TResult>> WhereAsync<TKey, TResult>(
             Expression<Func<TEntry, bool>> predicate,
             Expression<Func<TEntry, TKey>> keySelector,
-            Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupBySelector,
+            Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupSelector,
             CancellationToken ct = default)
         {
             if (predicate == null)
@@ -97,19 +97,17 @@ namespace MedEasy.DAL.Repositories
             {
                 throw new ArgumentNullException(nameof(keySelector));
             }
-            if (groupBySelector == null)
+            if (groupSelector == null)
             {
-                throw new ArgumentNullException(nameof(groupBySelector));
+                throw new ArgumentNullException(nameof(groupSelector));
             }
 
-            IEnumerable<TResult> results = await Entries
+            return await Entries
                     .Where(predicate)
                     .GroupBy(keySelector)
-                    .Select(groupBySelector)
+                    .Select(groupSelector)
                     .ToArrayAsync(ct)
                     .ConfigureAwait(false);
-
-            return results;
         }
 
         public virtual async ValueTask<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default) => await WhereAsync(item => item, predicate, ct)
@@ -163,7 +161,7 @@ namespace MedEasy.DAL.Repositories
 
             if (ct.IsCancellationRequested)
             {
-                pagedResult = Page<TEntry>.Empty;
+                pagedResult = Page<TEntry>.Empty(pageSize);
             }
             else
             {
@@ -225,15 +223,14 @@ namespace MedEasy.DAL.Repositories
                 .Skip(pageSize * (page < 1 ? 1 : page - 1))
                 .Take(pageSize);
 
-            //we compute both ValueTask
-
+            // we compute both ValueTask
             IEnumerable<TResult> result = await query.ToListAsync(ct)
                 .ConfigureAwait(false);
-            int total = await Entries.Select(selector).CountAsync(predicate, ct)
+            long total = await Entries.Select(selector).LongCountAsync(predicate, ct)
                 .ConfigureAwait(false);
 
             return total == 0
-                ? Page<TResult>.Empty
+                ? Page<TResult>.Empty(pageSize)
                 : new Page<TResult>(result, total, pageSize);
         }
 
