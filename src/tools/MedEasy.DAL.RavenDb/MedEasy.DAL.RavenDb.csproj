@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RavenDB.Client" Version="4.1.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MedEasy.DAL\MedEasy.DAL.csproj" />
+  </ItemGroup>
+
+</Project>

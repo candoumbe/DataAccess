@@ -61,7 +61,7 @@ namespace MedEasy.DAL.Interfaces
         /// </summary>
         /// <param name="ct"></param>
         /// <returns>The number of objects in an Added, Modified, or Deleted state</returns>
-        public async Task<int> SaveChangesAsync(CancellationToken ct = default) 
+        public async Task SaveChangesAsync(CancellationToken ct = default)
             => await _context.SaveChangesAsync(ct)
             .ConfigureAwait(false);
 

@@ -60,15 +60,25 @@ namespace MedEasy.DAL.Repositories
                 resultQuery = resultQuery.OrderBy(orderBy);
             }
 
-            IEnumerable<TResult> results = await resultQuery
-                .Skip(page < 1 ? 0 : (page - 1) * pageSize)
-                .Take(pageSize)
-                .Select(selector)
-                .ToArrayAsync(ct)
+            long total = await Entries.CountAsync(ct)
                 .ConfigureAwait(false);
 
-            Page<TResult> pageResult = new Page<TResult>(results, await Entries.CountAsync(ct).ConfigureAwait(false), pageSize);
+            Page<TResult> pageResult;
+            if (total > 0)
+            {
+                IEnumerable<TResult> results = await resultQuery
+                        .Skip(page < 1 ? 0 : (page - 1) * pageSize)
+                        .Take(pageSize)
+                        .Select(selector)
+                        .ToArrayAsync(ct)
+                        .ConfigureAwait(false);
 
+                pageResult = new Page<TResult>(results, total , pageSize);
+            }
+            else
+            {
+                pageResult = Page<TResult>.Empty(pageSize);
+            }
             return pageResult;
         }
 
