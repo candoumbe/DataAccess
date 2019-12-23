@@ -42,12 +42,12 @@ namespace MedEasy.DAL.Repositories
         {
             if (total < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(total));
+                throw new ArgumentOutOfRangeException(nameof(total), total, $"{nameof(total)} must not be a negative value");
             }
 
             if (size < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(size));
+                throw new ArgumentOutOfRangeException(nameof(size), size, $"{nameof(size)} must not be a negative value");
             }
 
             Entries = entries ?? throw new ArgumentNullException(nameof(entries));
