@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <AssemblyName>MedEasy.DAL</AssemblyName>
     <PackageId>MedEasy.DAL</PackageId>
     <LangVersion>latest</LangVersion>
@@ -12,14 +12,8 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Datafilters.Expressions" Version="2019.3.28.1" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.3" />
-    <PackageReference Include="Optional" Version="4.0.0" />
-    <PackageReference Include="Roslynator.Analyzers" Version="2.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
+    <PackageReference Include="Datafilters.Expressions" Version="1.0.0-*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.*" />
+    <PackageReference Include="Optional" Version="4.*" />
   </ItemGroup>
 </Project>
