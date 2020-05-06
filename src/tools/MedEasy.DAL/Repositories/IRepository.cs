@@ -22,9 +22,9 @@ namespace MedEasy.DAL.Repositories
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="selector">The selector.</param>
-        /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
         /// <param name="pageSize">Size of the page.</param>
         /// <param name="page">Index of the page.</param>
+        /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
         ValueTask<Page<TResult>> ReadPageAsync<TResult>(
@@ -44,9 +44,9 @@ namespace MedEasy.DAL.Repositories
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="selector">The selector.</param>
-        /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
         /// <param name="pageSize">Size of the page.</param>
         /// <param name="page">Index of the page.</param>
+        /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
         ValueTask<Page<TResult>> ReadPageAsync<TResult>(
@@ -103,8 +103,8 @@ namespace MedEasy.DAL.Repositories
         /// </summary>
         /// <typeparam name="TKey">Type of the element that will serve to "group" entries together</typeparam>
         /// <typeparam name="TResult">Type of the group result</typeparam>
-        /// <param name="keySelector">Selector which defines how results should be grouped</param>
         /// <param name="predicate">Predicate that will be used to filter groups</param>
+        /// <param name="keySelector">Selector which defines how results should be grouped</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
         ValueTask<IEnumerable<TResult>> WhereAsync<TKey, TResult>(
@@ -450,8 +450,8 @@ namespace MedEasy.DAL.Repositories
         /// </summary>
         /// <remarks>
         /// </remarks>
-        /// <param name="predicate">predicate to evaluate all the entries against</param>
         /// <param name="selector">projection before testing the <paramref name="predicate"/></param>
+        /// <param name="predicate">predicate to evaluate all the entries against</param>
         /// <returns><c>true</c> if all entries statifies the <param name="predicate" /> and <c>false</c> otherwise</returns>
         ValueTask<bool> AllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default);
     }

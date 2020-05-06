@@ -1,6 +1,8 @@
 ﻿using MedEasy.DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace System.Linq
 {
@@ -18,14 +20,18 @@ namespace System.Linq
         /// <returns></returns>
         public static IQueryable<T> Include<T>(this IQueryable<T> entries, IEnumerable<IncludeClause<T>> includes)
         {
-            if (includes != null)
+            Expression queryExpression = entries.Expression;
+            foreach (IncludeClause<T> includeClause in includes)
             {
-                foreach (IncludeClause<T> includeClause in includes)
-                {
-                    entries = EntityFrameworkQueryableExtensions.Include(entries, (dynamic)includeClause.Expression);
-                }
+                queryExpression = Expression.Call(
+                    typeof(EntityFrameworkQueryableExtensions),
+                    nameof(EntityFrameworkQueryableExtensions.Include),
+                    new Type[] { entries.ElementType, includeClause.Expression.ReturnType },
+                    entries.Expression, includeClause.Expression
+                );
             }
-            return entries;
+    
+            return (IQueryable<T>) entries.Provider.CreateQuery(queryExpression);
         }
     }
 }
