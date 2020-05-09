@@ -303,34 +303,41 @@ namespace MedEasy.DAL.Repositories
         public async ValueTask<TEntry> FirstAsync(CancellationToken ct = default) => await Entries.FirstAsync(ct)
                 .ConfigureAwait(false);
 
+        /// <inheritdoc/>
         public async ValueTask<Option<TEntry>> FirstOrDefaultAsync(CancellationToken ct = default) => (await Entries.FirstOrDefaultAsync(ct)
                 .ConfigureAwait(false))
                 .NoneWhen(result => Equals(default, result));
 
+        /// <inheritdoc/>
         public async ValueTask<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default) => await Entries.FirstAsync(predicate, ct)
                 .ConfigureAwait(false);
 
+        /// <inheritdoc/>
         public void Delete(Expression<Func<TEntry, bool>> predicate)
         {
             IEnumerable<TEntry> entries = Entries.Where(predicate);
             Entries.RemoveRange(entries);
         }
 
+        /// <inheritdoc/>
         public async ValueTask<TResult> FirstAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default) => await Entries
                 .Where(predicate)
                 .Select(selector)
                 .FirstAsync(cancellationToken)
                 .ConfigureAwait(false);
 
+        /// <inheritdoc/>
         public async ValueTask<Option<TResult>> FirstOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default) => (await Entries.Where(predicate).Select(selector)
                 .FirstOrDefaultAsync(ct)
                 .ConfigureAwait(false))
                 .NoneWhen(result => Equals(default, result));
 
+        /// <inheritdoc/>
         public async ValueTask<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default) => (await Entries.FirstOrDefaultAsync(predicate, ct)
                 .ConfigureAwait(false))
                 .NoneWhen(result => Equals(default, result));
 
+        /// <inheritdoc/>
         public TEntry Create(TEntry entry)
         {
             if (entry == null)
@@ -340,6 +347,53 @@ namespace MedEasy.DAL.Repositories
 
             return Entries.Add(entry).Entity;
         }
+
+        /// <inheritdoc/>
+        public IAsyncEnumerable<TEntry> Stream(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default)
+        {
+            return Context.Set<TEntry>()
+                          .Where(predicate)
+                          .AsAsyncEnumerable();
+        }
+
+        /// <inheritdoc/>
+        public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken ct = default)
+        {
+            return Context.Set<TEntry>()
+                          .Select(selector)
+                          .Where(predicate)
+                          .AsAsyncEnumerable();
+        }
+
+        /// <inheritdoc/>
+        public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, ISort<TResult> orderBy, CancellationToken ct = default)
+        {
+            return Context.Set<TEntry>()
+                          .Select(selector)
+                          .Where(predicate)
+                          .OrderBy(orderBy)
+                          .AsAsyncEnumerable();
+        }
+
+        /// <inheritdoc/>
+        public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, ISort<TResult> orderBy, CancellationToken ct = default)
+        {
+            return Context.Set<TEntry>()
+                          .Where(predicate)
+                          .Select(selector)
+                          .OrderBy(orderBy)
+                          .AsAsyncEnumerable();
+        }
+
+        /// <inheritdoc/>
+        public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default)
+        {
+            return Context.Set<TEntry>()
+                          .Where(predicate)
+                          .Select(selector)
+                          .AsAsyncEnumerable();
+        }
+
 
         public IEnumerable<TEntry> Create(IEnumerable<TEntry> entries)
         {
