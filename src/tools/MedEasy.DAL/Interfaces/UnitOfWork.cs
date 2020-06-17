@@ -65,7 +65,6 @@ namespace MedEasy.DAL.Interfaces
             => await _context.SaveChangesAsync(ct)
             .ConfigureAwait(false);
 
-        
         public void Dispose()
         {
             Dispose(true);
