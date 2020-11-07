@@ -1,6 +1,7 @@
 ﻿using MedEasy.DAL.Repositories;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+
 using System.Collections.Generic;
 using System.Linq.Expressions;
 

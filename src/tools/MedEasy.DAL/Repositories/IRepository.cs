@@ -4,8 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+
 using DataFilters;
-using DataFilters.Expressions;
+
 using Optional;
 
 namespace MedEasy.DAL.Repositories

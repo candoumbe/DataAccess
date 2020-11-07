@@ -7,7 +7,6 @@ using MedEasy.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using Optional;
-using DataFilters.Expressions;
 using DataFilters;
 #if NETSTANDARD1_3
 using Z.EntityFramework.Plus;

@@ -1,7 +1,8 @@
 using System;
+
 using MedEasy.DAL.Repositories;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace MedEasy.DAL.Interfaces
 {

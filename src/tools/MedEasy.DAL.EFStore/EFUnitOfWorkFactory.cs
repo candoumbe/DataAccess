@@ -1,7 +1,8 @@
 ﻿using MedEasy.DAL.Interfaces;
+
 using Microsoft.EntityFrameworkCore;
+
 using System;
-using System.Threading.Tasks;
 
 namespace MedEasy.DAL.EFStore
 {
