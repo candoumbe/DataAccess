@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
     <AssemblyName>MedEasy.DAL</AssemblyName>
     <PackageId>MedEasy.DAL</PackageId>
     <LangVersion>latest</LangVersion>
@@ -10,10 +10,21 @@
     <PackageTags>DAL, EF, Entity</PackageTags>
   </PropertyGroup>
 
-
+  <Choose>
+    <When Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
+      <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.*" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.*" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+  
   <ItemGroup>
-    <PackageReference Include="Datafilters.Expressions" Version="1.0.0-*" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.*" />
+    <PackageReference Include="Datafilters.Expressions" Version="0.3.2" />
     <PackageReference Include="Optional" Version="4.*" />
   </ItemGroup>
 </Project>
