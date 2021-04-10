@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
+
 using MedEasy.DAL.Repositories;
+
 using System;
-using System.Collections.Generic;
+
 using Xunit;
 
 namespace MedEasy.DAL.Tests

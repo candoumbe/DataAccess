@@ -28,20 +28,14 @@ namespace MedEasy.DAL.Repositories
         /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
-        ValueTask<Page<TResult>> ReadPageAsync<TResult>(
-            Expression<Func<TEntry, TResult>> selector,
-            int pageSize,
-            int page,
-            ISort<TResult> orderBy = null,
-            CancellationToken ct = default);
+        ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+                                                        int pageSize,
+                                                        int page,
+                                                        ISort<TResult> orderBy = null,
+                                                        CancellationToken ct = default);
 
         /// <summary>
-        /// <para>
         ///     Reads all entries from the repository.
-        /// </para>
-        /// <para>
-        ///     
-        /// </para>
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="selector">The selector.</param>
@@ -50,12 +44,11 @@ namespace MedEasy.DAL.Repositories
         /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
-        ValueTask<Page<TResult>> ReadPageAsync<TResult>(
-            Expression<Func<TEntry, TResult>> selector,
-            int pageSize,
-            int page,
-            ISort<TEntry> orderBy = null,
-            CancellationToken ct = default);
+        ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+                                                        int pageSize,
+                                                        int page,
+                                                        ISort<TEntry> orderBy = null,
+                                                        CancellationToken ct = default);
 
         /// <summary>
         /// Gets all entries of the repository
