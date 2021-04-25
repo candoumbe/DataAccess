@@ -73,6 +73,6 @@ namespace MedEasy.DAL.Repositories
         /// <summary>
         /// Gets an empty <see cref="Page{T}"/> instance.
         /// </summary>
-        public static Page<T> Empty(in long pageSize) => new Page<T>(Enumerable.Empty<T>(), 0, pageSize);
+        public static Page<T> Empty(in long pageSize) => new(Enumerable.Empty<T>(), 0, pageSize);
     }
 }

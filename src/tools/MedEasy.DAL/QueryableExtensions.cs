@@ -31,8 +31,8 @@ namespace System.Linq
                     entries.Expression, includeClause.Expression
                 );
             }
-    
-            return (IQueryable<T>) entries.Provider.CreateQuery(queryExpression);
+
+            return (IQueryable<T>)entries.Provider.CreateQuery(queryExpression);
         }
     }
 }

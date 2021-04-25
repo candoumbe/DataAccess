@@ -12,6 +12,6 @@ namespace MedEasy.DAL.EFStore
         /// Builds a new <see cref="EFUnitOfWork"/> instance.
         /// </summary>
         /// <param name="context">The context used by this unit of work instance.</param>
-        public EFUnitOfWork(TContext context) : base(context) {}
+        public EFUnitOfWork(TContext context) : base(context) { }
     }
 }

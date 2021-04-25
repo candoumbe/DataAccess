@@ -81,7 +81,7 @@ namespace MedEasy.DAL.Repositories
         /// <param name="ct"></param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
         ValueTask<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
-            
+
         /// <summary>
         /// Gets entries of the repository that satisfied the specified <paramref name="predicate"/>
         /// </summary>
@@ -96,7 +96,7 @@ namespace MedEasy.DAL.Repositories
         /// <param name="predicate"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector,Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
+        IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
 
         /// <summary>
         /// Gets entries of the repository that satisfied the specified <paramref name="predicate"/>

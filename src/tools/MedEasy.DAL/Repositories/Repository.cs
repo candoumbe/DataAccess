@@ -72,7 +72,7 @@ namespace MedEasy.DAL.Repositories
                         .ToArrayAsync(ct)
                         .ConfigureAwait(false);
 
-                pageResult = new Page<TResult>(results, total , pageSize);
+                pageResult = new Page<TResult>(results, total, pageSize);
             }
             else
             {

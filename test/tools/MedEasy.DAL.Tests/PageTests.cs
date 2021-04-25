@@ -1,7 +1,10 @@
 ﻿using FluentAssertions;
+
 using MedEasy.DAL.Repositories;
+
 using System;
 using System.Linq;
+
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -12,7 +15,7 @@ namespace MedEasy.DAL.Tests
     [UnitTest]
     public class PageTests
     {
-        private ITestOutputHelper _outputTestHelper;
+        private readonly ITestOutputHelper _outputTestHelper;
 
         public PageTests(ITestOutputHelper outputHelper)
         {
@@ -93,7 +96,7 @@ namespace MedEasy.DAL.Tests
         public void CheckPageCount(int total, int pageSize, int expectedPageCount, string reason)
         {
             //Act
-            Page<object> page = new Page<object>(Enumerable.Empty<object>(), total, pageSize);
+            Page<object> page = new(Enumerable.Empty<object>(), total, pageSize);
 
             //Assert
             page.Count.Should().Be(expectedPageCount, reason);

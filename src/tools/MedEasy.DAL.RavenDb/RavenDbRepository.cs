@@ -27,15 +27,15 @@ namespace MedEasy.DAL.RavenDb
             _entries = session.Query<T>();
         }
 
-        public ValueTask<bool> AllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) 
-            => new ValueTask<bool>(_entries.All(predicate));
+        public ValueTask<bool> AllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+            => new(_entries.All(predicate));
 
         public ValueTask<bool> AllAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default)
-            => new ValueTask<bool>(_entries
+            => new(_entries
                 .Select(selector)
                 .All(predicate));
 
-        public ValueTask<bool> AnyAsync(CancellationToken cancellationToken = default) => new ValueTask<bool>(_entries.Any());
+        public ValueTask<bool> AnyAsync(CancellationToken cancellationToken = default) => new(_entries.Any());
 
         public ValueTask<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
@@ -59,7 +59,7 @@ namespace MedEasy.DAL.RavenDb
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public ValueTask<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
-            => new ValueTask<int>(_entries
+            => new(_entries
             .Count(predicate.Compile()));
 
         public T Create(T entry) => throw new NotImplementedException();

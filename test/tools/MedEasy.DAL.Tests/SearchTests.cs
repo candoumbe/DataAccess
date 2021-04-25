@@ -40,7 +40,7 @@ namespace MedEasy.DAL.Tests
         public void CtorBuildValidInstance()
         {
             // Act
-            Search<Henchman> search = new Search<Henchman>();
+            Search<Henchman> search = new();
 
             // Assert
             search.Filter.Should()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+
 using MedEasy.DAL.Repositories;
 
 namespace MedEasy.DAL.Interfaces
@@ -12,7 +13,7 @@ namespace MedEasy.DAL.Interfaces
         /// </summary>
         /// <param name="ct"></param>
         /// <returns>the number of elements modified</returns>
-       Task SaveChangesAsync(CancellationToken ct = default);
+        Task SaveChangesAsync(CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves the repository
