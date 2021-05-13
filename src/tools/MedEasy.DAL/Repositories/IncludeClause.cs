@@ -12,7 +12,7 @@ namespace MedEasy.DAL.Repositories
             Expression = selector;
         }
 
-        public static IncludeClause<T> Create<TProperty>(Expression<Func<T, TProperty>> selector) => new (selector);
+        public static IncludeClause<T> Create<TProperty>(Expression<Func<T, TProperty>> selector) => new(selector);
 
         public LambdaExpression Expression { get; }
     }

@@ -8,9 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using Optional;
 using DataFilters;
-#if NETSTANDARD1_3
-using Z.EntityFramework.Plus;
-#endif
 
 namespace MedEasy.DAL.Repositories
 {
@@ -32,19 +29,18 @@ namespace MedEasy.DAL.Repositories
 
         public virtual async ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector, int pageSize, int page, ISort<TResult> orderBy, CancellationToken ct = default)
         {
-            IQueryable<TResult> resultQuery = Entries.Select(selector);
-
-            int total = await Entries.CountAsync(ct).ConfigureAwait(false);
+            int total = await Entries.CountAsync(ct)
+                                     .ConfigureAwait(false);
             Page<TResult> pageOfResult = Page<TResult>.Empty(pageSize);
             if (total > 0)
             {
-                IEnumerable<TResult> results = await resultQuery
-                        .OrderBy(orderBy)
-                        .Skip(page < 1 ? 0 : (page - 1) * pageSize)
-                        .Take(pageSize)
-                        .ToArrayAsync(ct)
-                        .ConfigureAwait(false);
-                pageOfResult = new Page<TResult>(results, total, pageSize);
+                IEnumerable<TResult> results = await Entries.Select(selector)
+                                                            .OrderBy(orderBy)
+                                                            .Skip(page < 1 ? 0 : (page - 1) * pageSize)
+                                                            .Take(pageSize)
+                                                            .ToArrayAsync(ct)
+                                                            .ConfigureAwait(false);
+                pageOfResult = new (results, total, pageSize);
             }
 
             return pageOfResult;
@@ -225,12 +221,11 @@ namespace MedEasy.DAL.Repositories
             {
                 throw new ArgumentNullException(nameof(orderBy), $"{nameof(orderBy)} expression must be set");
             }
-            IQueryable<TResult> query = Entries
-                .Select(selector)
-                .Where(predicate)
-                .OrderBy(orderBy)
-                .Skip(pageSize * (page < 1 ? 1 : page - 1))
-                .Take(pageSize);
+            IQueryable<TResult> query = Entries.Select(selector)
+                                               .Where(predicate)
+                                               .OrderBy(orderBy)
+                                               .Skip(pageSize * (page < 1 ? 1 : page - 1))
+                                               .Take(pageSize);
 
             // we compute both ValueTask
             IEnumerable<TResult> result = await query.ToListAsync(ct)
