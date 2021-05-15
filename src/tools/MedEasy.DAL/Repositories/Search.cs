@@ -1,8 +1,8 @@
-﻿using DataFilters;
-using DataFilters.Expressions;
-
-namespace MedEasy.DAL.Repositories
+﻿namespace MedEasy.DAL.Repositories
 {
+    using DataFilters;
+    using DataFilters.Expressions;
+
     /// <summary>
     /// Wraps criteria to search elements 
     /// </summary>

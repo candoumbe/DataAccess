@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-using MedEasy.DAL.Repositories;
-
-namespace MedEasy.DAL.Interfaces
+﻿namespace MedEasy.DAL.Interfaces
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using MedEasy.DAL.Repositories;
+
     public interface IUnitOfWork : IDisposable
     {
         /// <summary>

@@ -1,16 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
-
-using DataFilters;
-
-using Optional;
-
 namespace MedEasy.DAL.Repositories
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using DataFilters;
+
+    using Optional;
+
     public interface IRepository<TEntry> where TEntry : class
     {
         /// <summary>

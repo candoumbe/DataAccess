@@ -1,12 +1,12 @@
-﻿using MedEasy.DAL.Repositories;
-
-using Microsoft.EntityFrameworkCore;
-
-using System.Collections.Generic;
-using System.Linq.Expressions;
-
-namespace System.Linq
+﻿namespace System.Linq
 {
+    using MedEasy.DAL.Repositories;
+
+    using Microsoft.EntityFrameworkCore;
+
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+
     /// <summary>
     /// Contains utility methods for Queryable
     /// </summary>

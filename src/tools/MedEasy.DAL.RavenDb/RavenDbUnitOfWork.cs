@@ -1,14 +1,14 @@
-﻿using MedEasy.DAL.Interfaces;
-using MedEasy.DAL.Repositories;
-
-using Raven.Client.Documents.Session;
-
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace MedEasy.DAL.RavenDb
+﻿namespace MedEasy.DAL.RavenDb
 {
+    using MedEasy.DAL.Interfaces;
+    using MedEasy.DAL.Repositories;
+
+    using Raven.Client.Documents.Session;
+
+    using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public class RavenDbUnitOfWork : IUnitOfWork
     {
         private readonly IAsyncDocumentSession _session;

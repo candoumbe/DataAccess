@@ -1,8 +1,8 @@
-using System;
-using System.Linq.Expressions;
-
 namespace MedEasy.DAL.Repositories
 {
+    using System;
+    using System.Linq.Expressions;
+
     public class IncludeClause<T>
     {
 

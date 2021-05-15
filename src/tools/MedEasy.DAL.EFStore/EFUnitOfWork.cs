@@ -1,8 +1,8 @@
-﻿
-using MedEasy.DAL.Interfaces;
-
-namespace MedEasy.DAL.EFStore
+﻿namespace MedEasy.DAL.EFStore
 {
+
+    using MedEasy.DAL.Interfaces;
+
     /// <summary>
     /// Unit of work implementation that relies on Entity Framework.
     /// </summary>

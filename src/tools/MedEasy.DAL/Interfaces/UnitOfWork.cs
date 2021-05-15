@@ -1,12 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using MedEasy.DAL.Repositories;
-using System.Collections.Concurrent;
-
 namespace MedEasy.DAL.Interfaces
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using MedEasy.DAL.Repositories;
+    using System.Collections.Concurrent;
+
     /// <summary>
     /// <para>
     /// Allow to work with several <see cref="IRepository{TEntry}"/>s.

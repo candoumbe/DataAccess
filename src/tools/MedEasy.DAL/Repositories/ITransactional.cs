@@ -1,8 +1,8 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace MedEasy.DAL.Repositories
+﻿namespace MedEasy.DAL.Repositories
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+
     /// <summary>
     /// This interface defines methods to implement to support transactional operations
     /// </summary>

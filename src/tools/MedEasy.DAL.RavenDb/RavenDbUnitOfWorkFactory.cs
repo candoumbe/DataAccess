@@ -1,11 +1,11 @@
-﻿using MedEasy.DAL.Interfaces;
-
-using Raven.Client.Documents;
-
-using System.Collections.Generic;
-
-namespace MedEasy.DAL.RavenDb
+﻿namespace MedEasy.DAL.RavenDb
 {
+    using MedEasy.DAL.Interfaces;
+
+    using Raven.Client.Documents;
+
+    using System.Collections.Generic;
+
     public class RavenDbUnitOfWorkFactory : IUnitOfWorkFactory
     {
         private readonly IDocumentStore _store;

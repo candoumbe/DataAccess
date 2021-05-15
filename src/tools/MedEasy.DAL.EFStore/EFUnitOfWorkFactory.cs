@@ -1,11 +1,11 @@
-﻿using MedEasy.DAL.Interfaces;
-
-using Microsoft.EntityFrameworkCore;
-
-using System;
-
-namespace MedEasy.DAL.EFStore
+﻿namespace MedEasy.DAL.EFStore
 {
+    using MedEasy.DAL.Interfaces;
+
+    using Microsoft.EntityFrameworkCore;
+
+    using System;
+
     /// <summary>
     /// Defines a unit of work factory wrapper around Entity Framework
     /// </summary>

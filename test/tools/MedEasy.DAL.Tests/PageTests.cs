@@ -1,16 +1,16 @@
-﻿using FluentAssertions;
-
-using MedEasy.DAL.Repositories;
-
-using System;
-using System.Linq;
-
-using Xunit;
-using Xunit.Abstractions;
-using Xunit.Categories;
-
-namespace MedEasy.DAL.Tests
+﻿namespace MedEasy.DAL.Tests
 {
+    using FluentAssertions;
+
+    using MedEasy.DAL.Repositories;
+
+    using System;
+    using System.Linq;
+
+    using Xunit;
+    using Xunit.Abstractions;
+    using Xunit.Categories;
+
     [Feature("DAL")]
     [UnitTest]
     public class PageTests

@@ -1,13 +1,13 @@
-﻿using FluentAssertions;
-
-using MedEasy.DAL.Repositories;
-
-using System;
-
-using Xunit;
-
-namespace MedEasy.DAL.Tests
+﻿namespace MedEasy.DAL.Tests
 {
+    using FluentAssertions;
+
+    using MedEasy.DAL.Repositories;
+
+    using System;
+
+    using Xunit;
+
     public class SearchTests
     {
         public class Person

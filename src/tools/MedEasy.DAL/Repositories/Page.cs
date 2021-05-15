@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace MedEasy.DAL.Repositories
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     /// <summary>
     /// Helper to encapsulates a page of results.
     /// </summary>

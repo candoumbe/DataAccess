@@ -1,9 +1,9 @@
-using System;
-
-using MedEasy.DAL.Interfaces;
-
 namespace MedEasy.DAL.Repositories
 {
+    using System;
+
+    using MedEasy.DAL.Interfaces;
+
     /// <summary>
     /// Repository base class
     /// </summary>

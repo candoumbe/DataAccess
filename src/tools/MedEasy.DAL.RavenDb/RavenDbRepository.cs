@@ -1,21 +1,21 @@
-﻿using DataFilters;
-
-using MedEasy.DAL.Repositories;
-
-using Optional;
-
-using Raven.Client.Documents.Linq;
-using Raven.Client.Documents.Session;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace MedEasy.DAL.RavenDb
+﻿namespace MedEasy.DAL.RavenDb
 {
+    using DataFilters;
+
+    using MedEasy.DAL.Repositories;
+
+    using Optional;
+
+    using Raven.Client.Documents.Linq;
+    using Raven.Client.Documents.Session;
+
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public class RavenDbRepository<T> : IRepository<T> where T : class
     {
         private readonly IAsyncDocumentSession _session;

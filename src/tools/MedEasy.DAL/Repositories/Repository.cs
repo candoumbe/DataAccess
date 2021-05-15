@@ -1,16 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using MedEasy.DAL.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using Optional;
-using DataFilters;
-
 namespace MedEasy.DAL.Repositories
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Threading.Tasks;
+    using MedEasy.DAL.Interfaces;
+    using Microsoft.EntityFrameworkCore;
+    using System.Threading;
+    using Optional;
+    using DataFilters;
+
     public class Repository<TEntry> : RepositoryBase<TEntry>, IRepository<TEntry> where TEntry : class
     {
         protected DbSet<TEntry> Entries { get; set; }
