@@ -345,6 +345,7 @@ namespace MedEasy.DAL.Repositories
         /// <inheritdoc/>
         public IAsyncEnumerable<TEntry> Stream(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default)
         {
+            ct.ThrowIfCancellationRequested();
             return Context.Set<TEntry>()
                           .Where(predicate)
                           .AsAsyncEnumerable();
@@ -353,6 +354,7 @@ namespace MedEasy.DAL.Repositories
         /// <inheritdoc/>
         public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken ct = default)
         {
+            ct.ThrowIfCancellationRequested();
             return Context.Set<TEntry>()
                           .Select(selector)
                           .Where(predicate)
@@ -362,6 +364,7 @@ namespace MedEasy.DAL.Repositories
         /// <inheritdoc/>
         public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, ISort<TResult> orderBy, CancellationToken ct = default)
         {
+            ct.ThrowIfCancellationRequested();
             return Context.Set<TEntry>()
                           .Select(selector)
                           .Where(predicate)
@@ -372,6 +375,7 @@ namespace MedEasy.DAL.Repositories
         /// <inheritdoc/>
         public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, ISort<TResult> orderBy, CancellationToken ct = default)
         {
+            ct.ThrowIfCancellationRequested();
             return Context.Set<TEntry>()
                           .Where(predicate)
                           .Select(selector)
@@ -382,6 +386,7 @@ namespace MedEasy.DAL.Repositories
         /// <inheritdoc/>
         public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default)
         {
+            ct.ThrowIfCancellationRequested();
             return Context.Set<TEntry>()
                           .Where(predicate)
                           .Select(selector)
