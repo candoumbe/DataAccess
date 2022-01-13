@@ -1,6 +1,5 @@
 ﻿namespace MedEasy.DAL.EFStore
 {
-
     using MedEasy.DAL.Interfaces;
 
     /// <summary>

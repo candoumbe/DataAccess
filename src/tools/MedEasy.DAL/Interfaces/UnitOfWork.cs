@@ -39,7 +39,7 @@ namespace MedEasy.DAL.Interfaces
         {
             IRepository<TEntry> repository;
             // Checks if the Dictionary Key contains the Type class
-            if (_repositories.Keys.Contains(typeof(TEntry)))
+            if (_repositories.ContainsKey(typeof(TEntry)))
             {
                 // Return the repository for that Type class
                 repository = _repositories[typeof(TEntry)] as IRepository<TEntry>;

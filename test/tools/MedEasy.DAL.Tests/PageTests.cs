@@ -26,9 +26,7 @@
         public void CtorWithNullEntriesShouldThrowArgumentNullException()
         {
             //Act
-#pragma warning disable IDE0039 // Utiliser une fonction locale
             Action action = () => new Page<object>(null, 0, 0);
-#pragma warning restore IDE0039 // Utiliser une fonction locale
 
             //Assert
             ArgumentNullException exception = action.Should().Throw<ArgumentNullException>().Which;
@@ -58,11 +56,7 @@
         public void CtorWithNegativePageSizeShouldThrowArgumentOutOfRangeException(int pageSize)
         {
             _outputTestHelper.WriteLine($"Page size : {pageSize}");
-
-#pragma warning disable IDE0039 // Utiliser une fonction locale
             Action action = () => new Page<object>(Enumerable.Empty<object>(), 0, pageSize);
-#pragma warning restore IDE0039 // Utiliser une fonction locale
-
             action.Should().Throw<ArgumentOutOfRangeException>().Which
                 .ParamName.Should()
                     .BeEquivalentTo($"{nameof(Page<object>.Size)}");
@@ -76,14 +70,12 @@
             _outputTestHelper.WriteLine($"{nameof(Page<object>.Total)} : {total}");
 
             //Act
-#pragma warning disable IDE0039 // Utiliser une fonction locale
             Action action = () => new Page<object>(Enumerable.Empty<object>(), total, 1);
-#pragma warning restore IDE0039 // Utiliser une fonction locale
 
             // Assert
             action.Should().Throw<ArgumentOutOfRangeException>().Which
                 .ParamName.Should()
-                    .BeEquivalentTo($"{nameof(Page<object>.Total)}");
+                    .BeEquivalentTo(nameof(Page<object>.Total));
         }
 
         [Theory]
