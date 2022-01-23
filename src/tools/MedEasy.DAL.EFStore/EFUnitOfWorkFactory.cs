@@ -16,13 +16,18 @@
         /// Options used to create the unit of work instances
         /// </summary>
         public DbContextOptions<TContext> Options { get; }
+
+        /// <summary>
+        /// Factory function for new <typeparamref name="TContext"/> instances.
+        /// </summary>
         public Func<DbContextOptions<TContext>, TContext> ContextGenerator { get; }
 
         /// <summary>
         /// Builds a new <see cref="EFUnitOfWorkFactory"/> instance
         /// </summary>
         /// <param name="options">options that will be used by the <see cref="EFUnitOfWork"/> returned by calling <see cref="NewUnitOfWork"/></param>
-        /// <param name="contextGenerator"></param>
+        /// <param name="contextGenerator">Function to call to create new <typeparamref name="TContext"/> instances.</param>
+        /// <exception cref="ArgumentNullException">if <paramref name="contextGenerator"/> is <c>null</c>.</exception>
         public EFUnitOfWorkFactory(DbContextOptions<TContext> options, Func<DbContextOptions<TContext>, TContext> contextGenerator)
         {
             Options = options;
