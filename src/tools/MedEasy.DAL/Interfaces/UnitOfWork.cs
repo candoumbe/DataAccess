@@ -9,7 +9,7 @@ namespace MedEasy.DAL.Interfaces
 
     /// <summary>
     /// <para>
-    /// Allow to work with several <see cref="IRepository{TEntry}"/>s.
+    /// Allow to work with several <see cref="IRepository{TEntry}"/> instances.
     /// </para>
     /// Changes made to entities of any <see cref="IRepository{TEntry}"/> by calling the <see cref="Repository{TEntry}"/> method can either
     /// <list type="bullet">
@@ -17,7 +17,7 @@ namespace MedEasy.DAL.Interfaces
     /// <item>disposed</item>
     /// </list>
     /// </summary>
-    /// <typeparam name="TContext"></typeparam>
+    /// <typeparam name="TContext">Type of the connection</typeparam>
     public class UnitOfWork<TContext> : IUnitOfWork where TContext : IDbContext
     {
         private readonly TContext _context;
@@ -65,6 +65,7 @@ namespace MedEasy.DAL.Interfaces
             => await _context.SaveChangesAsync(ct)
             .ConfigureAwait(false);
 
+        ///<inheritdoc/>
         public void Dispose()
         {
             Dispose(true);
