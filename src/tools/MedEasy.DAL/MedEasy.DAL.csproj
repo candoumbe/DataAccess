@@ -29,7 +29,7 @@
   </Choose>
   
   <ItemGroup>
-    <PackageReference Include="Datafilters.Expressions" Version="0.10.2" />
+    <PackageReference Include="Datafilters.Expressions" Version="0.11.0" />
     <PackageReference Include="Optional" Version="4.*" />
   </ItemGroup>
 </Project>
