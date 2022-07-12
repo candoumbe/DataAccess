@@ -23,7 +23,7 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.6" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.7" />
       </ItemGroup>
     </Otherwise>
   </Choose>
