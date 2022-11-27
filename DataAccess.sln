@@ -1,0 +1,95 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{91B90448-4C57-49AC-9A49-E4919035E1EF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.DataAccess.Tests", "test\Candoumbe.DataAccess.Tests\Candoumbe.DataAccess.Tests.csproj", "{C572DA49-1F54-4884-AC07-851CF64264DD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A960764B-242B-4163-B67B-5B28B8206E50}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.DataAccess.RavenDb", "src\Candoumbe.DataAccess.RavenDb\Candoumbe.DataAccess.RavenDb.csproj", "{3B4BF7C5-73FB-4BF8-B64E-A41BEA003266}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.DataAccess.EFStore", "src\Candoumbe.DataAccess.EFCore\Candoumbe.DataAccess.EFStore.csproj", "{DA683491-84B7-4617-9FC1-ECFA183E438A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.DataAccess", "src\Candoumbe.DataAccess\Candoumbe.DataAccess.csproj", "{2F08BA6B-CD20-461B-8FCB-1BCC1831453F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{349A40BE-22B1-4FFB-A0BE-F9027C01FC63}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		build.cmd = build.cmd
+		build.ps1 = build.ps1
+		build.sh = build.sh
+		CHANGELOG.md = CHANGELOG.md
+		core.props = core.props
+		global.json = global.json
+		README.md = README.md
+		renovate.json = renovate.json
+		tests.props = tests.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{453627F0-00A6-4EB6-86D4-8DB93A6F5FA6}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug-report.md = .github\ISSUE_TEMPLATE\bug-report.md
+		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{8DBACAE3-D521-4FE0-B69E-4059878BE503}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug-report.md = .github\ISSUE_TEMPLATE\bug-report.md
+		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{40E77C2C-C7EE-4F32-95EE-E0AC42CFD28F}"
+	ProjectSection(SolutionItems) = preProject
+		.config\dotnet-tools.json = .config\dotnet-tools.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{BFD57C4D-D69D-4E12-98C9-501A976CEA18}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContinuousIntegration", "build\ContinuousIntegration.csproj", "{3E307E4F-33A2-4034-A817-00BA772CCB39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C572DA49-1F54-4884-AC07-851CF64264DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C572DA49-1F54-4884-AC07-851CF64264DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C572DA49-1F54-4884-AC07-851CF64264DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C572DA49-1F54-4884-AC07-851CF64264DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B4BF7C5-73FB-4BF8-B64E-A41BEA003266}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B4BF7C5-73FB-4BF8-B64E-A41BEA003266}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B4BF7C5-73FB-4BF8-B64E-A41BEA003266}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B4BF7C5-73FB-4BF8-B64E-A41BEA003266}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA683491-84B7-4617-9FC1-ECFA183E438A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA683491-84B7-4617-9FC1-ECFA183E438A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA683491-84B7-4617-9FC1-ECFA183E438A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA683491-84B7-4617-9FC1-ECFA183E438A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F08BA6B-CD20-461B-8FCB-1BCC1831453F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F08BA6B-CD20-461B-8FCB-1BCC1831453F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F08BA6B-CD20-461B-8FCB-1BCC1831453F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F08BA6B-CD20-461B-8FCB-1BCC1831453F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E307E4F-33A2-4034-A817-00BA772CCB39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E307E4F-33A2-4034-A817-00BA772CCB39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E307E4F-33A2-4034-A817-00BA772CCB39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E307E4F-33A2-4034-A817-00BA772CCB39}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C572DA49-1F54-4884-AC07-851CF64264DD} = {91B90448-4C57-49AC-9A49-E4919035E1EF}
+		{3B4BF7C5-73FB-4BF8-B64E-A41BEA003266} = {A960764B-242B-4163-B67B-5B28B8206E50}
+		{DA683491-84B7-4617-9FC1-ECFA183E438A} = {A960764B-242B-4163-B67B-5B28B8206E50}
+		{2F08BA6B-CD20-461B-8FCB-1BCC1831453F} = {A960764B-242B-4163-B67B-5B28B8206E50}
+		{8DBACAE3-D521-4FE0-B69E-4059878BE503} = {453627F0-00A6-4EB6-86D4-8DB93A6F5FA6}
+		{3E307E4F-33A2-4034-A817-00BA772CCB39} = {BFD57C4D-D69D-4E12-98C9-501A976CEA18}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {624C7BF3-659F-4D2B-8470-C37A28C6B740}
+	EndGlobalSection
+EndGlobal
