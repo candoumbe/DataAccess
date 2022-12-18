@@ -30,8 +30,7 @@ namespace ContinuousIntegration
         ImportSecrets = new[]
         {
             nameof(NugetApiKey),
-            nameof(IReportCoverage.CodecovToken),
-            nameof(IMutationTest.StrykerDashboardApiKey)
+            nameof(IReportCoverage.CodecovToken)
         },
         OnPullRequestExcludePaths = new[]
         {
@@ -123,6 +122,13 @@ namespace ContinuousIntegration
 
         /// <inheritdoc/>
         bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>()?.CodecovToken is not null;
+
+        [Parameter]
+        [Secret]
+        public readonly string CodecovToken;
+
+        ///<inheritdoc/>
+        string IReportCoverage.CodecovToken => CodecovToken;
 
         /// <summary>
         /// Defines the default target called when running the pipeline with no args
