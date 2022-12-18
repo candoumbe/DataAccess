@@ -1,6 +1,6 @@
 namespace Candoumbe.DataAccess.Abstractions
 {
-    using Candoumbe.DataAccess.Repositories;
+    using Microsoft.EntityFrameworkCore;
 
     using System;
     using System.Collections.Concurrent;
@@ -18,20 +18,23 @@ namespace Candoumbe.DataAccess.Abstractions
     /// <item>disposed</item>
     /// </list>
     /// </summary>
-    /// <typeparam name="TContext">Type of the context onto which the <see cref="UnitOfWork{TContext}"/></typeparam>
-    public class UnitOfWork<TContext> : IUnitOfWork where TContext : IDbContext
+    /// <typeparam name="TContext">Type of the context onto which the <see cref="EntityFrameworkUnitOfWork{TContext}"/></typeparam>
+    public class EntityFrameworkUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext, IDbContext
     {
         private readonly TContext _context;
+        private readonly IRepositoryFactory _repositoryFactory;
         private readonly IDictionary<Type, object> _repositories;
         private bool _disposed;
 
         /// <summary>
-        /// Builds a new instance of <see cref="UnitOfWork{TContext}"/>
+        /// Builds a new instance of <see cref="EntityFrameworkUnitOfWork{TContext}"/>
         /// </summary>
-        /// <param name="context">instance of <typeparamref name="TContext"/> that the current <see cref="UnitOfWork{TContext}"/> will wrap</param>
-        public UnitOfWork(TContext context)
+        /// <param name="context">instance of <typeparamref name="TContext"/> that the current <see cref="EntityFrameworkUnitOfWork{TContext}"/> will wrap</param>
+        /// <param name="repositoryFactory"></param>
+        public EntityFrameworkUnitOfWork(TContext context, IRepositoryFactory repositoryFactory)
         {
             _context = context;
+            _repositoryFactory = repositoryFactory;
             _repositories = new ConcurrentDictionary<Type, object>();
             _disposed = false;
         }
@@ -49,7 +52,7 @@ namespace Candoumbe.DataAccess.Abstractions
             else
             {
                 // If the repository for that Type class doesn't exist, create it
-                repository = new Repository<TEntry>(_context);
+                repository = _repositoryFactory.NewRepository<TEntry>(_context);
                 // Add it to the dictionary
                 _repositories.Add(typeof(TEntry), repository);
             }

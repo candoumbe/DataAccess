@@ -10,6 +10,11 @@
           "type": "boolean",
           "description": "Indicates if any changes should be stashed automatically prior to switching branch (Default : true)"
         },
+        "CodecovToken": {
+          "type": "string",
+          "description": "The API key used to push code coverage to CodeCov",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
         "Configuration": {
           "type": "string",
           "enum": []
@@ -66,7 +71,7 @@
         },
         "Issues": {
           "type": "array",
-          "description": "Issues that will be closed once the pull request is merged",
+          "description": "Issues that will be closed once the pull request is completed",
           "items": {
             "type": "string"
           }
@@ -115,12 +120,15 @@
               "AddGithubRelease",
               "Changelog",
               "Clean",
+              "Coldfix",
               "Compile",
               "Feature",
               "Hotfix",
               "ManageSecrets",
               "Pack",
               "Publish",
+              "Release",
+              "ReportCoverage",
               "Restore",
               "UnitTests"
             ]
@@ -139,12 +147,15 @@
               "AddGithubRelease",
               "Changelog",
               "Clean",
+              "Coldfix",
               "Compile",
               "Feature",
               "Hotfix",
               "ManageSecrets",
               "Pack",
               "Publish",
+              "Release",
+              "ReportCoverage",
               "Restore",
               "UnitTests"
             ]

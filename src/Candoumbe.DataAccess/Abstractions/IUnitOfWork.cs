@@ -1,7 +1,5 @@
 ﻿namespace Candoumbe.DataAccess.Abstractions
 {
-    using Candoumbe.DataAccess.Repositories;
-
     using System;
     using System.Threading;
     using System.Threading.Tasks;

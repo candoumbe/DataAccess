@@ -1,10 +1,7 @@
 namespace Candoumbe.DataAccess.Abstractions
 {
-    using Candoumbe.DataAccess.Repositories;
-
-    using Microsoft.EntityFrameworkCore;
-
     using System;
+    using System.Linq;
 
     /// <summary>
     /// Interface for accessing a set of entries.
@@ -16,6 +13,6 @@ namespace Candoumbe.DataAccess.Abstractions
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        DbSet<T> Set<T>() where T : class;
+        IQueryable<T> Set<T>() where T : class;
     }
 }
