@@ -1,5 +1,4 @@
-﻿using Candoumbe.Pipelines;
-using Candoumbe.Pipelines.Components;
+﻿using Candoumbe.Pipelines.Components;
 using Candoumbe.Pipelines.Components.GitHub;
 using Candoumbe.Pipelines.Components.Workflows;
 
@@ -14,7 +13,6 @@ using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Utilities.Collections;
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,9 +41,11 @@ namespace ContinuousIntegration
     [ShutdownDotNetAfterServerBuild]
     public class Build : NukeBuild,
         IHaveSourceDirectory,
+        IHaveSolution,
         IHaveTestDirectory,
         IHaveConfiguration,
         IHaveGitVersion,
+        IHaveGitHubRepository,
         IHaveChangeLog,
         IHaveMainBranch,
         IHaveDevelopBranch,
@@ -53,18 +53,44 @@ namespace ContinuousIntegration
         IRestore,
         ICompile,
         IUnitTest,
-        IPublish,
         IReportCoverage,
+        IPack,
+        IPublish,
         ICreateGithubRelease,
-        IGitFlowWithPullRequest,
-        IHaveArtifacts
+        IGitFlowWithPullRequest
     {
-        [Solution]
         [Required]
+        [Solution]
         public readonly Solution Solution;
 
-        [CI]
-        public readonly GitHubActions GitHubActions;
+        ///<inheritdoc/>
+        Solution IHaveSolution.Solution => Solution;
+
+        /// <summary>
+        /// Token to interact with GitHub's API
+        /// </summary>
+        [Parameter]
+        [Secret]
+        public readonly string GitHubToken;
+
+        /// <summary>
+        /// Token to interact with Nuget's API
+        /// </summary>
+        [Parameter("Token to interact with Nuget's API")]
+        [Secret]
+        public readonly string NugetApiKey;
+
+        [Parameter]
+        [Secret]
+        public readonly string CodecovToken;
+
+        ///<inheritdoc/>
+        string IReportCoverage.CodecovToken => CodecovToken;
+
+
+        [Parameter("API Key used to submit Stryker dashboard")]
+        [Secret]
+        public readonly string StrykerDashboardApiKey;
 
         [GitVersion(NoFetch = true, Framework = "net5.0")]
         public readonly GitVersion GitVersion;
@@ -78,61 +104,30 @@ namespace ContinuousIntegration
         ///<inheritdoc/>
         GitVersion IHaveGitVersion.GitVersion => GitVersion;
 
-
-
-        [Parameter]
-        public readonly Configuration Configuration;
-
-        Configuration IHaveConfiguration.Configuration => Configuration;
+        [CI] public readonly GitHubActions GitHubActions;
 
         ///<inheritdoc/>
-        Solution IHaveSolution.Solution => Solution;
-
-        [Parameter]
-        [Secret]
-        public readonly string NugetApiKey;
+        IEnumerable<AbsolutePath> IClean.DirectoriesToDelete => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
+                                                                .Concat(this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj"));
 
         ///<inheritdoc/>
-        AbsolutePath IHaveTestDirectory.TestDirectory => RootDirectory / "tests";
+        IEnumerable<AbsolutePath> IClean.DirectoriesToClean => new[] { this.Get<IPack>().ArtifactsDirectory, this.Get<IReportCoverage>().CoverageReportDirectory };
 
         ///<inheritdoc/>
-        IEnumerable<AbsolutePath> IClean.DirectoriesToClean => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
-            .Concat(this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj"));
+        IEnumerable<AbsolutePath> IClean.DirectoriesToEnsureExistance => new[]
+        {
+            this.Get<IReportCoverage>().CoverageReportHistoryDirectory
+        };
 
         ///<inheritdoc/>
-        IEnumerable<Project> IUnitTest.UnitTestsProjects => this.Get<IHaveSolution>().Solution.GetProjects("*.Tests");
+        IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(this.Get<IHaveSolution>().Solution.GetProjects("*.UnitTests"));
 
         ///<inheritdoc/>
         IEnumerable<AbsolutePath> IPack.PackableProjects => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobFiles("**/*.csproj");
 
-        /// <inheritdoc/>
-        IEnumerable<PublishConfiguration> IPublish.PublishConfigurations => new PublishConfiguration[]
-        {
-            new NugetPublishConfiguration(
-                apiKey: NugetApiKey,
-                source: new Uri("https://api.nuget.org/v3/index.json"),
-                canBeUsed: () => NugetApiKey is not null
-            ),
-            new GitHubPublishConfiguration(
-                githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
-                source: new Uri($"https://nuget.pkg.github.com/{GitHubActions?.RepositoryOwner}/index.json"),
-                canBeUsed: () => this is ICreateGithubRelease createRelease && createRelease.GitHubToken is not null
-            ),
-        };
-
-        /// <inheritdoc/>
-        bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>()?.CodecovToken is not null;
-
-        [Parameter]
-        [Secret]
-        public readonly string CodecovToken;
-
         ///<inheritdoc/>
-        string IReportCoverage.CodecovToken => CodecovToken;
+        bool IReportCoverage.ReportToCodeCov => CodecovToken is not null;
 
-        /// <summary>
-        /// Defines the default target called when running the pipeline with no args
-        /// </summary>
         public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);
     }
 }
