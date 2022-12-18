@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,7 +13,6 @@
     <PackageReference Include="Candoumbe.Pipelines" Version="0.2.0-alpha0040" />
   </ItemGroup>
   <ItemGroup>
-    <PackageDownload Include="GitVersion.tool" Version="[5.11.1]" />
     <PackageDownload Include="GitVersion.Tool" Version="[5.11.1]" />
     <PackageDownload Include="ReportGenerator" Version="[5.1.13]" />
   </ItemGroup>
