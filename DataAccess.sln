@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "�
 		core.props = core.props
 		GitVersion.yml = GitVersion.yml
 		global.json = global.json
+		nuget.config = nuget.config
 		README.md = README.md
 		renovate.json = renovate.json
 		tests.props = tests.props
