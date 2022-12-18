@@ -7,6 +7,7 @@ using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Execution;
+using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
@@ -66,11 +67,19 @@ namespace ContinuousIntegration
         [CI]
         public readonly GitHubActions GitHubActions;
 
-        [GitVersion]
+        [GitVersion(NoFetch = true, Framework = "net5.0")]
         public readonly GitVersion GitVersion;
+
+        [GitRepository]
+        public readonly GitRepository GitRepository;
+
+        ///<inheritdoc/>
+        GitRepository IHaveGitRepository.GitRepository => GitRepository;
 
         ///<inheritdoc/>
         GitVersion IHaveGitVersion.GitVersion => GitVersion;
+
+
 
         [Parameter]
         public readonly Configuration Configuration;
