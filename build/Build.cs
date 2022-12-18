@@ -10,6 +10,7 @@ using Nuke.Common.Execution;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Utilities.Collections;
 
 using System;
@@ -64,6 +65,12 @@ namespace ContinuousIntegration
 
         [CI]
         public readonly GitHubActions GitHubActions;
+
+        [GitVersion]
+        public readonly GitVersion GitVersion;
+
+        ///<inheritdoc/>
+        GitVersion IHaveGitVersion.GitVersion => GitVersion;
 
         [Parameter]
         public readonly Configuration Configuration;
