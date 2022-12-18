@@ -10,9 +10,11 @@ using Nuke.Common.Execution;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Utilities.Collections;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ContinuousIntegration
 {
@@ -72,6 +74,10 @@ namespace ContinuousIntegration
 
         ///<inheritdoc/>
         AbsolutePath IHaveTestDirectory.TestDirectory => RootDirectory / "tests";
+
+        ///<inheritdoc/>
+        IEnumerable<AbsolutePath> IClean.DirectoriesToClean => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
+            .Concat(this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj"));
 
         ///<inheritdoc/>
         IEnumerable<Project> IUnitTest.UnitTestsProjects => this.Get<IHaveSolution>().Solution.GetProjects("*.Tests");
