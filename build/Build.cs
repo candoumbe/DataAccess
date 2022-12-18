@@ -65,6 +65,11 @@ namespace ContinuousIntegration
         [CI]
         public readonly GitHubActions GitHubActions;
 
+        [Parameter]
+        public readonly Configuration Configuration;
+
+        Configuration IHaveConfiguration.Configuration => Configuration;
+
         ///<inheritdoc/>
         Solution IHaveSolution.Solution => Solution;
 
