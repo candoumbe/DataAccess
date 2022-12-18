@@ -1,4 +1,5 @@
-﻿using Candoumbe.Pipelines.Components;
+﻿using Candoumbe.Pipelines;
+using Candoumbe.Pipelines.Components;
 using Candoumbe.Pipelines.Components.GitHub;
 using Candoumbe.Pipelines.Components.Workflows;
 
@@ -13,8 +14,11 @@ using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Utilities.Collections;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using static Serilog.Log;
 
 namespace ContinuousIntegration
 {
@@ -74,6 +78,15 @@ namespace ContinuousIntegration
         public readonly string GitHubToken;
 
         /// <summary>
+        /// Token to interact with GitHub's API
+        /// </summary>
+        [Parameter]
+        public Configuration Configuration;
+
+        ///<inheritdoc />
+        Configuration IHaveConfiguration.Configuration => Configuration;
+
+        /// <summary>
         /// Token to interact with Nuget's API
         /// </summary>
         [Parameter("Token to interact with Nuget's API")]
@@ -95,16 +108,17 @@ namespace ContinuousIntegration
         [GitVersion(NoFetch = true, Framework = "net5.0")]
         public readonly GitVersion GitVersion;
 
+        ///<inheritdoc/>
+        GitVersion IHaveGitVersion.GitVersion => GitVersion;
+
         [GitRepository]
         public readonly GitRepository GitRepository;
 
         ///<inheritdoc/>
         GitRepository IHaveGitRepository.GitRepository => GitRepository;
 
-        ///<inheritdoc/>
-        GitVersion IHaveGitVersion.GitVersion => GitVersion;
-
-        [CI] public readonly GitHubActions GitHubActions;
+        [CI]
+        public readonly GitHubActions GitHubActions;
 
         ///<inheritdoc/>
         IEnumerable<AbsolutePath> IClean.DirectoriesToDelete => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
@@ -128,6 +142,28 @@ namespace ContinuousIntegration
         ///<inheritdoc/>
         bool IReportCoverage.ReportToCodeCov => CodecovToken is not null;
 
+        ///<inheritdoc/>
+        public IEnumerable<PublishConfiguration> PublishConfigurations => new PublishConfiguration[]
+        {
+            new NugetPublishConfiguration(
+                apiKey: NugetApiKey,
+                source: new Uri("https://api.nuget.org/v3/index.json"),
+                canBeUsed: () => NugetApiKey is not null
+            ),
+            new GitHubPublishConfiguration(
+                githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
+                source: new Uri($"https://nuget.pkg.github.com/{GitHubActions?.RepositoryOwner}/index.json"),
+                canBeUsed: () => this is ICreateGithubRelease createRelease && createRelease.GitHubToken is not null
+            ),
+        };
+
         public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);
+
+        ///<inheritdoc/>
+        protected override void OnBuildCreated()
+        {
+            Information($"{nameof(IHaveConfiguration)}.{nameof(IHaveConfiguration.Configuration)} : {this.Get<IHaveConfiguration>().Configuration}");
+            Information($"{nameof(Configuration)} : {Configuration}");
+        }
     }
 }
