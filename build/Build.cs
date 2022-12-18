@@ -6,6 +6,7 @@ using Candoumbe.Pipelines.Components.Workflows;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.CI.GitHubActions;
+using Nuke.Common.Execution;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
@@ -20,21 +21,23 @@ namespace ContinuousIntegration
         EnableGitHubToken = true,
         FetchDepth = 0,
         InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IPublish.Publish), nameof(ICreateGithubRelease.AddGithubRelease) },
-        CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
+        CacheKeyFiles = new[] { "global.json", "src/**/*.csproj", "test/**/*.csproj" },
         PublishArtifacts = true,
         ImportSecrets = new[]
         {
-        nameof(NugetApiKey),
-        nameof(IReportCoverage.CodecovToken),
-        nameof(IMutationTest.StrykerDashboardApiKey)
+            nameof(NugetApiKey),
+            nameof(IReportCoverage.CodecovToken),
+            nameof(IMutationTest.StrykerDashboardApiKey)
         },
         OnPullRequestExcludePaths = new[]
         {
-        "docs/*",
-        "README.md",
-        "CHANGELOG.md"
+            "docs/*",
+            "README.md",
+            "CHANGELOG.md"
         })]
     [DotNetVerbosityMapping]
+    [HandleVisualStudioDebugging]
+    [ShutdownDotNetAfterServerBuild]
     public class Build : NukeBuild,
         IHaveSourceDirectory,
         IHaveTestDirectory,
@@ -42,15 +45,19 @@ namespace ContinuousIntegration
         IHaveGitVersion,
         IHaveChangeLog,
         IHaveMainBranch,
+        IHaveDevelopBranch,
         IClean,
         IRestore,
         ICompile,
         IUnitTest,
         IPublish,
+        IReportCoverage,
         ICreateGithubRelease,
-        IGitHubFlowWithPullRequest
+        IGitFlowWithPullRequest,
+        IHaveArtifacts
     {
-        [Solution(SuppressBuildProjectCheck = true)]
+        [Solution]
+        [Required]
         public readonly Solution Solution;
 
         [CI]
@@ -87,14 +94,12 @@ namespace ContinuousIntegration
             ),
         };
 
-        ///// <inheritdoc/>
-        //bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>()?.CodecovToken is not null;
+        /// <inheritdoc/>
+        bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>()?.CodecovToken is not null;
 
         /// <summary>
         /// Defines the default target called when running the pipeline with no args
         /// </summary>
         public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);
-
-
     }
 }

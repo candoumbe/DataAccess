@@ -1,4 +1,6 @@
-namespace Candoumbe.DataAccess.Repositories
+using Candoumbe.DataAccess.Repositories;
+
+namespace Candoumbe.DataAccess.Abstractions
 {
     using DataFilters;
 
@@ -100,7 +102,9 @@ namespace Candoumbe.DataAccess.Repositories
         /// <param name="selector"></param>
         /// <param name="predicate"></param>
         /// <param name="ct"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// This method requires the underlying datastore to remain opened.
+        /// </remarks>
         IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
 
         /// <summary>
@@ -293,7 +297,7 @@ namespace Candoumbe.DataAccess.Repositories
         ValueTask<int> CountAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets the entry entry of the repository
+        /// Gets the entry of the repository
         /// </summary>
         /// <returns>
         /// the single entry of the repository
@@ -425,14 +429,15 @@ namespace Candoumbe.DataAccess.Repositories
         /// <summary>
         /// Delete all entries that match <paramref name="predicate"/>
         /// </summary>
-        /// <param name="predicate"></param>
+        /// <param name="predicate">Defines which <typeparamref name="TEntry"/> will be deleted.</param>
+        /// <param name="ct">Notifies to cancel the execution of the request.</param>
         /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <c>nuull</c></exception>
-        void Delete(Expression<Func<TEntry, bool>> predicate);
+        ValueTask Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
 
         /// <summary>
         /// Delete all entries of the underlying datastore
         /// </summary>
-        void Clear();
+        ValueTask Clear(CancellationToken ct = default);
 
         /// <summary>
         /// Gets the first entry that matches <paramref name="predicate"/>

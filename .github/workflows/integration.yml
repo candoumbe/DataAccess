@@ -40,7 +40,7 @@ jobs:
           path: |
             .nuke/temp
             ~/.nuget/packages
-          key: ${{ runner.os }}-${{ hashFiles('global.json', 'src/**/*.csproj') }}
+          key: ${{ runner.os }}-${{ hashFiles('global.json', 'src/**/*.csproj', 'test/**/*.csproj') }}
       - name: Run './build.cmd UnitTests Publish AddGithubRelease'
         run: ./build.cmd UnitTests Publish AddGithubRelease
         env:
@@ -52,6 +52,14 @@ jobs:
         with:
           name: unit-tests
           path: output/artifacts/tests-results/unit-tests
+      - uses: actions/upload-artifact@v1
+        with:
+          name: coverage-report
+          path: output/artifacts/reports/coverage-report
+      - uses: actions/upload-artifact@v1
+        with:
+          name: coverage-history
+          path: output/artifacts/reports/coverage-history
       - uses: actions/upload-artifact@v1
         with:
           name: packages

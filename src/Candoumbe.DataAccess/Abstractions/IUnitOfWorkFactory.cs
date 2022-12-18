@@ -1,5 +1,7 @@
 namespace Candoumbe.DataAccess.Abstractions
 {
+    using Candoumbe.DataAccess.Repositories;
+
     /// <summary>
     /// Defines the contract of a factory that builds <see cref="IUnitOfWork"/>s.
     /// </summary>

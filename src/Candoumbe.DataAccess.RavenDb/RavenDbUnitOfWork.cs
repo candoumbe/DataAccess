@@ -1,7 +1,6 @@
 ﻿namespace Candoumbe.DataAccess.RavenDb
 {
     using Candoumbe.DataAccess.Abstractions;
-    using Candoumbe.DataAccess.Repositories;
 
     using Raven.Client.Documents.Session;
 

@@ -1,5 +1,6 @@
 ﻿namespace Candoumbe.DataAccess.RavenDb
 {
+    using Candoumbe.DataAccess.Abstractions;
     using Candoumbe.DataAccess.Repositories;
 
     using DataFilters;
@@ -33,14 +34,15 @@
             _entries = session.Query<T>();
         }
         /// <inheritdoc/>
-        public ValueTask<bool> AllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
-            => new(_entries.All(predicate));
+        public async ValueTask<bool> AllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+            => await _entries.AllAsync(predicate).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public ValueTask<bool> AllAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default)
-            => new(_entries
+        public async ValueTask<bool> AllAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default)
+            => await _entries
                 .Select(selector)
-                .All(predicate));
+                .AllAsync(predicate)
+                .ConfigureAwait(false);
 
         /// <inheritdoc/>
         public async ValueTask<bool> AnyAsync(CancellationToken cancellationToken = default) => await _entries.AnyAsync(cancellationToken).ConfigureAwait(false);
@@ -49,18 +51,16 @@
         public ValueTask<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public void Clear()
+        public async ValueTask Clear(CancellationToken ct = default)
         {
-            IRavenQueryable<T> elements = _session.Query<T>();
-            foreach (T item in elements)
+            IAsyncEnumerable<T> elements = _session.Query<T>().AsAsyncEnumerable();
+            await foreach (T item in elements.WithCancellation(ct))
             {
                 _session.Delete(item);
             }
         }
         /// <inheritdoc/>
-        public async ValueTask<int> CountAsync(CancellationToken cancellationToken = default) => await _session.Advanced.AsyncDocumentQuery<T>()
-            .CountAsync(cancellationToken)
-            .ConfigureAwait(false);
+        public async ValueTask<int> CountAsync(CancellationToken cancellationToken = default) => await _entries.CountAsync(cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Asynchronously count the number of entries in the underlying repository that matches <paramref name="predicate"/>.
@@ -68,30 +68,38 @@
         /// <param name="predicate"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public ValueTask<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
-            => new(_entries
-            .Count(predicate.Compile()));
+        public async ValueTask<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+            => await _entries.CountAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
         public T Create(T entry) => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public IEnumerable<T> Create(IEnumerable<T> entries) => throw new NotImplementedException();
+        public IEnumerable<T> Create(IEnumerable<T> entries)
+        {
+            entries.ForEach(async entry => await _session.StoreAsync(entry).ConfigureAwait(false));
+            return entries;
+        }
 
         /// <inheritdoc/>
-        public void Delete(Expression<Func<T, bool>> predicate) => throw new NotImplementedException();
+        public ValueTask Delete(Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public ValueTask<T> FirstAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async ValueTask<T> FirstAsync(CancellationToken cancellationToken = default) => await _entries.FirstAsync(cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public ValueTask<T> FirstAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async ValueTask<T> FirstAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => await _entries.FirstAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public ValueTask<TResult> FirstAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async ValueTask<TResult> FirstAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+            => await _entries.Where(predicate)
+                             .Select(selector)
+                             .FirstAsync(cancellationToken)
+                             .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public ValueTask<Option<T>> FirstOrDefaultAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async ValueTask<Option<T>> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
+            => (await _entries.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false)).SomeNotNull();
 
         /// <inheritdoc/>
         public ValueTask<Option<T>> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
