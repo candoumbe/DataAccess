@@ -12,7 +12,6 @@
         },
         "CodecovToken": {
           "type": "string",
-          "description": "The API key used to push code coverage to CodeCov",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Configuration": {
