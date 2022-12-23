@@ -78,15 +78,6 @@ namespace ContinuousIntegration
         public readonly string GitHubToken;
 
         /// <summary>
-        /// Token to interact with GitHub's API
-        /// </summary>
-        [Parameter]
-        public Configuration Configuration;
-
-        ///<inheritdoc />
-        Configuration IHaveConfiguration.Configuration => Configuration;
-
-        /// <summary>
         /// Token to interact with Nuget's API
         /// </summary>
         [Parameter("Token to interact with Nuget's API")]
@@ -163,7 +154,6 @@ namespace ContinuousIntegration
         protected override void OnBuildCreated()
         {
             Information($"{nameof(IHaveConfiguration)}.{nameof(IHaveConfiguration.Configuration)} : {this.Get<IHaveConfiguration>().Configuration}");
-            Information($"{nameof(Configuration)} : {Configuration}");
         }
     }
 }
