@@ -1,4 +1,4 @@
-﻿namespace Candoumbe.DataAccess.Tests
+﻿namespace Candoumbe.DataAccess.Tests.Repositories
 {
     using Candoumbe.DataAccess.Repositories;
 

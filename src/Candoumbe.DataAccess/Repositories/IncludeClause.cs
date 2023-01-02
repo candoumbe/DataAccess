@@ -20,7 +20,7 @@ namespace Candoumbe.DataAccess.Repositories
         /// <typeparam name="TProperty">Type of the property targeted by <paramref name="expression"/>.</typeparam>
         /// <param name="expression">The property the resulting <see cref="IncludeClause{T}"/> will be built for.</param>
         /// <returns>an <see cref="IncludeClause{T}"/> that targets the property to include</returns>
-        public static IncludeClause<T> Create<TProperty>(Expression<Func<T, TProperty>> expression) => new IncludeClause<T>(expression);
+        public static IncludeClause<T> Create<TProperty>(Expression<Func<T, TProperty>> expression) => new(expression);
 
         /// <summary>
         /// Lambda expression wrapped by the current instance.

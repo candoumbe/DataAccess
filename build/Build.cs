@@ -27,7 +27,7 @@ namespace ContinuousIntegration
         EnableGitHubToken = true,
         FetchDepth = 0,
         InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IPublish.Publish), nameof(ICreateGithubRelease.AddGithubRelease) },
-        CacheKeyFiles = new[] { "global.json", "src/**/*.csproj", "test/**/*.csproj" },
+        CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
         PublishArtifacts = true,
         ImportSecrets = new[]
         {
@@ -116,7 +116,7 @@ namespace ContinuousIntegration
                                                                 .Concat(this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj"));
 
         ///<inheritdoc/>
-        IEnumerable<AbsolutePath> IClean.DirectoriesToClean => new[] { this.Get<IPack>().ArtifactsDirectory, this.Get<IReportCoverage>().CoverageReportDirectory };
+        IEnumerable<AbsolutePath> IClean.DirectoriesToClean => new[] { this.Get<IReportCoverage>().CoverageReportDirectory };
 
         ///<inheritdoc/>
         IEnumerable<AbsolutePath> IClean.DirectoriesToEnsureExistance => new[]
@@ -125,7 +125,7 @@ namespace ContinuousIntegration
         };
 
         ///<inheritdoc/>
-        IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(this.Get<IHaveSolution>().Solution.GetProjects("*.UnitTests"));
+        IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(this.Get<IHaveSolution>().Solution.GetProjects("*.*Tests"));
 
         ///<inheritdoc/>
         IEnumerable<AbsolutePath> IPack.PackableProjects => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobFiles("**/*.csproj");
