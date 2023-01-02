@@ -85,10 +85,24 @@
         public ValueTask Delete(Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public async ValueTask<T> FirstAsync(CancellationToken cancellationToken = default) => await _entries.FirstAsync(cancellationToken).ConfigureAwait(false);
+        public async ValueTask<T> FirstAsync(CancellationToken cancellationToken = default)
+            => await FirstAsync(Enumerable.Empty<IncludeClause<T>>(), cancellationToken).ConfigureAwait(false);
+
 
         /// <inheritdoc/>
-        public async ValueTask<T> FirstAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => await _entries.FirstAsync(predicate, cancellationToken).ConfigureAwait(false);
+        public async ValueTask<T> FirstAsync(IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
+            => await _entries.Include(includedProperties)
+                             .FirstAsync(cancellationToken).ConfigureAwait(false);
+
+#if NETSTANDARD2_0
+        /// <inheritdoc/>
+        public async ValueTask<T> FirstAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+            => await FirstAsync(predicate, Enumerable.Empty<IncludeClause<T>>(), cancellationToken).ConfigureAwait(false);
+#endif
+
+        /// <inheritdoc/>
+        public async ValueTask<T> FirstAsync(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
+            => await _entries.Include(includedProperties).FirstAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
         public async ValueTask<TResult> FirstAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
@@ -97,12 +111,23 @@
                              .FirstAsync(cancellationToken)
                              .ConfigureAwait(false);
 
+#if NETSTANDARD2_0
         /// <inheritdoc/>
         public async ValueTask<Option<T>> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
+            => await FirstOrDefaultAsync(Enumerable.Empty<IncludeClause<T>>(), cancellationToken).ConfigureAwait(false);
+#endif
+
+        /// <inheritdoc/>
+        public async ValueTask<Option<T>> FirstOrDefaultAsync(IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
             => (await _entries.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false)).SomeNotNull();
 
         /// <inheritdoc/>
-        public ValueTask<Option<T>> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public ValueTask<Option<T>> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        /// <inheritdoc/>
+        public ValueTask<Option<T>> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
 
         /// <inheritdoc/>
         public ValueTask<Option<TResult>> FirstOrDefaultAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
@@ -123,6 +148,10 @@
         public ValueTask<T> SingleAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
         public ValueTask<T> SingleAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        /// <inheritdoc/>
+        public ValueTask<T> SingleAsync(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
         /// <inheritdoc/>
         public ValueTask<TResult> SingleAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>

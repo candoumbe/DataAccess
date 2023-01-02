@@ -37,7 +37,7 @@ namespace Candoumbe.DataAccess.Repositories
         /// <param name="total">Number of items</param>
         /// <param name="size">Number of items per page.</param>
         /// <exception cref="ArgumentOutOfRangeException">if either<paramref name="total"/> or <paramref name="size"/> are negative</exception>
-        /// <exception cref="ArgumentNullException">if <paramref name="entries"/> is <c>null</c></exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="entries"/> is <see langword="null"/></exception>
         public Page(IEnumerable<T> entries, long total, long size)
         {
             if (total < 0)
