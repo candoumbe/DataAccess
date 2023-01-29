@@ -44,10 +44,9 @@ namespace Candoumbe.DataAccess.Abstractions
         {
             IRepository<TEntry> repository;
             // Checks if the Dictionary Key contains the Type class
-            if (_repositories.ContainsKey(typeof(TEntry)))
+            if (!_repositories.TryGetValue(typeof(TEntry), out object value))
             {
-                // Return the repository for that Type class
-                repository = _repositories[typeof(TEntry)] as IRepository<TEntry>;
+                repository = value as IRepository<TEntry>;
             }
             else
             {
@@ -66,8 +65,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="ct"></param>
         /// <returns>The number of objects in an Added, Modified, or Deleted state</returns>
         public async Task SaveChangesAsync(CancellationToken ct = default)
-            => await _context.SaveChangesAsync(ct)
-            .ConfigureAwait(false);
+            => await _context.SaveChangesAsync(ct).ConfigureAwait(false);
 
         ///<inheritdoc/>
         public void Dispose()

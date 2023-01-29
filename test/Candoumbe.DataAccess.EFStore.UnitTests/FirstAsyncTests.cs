@@ -19,7 +19,7 @@
     using Xunit.Categories;
 
     [UnitTest]
-    public class FirstAsyncTests : EntityFrameworkRepositoryTestsBase, IClassFixture<SqliteDatabaseFixture>, IAsyncLifetime
+    public class FirstAsyncTests : EntityFrameworkRepositoryTestsBase, IClassFixture<SqliteDatabaseFixture>
     {
         public FirstAsyncTests(SqliteDatabaseFixture databaseFixture) : base(databaseFixture)
         {

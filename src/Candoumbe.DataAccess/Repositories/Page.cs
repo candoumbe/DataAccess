@@ -28,7 +28,7 @@ namespace Candoumbe.DataAccess.Repositories
         /// <summary>
         /// Number of items per <see cref="Page{T}"/>
         /// </summary>
-        public long Size { get; }
+        public PageSize Size { get; }
 
         /// <summary>
         /// Builds a new <see cref="Page{T}"/> instances
@@ -38,41 +38,26 @@ namespace Candoumbe.DataAccess.Repositories
         /// <param name="size">Number of items per page.</param>
         /// <exception cref="ArgumentOutOfRangeException">if either<paramref name="total"/> or <paramref name="size"/> are negative</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="entries"/> is <see langword="null"/></exception>
-        public Page(IEnumerable<T> entries, long total, long size)
+        public Page(IEnumerable<T> entries, long total, PageSize size)
         {
             if (total < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(total), total, $"{nameof(total)} must not be a negative value");
             }
 
-            if (size < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(size), size, $"{nameof(size)} must not be a negative value");
-            }
-
             Entries = entries ?? throw new ArgumentNullException(nameof(entries));
             Total = total;
             Size = size;
-            if (Size >= 1)
+            Count = (int)Math.Ceiling(Total / (decimal)Size.Value) switch
             {
-                if (Total > 0)
-                {
-                    Count = (int)Math.Ceiling(Total / (decimal)Size);
-                }
-                else
-                {
-                    Count = 1;
-                }
-            }
-            else
-            {
-                Count = 1;
-            }
+                < 1 => 1,
+                int result => result
+            };
         }
 
         /// <summary>
         /// Gets an empty <see cref="Page{T}"/> instance.
         /// </summary>
-        public static Page<T> Empty(in long pageSize) => new Page<T>(Enumerable.Empty<T>(), 0, pageSize);
+        public static Page<T> Empty(in PageSize pageSize) => new Page<T>(Enumerable.Empty<T>(), 0, pageSize);
     }
 }

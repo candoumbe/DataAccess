@@ -36,19 +36,6 @@
     </When>
   </Choose>
 
-  <!-- Set package references based on target framework -->
-  <Choose>
-    <When Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net\d\.0$'))">
-      <ItemGroup>
-        <PackageReference Include="FluentValidation" Version="10.4.0" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="FluentValidation" Version="8.6.3" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
   <ItemGroup>
     <PackageReference Include="Optional" Version="4.0.0"/>
     <PackageReference Include="Candoumbe.MiscUtilities" Version="0.10.0"/>

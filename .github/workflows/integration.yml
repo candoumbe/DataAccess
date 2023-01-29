@@ -19,12 +19,13 @@ name: integration
 on:
   push:
     branches-ignore:
-      - MainBranchName
+      - main
   pull_request:
     paths:
       - '!docs/*'
       - '!README.md'
       - '!CHANGELOG.md'
+      - '!LICENSE'
 
 jobs:
   ubuntu-latest:
@@ -40,9 +41,9 @@ jobs:
           path: |
             .nuke/temp
             ~/.nuget/packages
-          key: ${{ runner.os }}-${{ hashFiles('global.json', 'src/**/*.csproj') }}
-      - name: Run './build.cmd UnitTests Publish AddGithubRelease'
-        run: ./build.cmd UnitTests Publish AddGithubRelease
+          key: ${{ runner.os }}-${{ hashFiles('src/**/*.csproj', 'test/**/*.csproj', 'stryker-config.json', 'test/**/*/xunit.runner.json') }}
+      - name: Run './build.cmd Compile UnitTests Pack Publish'
+        run: ./build.cmd Compile UnitTests Pack Publish
         env:
           NugetApiKey: ${{ secrets.NUGET_API_KEY }}
           CodecovToken: ${{ secrets.CODECOV_TOKEN }}
