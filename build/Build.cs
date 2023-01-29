@@ -26,7 +26,7 @@ namespace ContinuousIntegration
             "test/**/*.csproj",
             "stryker-config.json",
             "test/**/*/xunit.runner.json" },
-        OnPushBranchesIgnore = new[] { IGitFlowWithPullRequest.MainBranchName },
+        OnPushBranchesIgnore = new[] { IHaveMainBranch.MainBranchName },
         EnableGitHubToken = true,
         ImportSecrets = new[]
         {
@@ -42,6 +42,32 @@ namespace ContinuousIntegration
             "LICENSE"
         }
     )]
+    [GitHubActions("delivery", GitHubActionsImage.UbuntuLatest,
+        AutoGenerate = true,
+        FetchDepth = 0,
+        InvokedTargets = new[] { nameof(IUnitTest.Compile), nameof(IPublish.Pack), nameof(IPublish.Publish) },
+        CacheKeyFiles = new[] {
+            "src/**/*.csproj",
+            "test/**/*.csproj",
+            "stryker-config.json",
+            "test/**/*/xunit.runner.json" },
+        OnPushBranches = new[] { IHaveMainBranch.MainBranchName },
+        EnableGitHubToken = true,
+        ImportSecrets = new[]
+        {
+            nameof(NugetApiKey),
+            nameof(IReportCoverage.CodecovToken)
+        },
+        PublishArtifacts = true,
+        OnPullRequestExcludePaths = new[]
+        {
+            "docs/*",
+            "README.md",
+            "CHANGELOG.md",
+            "LICENSE"
+        }
+    )]
+
     [DotNetVerbosityMapping]
     [ShutdownDotNetAfterServerBuild]
     public class Build : NukeBuild,
