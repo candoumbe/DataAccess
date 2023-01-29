@@ -4,6 +4,9 @@
 
     using FluentAssertions;
 
+    using FsCheck;
+    using FsCheck.Xunit;
+
     using System;
     using System.Linq;
 
@@ -11,7 +14,6 @@
     using Xunit.Abstractions;
     using Xunit.Categories;
 
-    [Feature("DAL")]
     [UnitTest]
     public class PageTests
     {
@@ -26,51 +28,46 @@
         public void CtorWithNullEntriesShouldThrowArgumentNullException()
         {
             //Act
-            Action action = () => new Page<object>(null, 0, 0);
+            Action action = () => new Page<object>(null, 0, PageSize.From(0));
 
             //Assert
-            ArgumentNullException exception = action.Should().Throw<ArgumentNullException>().Which;
-            exception.ParamName.Should().NotBeNullOrWhiteSpace();
+            action.Should()
+                  .Throw<ArgumentNullException>()
+                  .Where(ex => !string.IsNullOrWhiteSpace(ex.ParamName))
+                  .Where(ex => !string.IsNullOrWhiteSpace(ex.Message));
         }
 
-        [Theory]
-        [InlineData(10)]
-        [InlineData(20)]
-        [InlineData(long.MaxValue)]
-        public void Default(long pageSize)
+        [Property]
+        public void Given_a_pageSize_When_calling_Empty_Then_the_resulting_instance_should_have_correct_values_for_all_properties(PositiveInt pageSize)
         {
             //Act
-            Page<object> pagedResult = Page<object>.Empty(pageSize);
+            Page<object> pagedResult = Page<object>.Empty(PageSize.From(pageSize.Item));
 
             //Assert
             pagedResult.Should().NotBeNull();
-            pagedResult.Size.Should().Be(pageSize);
+            pagedResult.Size.Value.Should().Be(pageSize.Item);
             pagedResult.Count.Should().Be(1);
             pagedResult.Total.Should().Be(0);
             pagedResult.Entries.Should().BeEmpty();
         }
 
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(int.MinValue)]
-        public void CtorWithNegativePageSizeShouldThrowArgumentOutOfRangeException(int pageSize)
+        [Property]
+        public void CtorWithNegativePageSizeShouldThrowArgumentOutOfRangeException(NegativeInt pageSize)
         {
-            _outputTestHelper.WriteLine($"Page size : {pageSize}");
-            Action action = () => new Page<object>(Enumerable.Empty<object>(), 0, pageSize);
+            _outputTestHelper.WriteLine($"Page size : {pageSize.Item}");
+            Action action = () => new Page<object>(Enumerable.Empty<object>(), 0, PageSize.From(pageSize.Item));
             action.Should().Throw<ArgumentOutOfRangeException>().Which
                 .ParamName.Should()
                     .BeEquivalentTo(nameof(Page<object>.Size));
         }
 
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(int.MinValue)]
-        public void CtorWithNegativeTotalShouldThrowArgumentOutOfRangeException(int total)
+        [Property]
+        public void CtorWithNegativeTotalShouldThrowArgumentOutOfRangeException(NegativeInt total)
         {
-            _outputTestHelper.WriteLine($"{nameof(Page<object>.Total)} : {total}");
+            _outputTestHelper.WriteLine($"{nameof(Page<object>.Total)} : {total.Item}");
 
             //Act
-            Action action = () => new Page<object>(Enumerable.Empty<object>(), total, 1);
+            Action action = () => new Page<object>(Enumerable.Empty<object>(), total.Item, PageSize.One);
 
             // Assert
             action.Should().Throw<ArgumentOutOfRangeException>().Which
@@ -78,20 +75,21 @@
                     .BeEquivalentTo(nameof(Page<object>.Total));
         }
 
-        [Theory]
-        [InlineData(0, 0, 1, "page size is set to 0 and number of element is also 0")]
-        [InlineData(1, 30, 1, "page size is set to 30 and number of element is 1")]
-        [InlineData(10, 5, 2, "page size is set to 5 and number of element is 10")]
-        [InlineData(12, 5, 3, "page size is set to 5 and number of element 12")]
-        [InlineData(400, 30, 14, "page size is set to 30 and number of element is 400")]
-        [InlineData(0, 30, 1, "page size is set to 0 and number of element is 0")]
-        public void CheckPageCount(int total, int pageSize, int expectedPageCount, string reason)
+        [Property(Arbitrary = new[] { typeof(Generators) })]
+        public void CheckPageCount(NonNegativeInt total, PageSize pageSize)
         {
+            // Arrange 
+            (int expected, string reason) = (int)Math.Ceiling((double)total.Item / pageSize) switch
+            {
+                < 1 => (1, "page count cannot be less than 1"),
+                int count => (count, "Page count must be an numeric value")
+            };
+
             //Act
-            Page<object> page = new(Enumerable.Empty<object>(), total, pageSize);
+            Page<object> page = new(Enumerable.Empty<object>(), total.Item, pageSize);
 
             //Assert
-            page.Count.Should().Be(expectedPageCount, reason);
+            page.Count.Should().Be(expected, reason);
         }
     }
 }

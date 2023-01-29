@@ -6,46 +6,47 @@ using Candoumbe.Pipelines.Components.Workflows;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.CI.GitHubActions;
-using Nuke.Common.Execution;
-using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
-using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Utilities.Collections;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using static Serilog.Log;
-
 namespace ContinuousIntegration
 {
     [GitHubActions("integration", GitHubActionsImage.UbuntuLatest,
-        OnPushBranchesIgnore = new[] { nameof(IHaveMainBranch.MainBranchName) },
-        EnableGitHubToken = true,
+        AutoGenerate = true,
         FetchDepth = 0,
-        InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IPublish.Publish), nameof(ICreateGithubRelease.AddGithubRelease) },
-        CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
-        PublishArtifacts = true,
+        InvokedTargets = new[] { nameof(IUnitTest.Compile), nameof(IUnitTest.UnitTests), nameof(IPublish.Pack), nameof(IPublish.Publish) },
+        CacheKeyFiles = new[] {
+            "src/**/*.csproj",
+            "test/**/*.csproj",
+            "stryker-config.json",
+            "test/**/*/xunit.runner.json" },
+        OnPushBranchesIgnore = new[] { IGitFlowWithPullRequest.MainBranchName },
+        EnableGitHubToken = true,
         ImportSecrets = new[]
         {
             nameof(NugetApiKey),
             nameof(IReportCoverage.CodecovToken)
         },
+        PublishArtifacts = true,
         OnPullRequestExcludePaths = new[]
         {
             "docs/*",
             "README.md",
-            "CHANGELOG.md"
-        })]
+            "CHANGELOG.md",
+            "LICENSE"
+        }
+    )]
     [DotNetVerbosityMapping]
-    [HandleVisualStudioDebugging]
     [ShutdownDotNetAfterServerBuild]
     public class Build : NukeBuild,
-        IHaveSourceDirectory,
         IHaveSolution,
+        IHaveSourceDirectory,
         IHaveTestDirectory,
         IHaveConfiguration,
         IHaveGitVersion,
@@ -57,84 +58,51 @@ namespace ContinuousIntegration
         IRestore,
         ICompile,
         IUnitTest,
+        IMutationTest,
         IReportCoverage,
         IPack,
         IPublish,
         ICreateGithubRelease,
-        IGitFlowWithPullRequest
+        IGitFlowWithPullRequest,
+        IHaveArtifacts
     {
+        [CI]
+        public GitHubActions GitHubActions;
+
         [Required]
         [Solution]
-        public readonly Solution Solution;
+        public Solution Solution;
 
         ///<inheritdoc/>
         Solution IHaveSolution.Solution => Solution;
 
-        /// <summary>
-        /// Token to interact with GitHub's API
-        /// </summary>
-        [Parameter]
-        [Secret]
-        public readonly string GitHubToken;
+        ///<inheritdoc/>
+        AbsolutePath IHaveSourceDirectory.SourceDirectory => RootDirectory / "src";
+
+        IEnumerable<AbsolutePath> IClean.DirectoriesToClean => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
+            .Concat(this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj"));
 
         /// <summary>
-        /// Token to interact with Nuget's API
+        /// Token used to interact with GitHub API
         /// </summary>
-        [Parameter("Token to interact with Nuget's API")]
+        [Parameter("Token used to interact with Nuget API")]
         [Secret]
         public readonly string NugetApiKey;
 
-        [Parameter]
-        [Secret]
-        public readonly string CodecovToken;
 
-        ///<inheritdoc/>
-        string IReportCoverage.CodecovToken => CodecovToken;
-
-
-        [Parameter("API Key used to submit Stryker dashboard")]
-        [Secret]
-        public readonly string StrykerDashboardApiKey;
-
-        [GitVersion(NoFetch = true, Framework = "net5.0")]
-        public readonly GitVersion GitVersion;
-
-        ///<inheritdoc/>
-        GitVersion IHaveGitVersion.GitVersion => GitVersion;
-
-        [GitRepository]
-        public readonly GitRepository GitRepository;
-
-        ///<inheritdoc/>
-        GitRepository IHaveGitRepository.GitRepository => GitRepository;
-
-        [CI]
-        public readonly GitHubActions GitHubActions;
-
-        ///<inheritdoc/>
-        IEnumerable<AbsolutePath> IClean.DirectoriesToDelete => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
-                                                                .Concat(this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj"));
-
-        ///<inheritdoc/>
-        IEnumerable<AbsolutePath> IClean.DirectoriesToClean => new[] { this.Get<IReportCoverage>().CoverageReportDirectory };
-
-        ///<inheritdoc/>
-        IEnumerable<AbsolutePath> IClean.DirectoriesToEnsureExistance => new[]
-        {
-            this.Get<IReportCoverage>().CoverageReportHistoryDirectory
-        };
-
-        ///<inheritdoc/>
-        IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(this.Get<IHaveSolution>().Solution.GetProjects("*.*Tests"));
+        /// Support plugins are available for:
+        ///   - JetBrains ReSharper        https://nuke.build/resharper
+        ///   - JetBrains Rider            https://nuke.build/rider
+        ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
+        ///   - Microsoft VSCode           https://nuke.build/vscode
+        public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);
 
         ///<inheritdoc/>
         IEnumerable<AbsolutePath> IPack.PackableProjects => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobFiles("**/*.csproj");
 
-        ///<inheritdoc/>
-        bool IReportCoverage.ReportToCodeCov => CodecovToken is not null;
 
         ///<inheritdoc/>
-        public IEnumerable<PublishConfiguration> PublishConfigurations => new PublishConfiguration[]
+        IEnumerable<PublishConfiguration> IPublish.PublishConfigurations => new PublishConfiguration[]
         {
             new NugetPublishConfiguration(
                 apiKey: NugetApiKey,
@@ -145,15 +113,24 @@ namespace ContinuousIntegration
                 githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
                 source: new Uri($"https://nuget.pkg.github.com/{GitHubActions?.RepositoryOwner}/index.json"),
                 canBeUsed: () => this is ICreateGithubRelease createRelease && createRelease.GitHubToken is not null
-            ),
-        };
+        )};
 
-        public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);
+        ///<inheritdoc/>
+        IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(this.Get<IHaveSolution>().Solution.GetProjects("*.UnitTests"));
+
+        ///<inheritdoc/>
+        IEnumerable<Project> IMutationTest.MutationTestsProjects => this.Get<IUnitTest>().UnitTestsProjects;
+
+        ///<inheritdoc/>
+        bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
 
         ///<inheritdoc/>
         protected override void OnBuildCreated()
         {
-            Information($"{nameof(IHaveConfiguration)}.{nameof(IHaveConfiguration.Configuration)} : {this.Get<IHaveConfiguration>().Configuration}");
+            if (IsServerBuild)
+            {
+                Environment.SetEnvironmentVariable("DOTNET_ROLL_FORWARD", "LatestMajor");
+            }
         }
     }
 }

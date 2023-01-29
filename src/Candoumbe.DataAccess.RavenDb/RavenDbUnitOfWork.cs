@@ -4,6 +4,8 @@
 
     using Raven.Client.Documents.Session;
 
+    using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
@@ -14,7 +16,7 @@
     public class RavenDbUnitOfWork : IUnitOfWork
     {
         private readonly IAsyncDocumentSession _session;
-        private readonly IDictionary<string, object> _repositories;
+        private readonly IDictionary<Type, object> _repositories;
 
         /// <summary>
         /// Builds a new <see cref="RavenDbUnitOfWork"/> instance.
@@ -23,25 +25,29 @@
         public RavenDbUnitOfWork(IAsyncDocumentSession session)
         {
             _session = session;
-            _repositories = new Dictionary<string, object>();
+            _repositories = new ConcurrentDictionary<Type, object>();
         }
 
         /// <inheritdoc/>
-        public void Dispose() => _session.Dispose();
+        public void Dispose()
+        {
+            _session.Dispose();
+            GC.SuppressFinalize(this);
+        }
 
         /// <inheritdoc/>
         public IRepository<TEntry> Repository<TEntry>() where TEntry : class
         {
             IRepository<TEntry> repository;
 
-            if (_repositories.ContainsKey(typeof(TEntry).FullName))
+            if (!_repositories.TryGetValue(typeof(TEntry), out object value))
             {
-                repository = _repositories[typeof(TEntry).FullName] as IRepository<TEntry>;
+                repository = value as IRepository<TEntry>;
             }
             else
             {
                 repository = new RavenDbRepository<TEntry>(_session);
-                _repositories.Add(typeof(TEntry).FullName, repository);
+                _repositories.Add(typeof(TEntry), repository);
             }
 
             return repository;

@@ -1,7 +1,6 @@
 ﻿namespace Candoumbe.DataAccess.Repositories
 {
     using DataFilters;
-    using DataFilters.Expressions;
 
     /// <summary>
     /// Wraps criteria to search elements
@@ -15,8 +14,8 @@
         public IFilter Filter { get; set; }
 
         /// <summary>
-        /// <see cref="OrderClause{T}"/> that can be applied to the result of the search.
+        /// <see cref="IOrder{T}"/> that can be applied to the result of the search.
         /// </summary>
-        public ISort<T> Sort { get; set; }
+        public IOrder<T> Order { get; set; }
     }
 }

@@ -4,8 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{91B90448-4C57-49AC-9A49-E4919035E1EF}"
+	ProjectSection(SolutionItems) = preProject
+		stryker-config.json = stryker-config.json
+	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.DataAccess.Tests", "test\Candoumbe.DataAccess.Tests\Candoumbe.DataAccess.Tests.csproj", "{C572DA49-1F54-4884-AC07-851CF64264DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.DataAccess.UnitTests", "test\Candoumbe.DataAccess.Tests\Candoumbe.DataAccess.UnitTests.csproj", "{C572DA49-1F54-4884-AC07-851CF64264DD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A960764B-242B-4163-B67B-5B28B8206E50}"
 EndProject
@@ -49,7 +52,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{BFD57C4D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContinuousIntegration", "build\ContinuousIntegration.csproj", "{3E307E4F-33A2-4034-A817-00BA772CCB39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Candoumbe.DataAccess.EFStore.UnitTests", "test\Candoumbe.DataAccess.EFStore.UnitTests\Candoumbe.DataAccess.EFStore.UnitTests.csproj", "{CDF8B290-A866-406A-BABD-EBD901B80925}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.DataAccess.EFStore.UnitTests", "test\Candoumbe.DataAccess.EFStore.UnitTests\Candoumbe.DataAccess.EFStore.UnitTests.csproj", "{CDF8B290-A866-406A-BABD-EBD901B80925}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

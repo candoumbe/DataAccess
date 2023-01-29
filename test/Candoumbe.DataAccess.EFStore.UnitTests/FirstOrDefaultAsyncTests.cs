@@ -14,6 +14,7 @@
     using Optional;
 
     using System;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -52,7 +53,11 @@
             maybeHero.Match(
                 hero => hero.Acolytes.Should()
                                      .BeEmpty("No instruction were defined to automatically include the acolytes property"),
-                () => Assert.Fail($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.FirstOrDefaultAsync)}' must return the entity when it exists")
+#if NET7_0_OR_GREATER
+                () => throw new UnreachableException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.FirstOrDefaultAsync)}' must return the entity when it exists")
+#else
+                () => throw new NotSupportedException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.FirstOrDefaultAsync)}' must return the entity when it exists")
+#endif
             );
         }
 
@@ -85,9 +90,12 @@
                 hero => hero.Acolytes.Should()
                                      .HaveSameCount(hero.Acolytes, $"'{nameof(Hero.Acolytes)}' was explicitely included").And
                                      .OnlyContain(acolyteActual => acolyteActual.Name == acolyte.Name),
-                () => Assert.Fail($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.SingleOrDefaultAsync)}' must return the entity when it exists")
+#if NET7_0_OR_GREATER
+                () => throw new UnreachableException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.FirstOrDefaultAsync)}' must return the entity when it exists")
+#else
+                () => throw new NotSupportedException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.FirstOrDefaultAsync)}' must return the entity when it exists")
+#endif
             );
-
         }
     }
 }

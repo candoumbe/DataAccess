@@ -20,6 +20,32 @@ namespace Candoumbe.DataAccess.Abstractions
     public interface IRepository<TEntry> where TEntry : class
     {
         /// <summary>
+        ///     Reads all entries from the repository.
+        /// </summary>
+        /// <param name="pageSize">Size of the page.</param>
+        /// <param name="page">Index of the page.</param>
+        /// <param name="orderBy">The order by clause to apply.</param>
+        /// <param name="ct">Notifies to cancel the execution of the request</param>
+        /// <returns><see cref="Page{T}"/> which holds the result</returns>
+        public async ValueTask<Page<TEntry>> ReadPageAsync(PageSize pageSize, PageIndex page, IOrder<TEntry> orderBy = null, CancellationToken ct = default)
+            => await ReadPageAsync(pageSize, page, Enumerable.Empty<IncludeClause<TEntry>>(), orderBy, ct).ConfigureAwait(false);
+
+        /// <summary>
+        ///     Reads all entries from the repository.
+        /// </summary>
+        /// <param name="pageSize">Size of the page.</param>
+        /// <param name="page">Index of the page.</param>
+        /// <param name="includedProperties">Properties to eagerly include for each entry.</param>
+        /// <param name="orderBy">The order by clause to apply.</param>
+        /// <param name="ct">Notifies to cancel the execution of the request</param>
+        /// <returns><see cref="Page{TEntry}"/> which holds the result</returns>
+        ValueTask<Page<TEntry>> ReadPageAsync(PageSize pageSize,
+                                              PageIndex page,
+                                              IEnumerable<IncludeClause<TEntry>> includedProperties,
+                                              IOrder<TEntry> orderBy = null,
+                                              CancellationToken ct = default);
+
+        /// <summary>
         /// <para>
         ///     Reads all entries from the repository.
         /// </para>
@@ -35,9 +61,9 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
         ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
-                                                        int pageSize,
-                                                        int page,
-                                                        ISort<TResult> orderBy = null,
+                                                        PageSize pageSize,
+                                                        PageIndex page,
+                                                        IOrder<TResult> orderBy = null,
                                                         CancellationToken ct = default);
 
         /// <summary>
@@ -51,9 +77,9 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
         ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
-                                                        int pageSize,
-                                                        int page,
-                                                        ISort<TEntry> orderBy = null,
+                                                        PageSize pageSize,
+                                                        PageIndex page,
+                                                        IOrder<TEntry> orderBy = null,
                                                         CancellationToken ct = default);
 
         /// <summary>
@@ -71,14 +97,6 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="ct">Token to stop query from running</param>
         /// <returns></returns>
         ValueTask<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken ct = default);
-
-        //IEnumerable<GroupedResult<TKey, TEntry>>  GroupBy<TKey>(Expression<Func<TEntry, TKey>> keySelector);
-
-        //ValueTask<IEnumerable<GroupedResult<TKey, TEntry>>> GroupByAsync<TKey>(Expression<Func<TEntry, TKey>> keySelector);
-
-        //IEnumerable<GroupedResult<TKey, TResult>> GroupBy<TKey, TResult>( Expression<Func<TEntry, TKey>> keySelector, Expression<Func<TEntry, TResult>> selector);
-
-        //ValueTask<IEnumerable<GroupedResult<TKey, TResult>>> GroupByAsync<TKey, TResult>( Expression<Func<TEntry, TKey>> keySelector, Expression<Func<TEntry, TResult>> selector);
 
         /// <summary>
         /// Gets entries of the repository that satisfied the specified <paramref name="predicate"/>
@@ -142,7 +160,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns><see cref="IEnumerable{T}"/> which holds the resu;t</returns>
         ValueTask<IEnumerable<TEntry>> WhereAsync(
             Expression<Func<TEntry, bool>> predicate,
-            ISort<TEntry> orderBy = null,
+            IOrder<TEntry> orderBy = null,
             IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken ct = default);
 
         /// <summary>
@@ -161,7 +179,7 @@ namespace Candoumbe.DataAccess.Abstractions
         ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector,
             Expression<Func<TEntry, bool>> predicate,
-            ISort<TResult> orderBy = null,
+            IOrder<TResult> orderBy = null,
             IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken ct = default);
 
         /// <summary>
@@ -179,7 +197,7 @@ namespace Candoumbe.DataAccess.Abstractions
         ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(
            Expression<Func<TEntry, TResult>> selector,
            Expression<Func<TResult, bool>> predicate,
-           ISort<TResult> orderBy = null,
+           IOrder<TResult> orderBy = null,
            CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -191,11 +209,11 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="page">the page of result to get (1 for the page, 2 for the second, ...)</param>
         /// <param name="cancellationToken"></param>
         /// <returns><see cref="Page{T}"/> which holds the </returns>
-        ValueTask<Page<TEntry>> WhereAsync(
-            Expression<Func<TEntry, bool>> predicate,
-            ISort<TEntry> orderBy,
-            int pageSize,
-            int page, CancellationToken cancellationToken = default);
+        ValueTask<Page<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate,
+                                           IOrder<TEntry> orderBy,
+                                           PageSize pageSize,
+                                           PageIndex page,
+                                           CancellationToken cancellationToken = default);
 
         /// <summary>
         /// gets a <see cref="Page{T}"/> of entries that satisfied the <paramref name="predicate"/>
@@ -215,12 +233,12 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/>
         ///  or <paramref name="orderBy"/> is <see langword="null"/>.
         /// </exception>
-        ValueTask<Page<TResult>> WhereAsync<TResult>(
-            Expression<Func<TEntry, TResult>> selector,
-            Expression<Func<TEntry, bool>> predicate,
-            ISort<TResult> orderBy,
-            int pageSize,
-            int page, CancellationToken cancellationToken = default);
+        ValueTask<Page<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+                                                     Expression<Func<TEntry, bool>> predicate,
+                                                     IOrder<TResult> orderBy,
+                                                     PageSize pageSize,
+                                                     PageIndex page,
+                                                     CancellationToken cancellationToken = default);
 
         /// <summary>
         /// gets a <see cref="Page{T}"/> of entries that satisfied the <paramref name="predicate"/>
@@ -240,7 +258,7 @@ namespace Candoumbe.DataAccess.Abstractions
         ValueTask<Page<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector,
             Expression<Func<TResult, bool>> predicate,
-            ISort<TResult> orderBy, int pageSize, int page, CancellationToken cancellationToken = default);
+            IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the max value of the selected element

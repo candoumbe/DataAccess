@@ -6,19 +6,28 @@
 
     using Xunit;
 
+    /// <summary>
+    /// Wraps a connection to an in-memory sqlite database.
+    /// </summary>
     public class SqliteDatabaseFixture : IAsyncLifetime
     {
-        private readonly SqliteConnection _connection;
-
+        /// <summary>
+        /// Builds a new <see cref="SqliteDatabaseFixture"/> that opens a connection to an in-memory sqlite database
+        /// </summary>
         public SqliteDatabaseFixture()
         {
-            _connection = new SqliteConnection("Data Source =:memory:");
+            Connection = new SqliteConnection("Data Source =:memory:");
         }
 
-        public SqliteConnection Connection => _connection;
+        /// <summary>
+        /// Connection used by the current instance.
+        /// </summary>
+        public SqliteConnection Connection { get; }
 
-        public async Task DisposeAsync() => await _connection.CloseAsync().ConfigureAwait(false);
+        ///<inheritdoc/>
+        public async Task DisposeAsync() => await Connection.CloseAsync().ConfigureAwait(false);
 
-        public async Task InitializeAsync() => await _connection.OpenAsync().ConfigureAwait(false);
+        ///<inheritdoc/>
+        public async Task InitializeAsync() => await Connection.OpenAsync().ConfigureAwait(false);
     }
 }

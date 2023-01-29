@@ -30,7 +30,6 @@
 
         public class Henchman : SuperHero
         {
-
         }
 
         /// <summary>
@@ -45,7 +44,7 @@
             // Assert
             search.Filter.Should()
                 .BeNull();
-            search.Sort.Should()
+            search.Order.Should()
                 .BeNull();
         }
     }
