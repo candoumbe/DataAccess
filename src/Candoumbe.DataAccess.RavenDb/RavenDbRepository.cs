@@ -32,18 +32,18 @@
             _session = session;
         }
         /// <inheritdoc/>
-        public async ValueTask<bool> AllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<bool> AllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
             => await _session.Query<T>().AllAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public async ValueTask<bool> AllAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<bool> AllAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default)
             => await _session.Query<T>()
                 .Select(selector)
                 .AllAsync(predicate, cancellationToken)
                 .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Page<T>> ReadPageAsync(PageSize pageSize, PageIndex page, IEnumerable<IncludeClause<T>> includedProperties, IOrder<T> orderBy, CancellationToken ct = default)
+        public virtual async Task<Page<T>> ReadPageAsync(PageSize pageSize, PageIndex page, IEnumerable<IncludeClause<T>> includedProperties, IOrder<T> orderBy, CancellationToken ct = default)
         {
             IRavenQueryable<T> entries = _session.Query<T>();
             int total = await entries.CountAsync(ct)
@@ -66,14 +66,14 @@
         }
 
         /// <inheritdoc/>
-        public async ValueTask<bool> AnyAsync(CancellationToken cancellationToken = default)
+        public async Task<bool> AnyAsync(CancellationToken cancellationToken = default)
             => await _session.Query<T>().AnyAsync(cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public ValueTask<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public async ValueTask Clear(CancellationToken ct = default)
+        public async Task Clear(CancellationToken ct = default)
         {
             IAsyncEnumerable<T> elements = _session.Query<T>().AsAsyncEnumerable();
             await foreach (T item in elements.WithCancellation(ct))
@@ -82,7 +82,7 @@
             }
         }
         /// <inheritdoc/>
-        public async ValueTask<int> CountAsync(CancellationToken cancellationToken = default)
+        public async Task<int> CountAsync(CancellationToken cancellationToken = default)
             => await _session.Query<T>().CountAsync(cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -91,7 +91,7 @@
         /// <param name="predicate"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async ValueTask<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
             => await _session.Query<T>().CountAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
@@ -105,26 +105,26 @@
         }
 
         /// <inheritdoc/>
-        public ValueTask Delete(Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task Delete(Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public async ValueTask<T> FirstAsync(CancellationToken cancellationToken = default)
+        public async Task<T> FirstAsync(CancellationToken cancellationToken = default)
             => await FirstAsync(Enumerable.Empty<IncludeClause<T>>(), cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public async ValueTask<T> FirstAsync(IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
+        public async Task<T> FirstAsync(IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
             => await _session.Query<T>()
                              .Include(includedProperties)
                              .FirstAsync(cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public async ValueTask<T> FirstAsync(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
+        public async Task<T> FirstAsync(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
             => await _session.Query<T>()
                              .Include(includedProperties)
                              .FirstAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public async ValueTask<TResult> FirstAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<TResult> FirstAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
             => await _session.Query<T>()
                              .Where(predicate)
                              .Select(selector)
@@ -132,54 +132,54 @@
                              .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public async ValueTask<Option<T>> FirstOrDefaultAsync(IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
+        public async Task<Option<T>> FirstOrDefaultAsync(IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
             => (await _session.Query<T>().FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false)).SomeNotNull();
 
         /// <inheritdoc/>
-        public ValueTask<Option<T>> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        public Task<Option<T>> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public ValueTask<Option<T>> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
+        public Task<Option<T>> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public ValueTask<Option<TResult>> FirstOrDefaultAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Option<TResult>> FirstOrDefaultAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public ValueTask<TResult> MaxAsync<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<TResult> MaxAsync<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<TResult> MinAsync<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<TResult> MinAsync<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<IEnumerable<T>> ReadAllAsync(CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<IEnumerable<T>> ReadAllAsync(CancellationToken ct = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<T, TResult>> selector, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<T, TResult>> selector, CancellationToken ct = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<T, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TResult> orderBy = null, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<T, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TResult> orderBy = null, CancellationToken ct = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<T, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<T> orderBy = null, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<T, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<T> orderBy = null, CancellationToken ct = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<T> SingleAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<T> SingleAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<T> SingleAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<T> SingleAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public ValueTask<T> SingleAsync(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<T> SingleAsync(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public ValueTask<TResult> SingleAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<TResult> SingleAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<Option<T>> SingleOrDefaultAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Option<T>> SingleOrDefaultAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<Option<T>> SingleOrDefaultAsync(IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Option<T>> SingleOrDefaultAsync(IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<Option<T>> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Option<T>> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<Option<T>> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Option<T>> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
         public IAsyncEnumerable<T> Stream(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
         {
@@ -191,22 +191,22 @@
             throw new NotImplementedException();
         }
         /// <inheritdoc/>
-        public ValueTask<IEnumerable<T>> WhereAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<IEnumerable<T>> WhereAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<IEnumerable<TResult>> WhereAsync<TKey, TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> keySelector, Expression<Func<IGrouping<TKey, T>, TResult>> groupSelector, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<IEnumerable<TResult>> WhereAsync<TKey, TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> keySelector, Expression<Func<IGrouping<TKey, T>, TResult>> groupSelector, CancellationToken ct = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<IEnumerable<T>> WhereAsync(Expression<Func<T, bool>> predicate, IOrder<T> orderBy = null, IEnumerable<IncludeClause<T>> includedProperties = null, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<IEnumerable<T>> WhereAsync(Expression<Func<T, bool>> predicate, IOrder<T> orderBy = null, IEnumerable<IncludeClause<T>> includedProperties = null, CancellationToken ct = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, IOrder<TResult> orderBy = null, IEnumerable<IncludeClause<T>> includedProperties = null, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, IOrder<TResult> orderBy = null, IEnumerable<IncludeClause<T>> includedProperties = null, CancellationToken ct = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, IOrder<TResult> orderBy = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, IOrder<TResult> orderBy = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<Page<T>> WhereAsync(Expression<Func<T, bool>> predicate, IOrder<T> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Page<T>> WhereAsync(Expression<Func<T, bool>> predicate, IOrder<T> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<Page<TResult>> WhereAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Page<TResult>> WhereAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public ValueTask<Page<TResult>> WhereAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Page<TResult>> WhereAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 }

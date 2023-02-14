@@ -41,7 +41,7 @@
         }
 
         /// <inheritdoc/>
-        public override async ValueTask Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public override async Task Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
         {
             IAsyncEnumerable<TEntry> entries = Context.Set<TEntry>().Where(predicate).AsAsyncEnumerable();
             await foreach (TEntry item in entries.WithCancellation(cancellationToken))

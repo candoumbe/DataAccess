@@ -27,7 +27,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="orderBy">The order by clause to apply.</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
-        public async ValueTask<Page<TEntry>> ReadPageAsync(PageSize pageSize, PageIndex page, IOrder<TEntry> orderBy = null, CancellationToken ct = default)
+        public async Task<Page<TEntry>> ReadPageAsync(PageSize pageSize, PageIndex page, IOrder<TEntry> orderBy = null, CancellationToken ct = default)
             => await ReadPageAsync(pageSize, page, Enumerable.Empty<IncludeClause<TEntry>>(), orderBy, ct).ConfigureAwait(false);
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="orderBy">The order by clause to apply.</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{TEntry}"/> which holds the result</returns>
-        ValueTask<Page<TEntry>> ReadPageAsync(PageSize pageSize,
+        Task<Page<TEntry>> ReadPageAsync(PageSize pageSize,
                                               PageIndex page,
                                               IEnumerable<IncludeClause<TEntry>> includedProperties,
                                               IOrder<TEntry> orderBy = null,
@@ -60,7 +60,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
-        ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+        Task<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                         PageSize pageSize,
                                                         PageIndex page,
                                                         IOrder<TResult> orderBy = null,
@@ -76,7 +76,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
-        ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+        Task<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                         PageSize pageSize,
                                                         PageIndex page,
                                                         IOrder<TEntry> orderBy = null,
@@ -87,7 +87,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// </summary>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        ValueTask<IEnumerable<TEntry>> ReadAllAsync(CancellationToken ct = default);
+        Task<IEnumerable<TEntry>> ReadAllAsync(CancellationToken ct = default);
 
         /// <summary>
         /// Gets all entries of the repository after applying <paramref name="selector"/>
@@ -96,7 +96,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="selector">projection to apply before retrieving the result.</param>
         /// <param name="ct">Token to stop query from running</param>
         /// <returns></returns>
-        ValueTask<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken ct = default);
+        Task<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken ct = default);
 
         /// <summary>
         /// Gets entries of the repository that satisfied the specified <paramref name="predicate"/>
@@ -104,7 +104,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="predicate">Filter the entries to retrieve</param>
         /// <param name="ct"></param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        ValueTask<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
+        Task<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
 
         /// <summary>
         /// Gets entries of the repository that satisfied the specified <paramref name="predicate"/>
@@ -133,7 +133,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="predicate"></param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
+        Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves entries grouped using the specified <paramref name="keySelector"/>
@@ -145,7 +145,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="groupSelector"></param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        ValueTask<IEnumerable<TResult>> WhereAsync<TKey, TResult>(
+        Task<IEnumerable<TResult>> WhereAsync<TKey, TResult>(
             Expression<Func<TEntry, bool>> predicate,
             Expression<Func<TEntry, TKey>> keySelector,
             Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupSelector, CancellationToken ct = default);
@@ -158,7 +158,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="includedProperties">Properties to include in each object</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="IEnumerable{T}"/> which holds the resu;t</returns>
-        ValueTask<IEnumerable<TEntry>> WhereAsync(
+        Task<IEnumerable<TEntry>> WhereAsync(
             Expression<Func<TEntry, bool>> predicate,
             IOrder<TEntry> orderBy = null,
             IEnumerable<IncludeClause<TEntry>> includedProperties = null, CancellationToken ct = default);
@@ -176,7 +176,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="includedProperties">Collection of <see cref="IncludeClause{T}"/> that describes properties to eagerly fetch for each item in the result</param>
         /// <param name="ct">Notifies to cancel the execution of the request</param>
         /// <returns>Collection of <typeparamref name="TResult"/> </returns>
-        ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(
+        Task<IEnumerable<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector,
             Expression<Func<TEntry, bool>> predicate,
             IOrder<TResult> orderBy = null,
@@ -194,7 +194,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="orderBy">Sort expression to apply to the collection of <typeparamref name="TResult"/>.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(
+        Task<IEnumerable<TResult>> WhereAsync<TResult>(
            Expression<Func<TEntry, TResult>> selector,
            Expression<Func<TResult, bool>> predicate,
            IOrder<TResult> orderBy = null,
@@ -209,7 +209,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="page">the page of result to get (1 for the page, 2 for the second, ...)</param>
         /// <param name="cancellationToken"></param>
         /// <returns><see cref="Page{T}"/> which holds the </returns>
-        ValueTask<Page<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate,
+        Task<Page<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate,
                                            IOrder<TEntry> orderBy,
                                            PageSize pageSize,
                                            PageIndex page,
@@ -233,7 +233,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/>
         ///  or <paramref name="orderBy"/> is <see langword="null"/>.
         /// </exception>
-        ValueTask<Page<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+        Task<Page<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                      Expression<Func<TEntry, bool>> predicate,
                                                      IOrder<TResult> orderBy,
                                                      PageSize pageSize,
@@ -255,7 +255,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="page">the page of result to get.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        ValueTask<Page<TResult>> WhereAsync<TResult>(
+        Task<Page<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector,
             Expression<Func<TResult, bool>> predicate,
             IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default);
@@ -267,7 +267,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="selector"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        ValueTask<TResult> MaxAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default);
+        Task<TResult> MaxAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the mininum value after applying the <paramref name="selector"/>
@@ -276,7 +276,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="selector">The projection to make before getting the minimum</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The minimum value</returns>
-        ValueTask<TResult> MinAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default);
+        Task<TResult> MinAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Checks if the current repository contains at least one entry
@@ -284,7 +284,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>
         ///     <see langword="true"/> if the repository contains at least one element or <see langword="false"/> otherwise
         /// </returns>
-        ValueTask<bool> AnyAsync(CancellationToken cancellationToken = default);
+        Task<bool> AnyAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Checks if the current repository contains one entry at least that match <paramref name="predicate"/>
@@ -294,7 +294,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>
         ///     <see langword="true"/> if the repository contains at least one element or <see langword="false"/> otherwise
         /// </returns>
-        ValueTask<bool> AnyAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<bool> AnyAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the number of entries in the repository.
@@ -302,7 +302,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>
         ///     the number of entries in the repository
         /// </returns>
-        ValueTask<int> CountAsync(CancellationToken cancellationToken = default);
+        Task<int> CountAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the number of entries in the repository that honor the <paramref name="predicate"/>.
@@ -312,7 +312,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>
         ///     the number of entries in the repository
         /// </returns>
-        ValueTask<int> CountAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<int> CountAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the entry of the repository
@@ -320,7 +320,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>
         /// the single entry of the repository
         /// </returns>
-        ValueTask<TEntry> SingleAsync(CancellationToken cancellationToken = default);
+        Task<TEntry> SingleAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the single entry that corresponds to the specified <paramref name="predicate"/>.
@@ -330,11 +330,11 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
 #if !NETSTANDARD2_0
-        public async ValueTask<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
             => await SingleAsync(predicate, Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken)
                     .ConfigureAwait(false);
 #else
-        ValueTask<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 #endif
 
         /// <summary>
@@ -345,7 +345,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// /// <param name="cancellationToken"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
-        ValueTask<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate,
+        Task<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate,
                                       IEnumerable<IncludeClause<TEntry>> includedProperties,
                                       CancellationToken cancellationToken = default);
 
@@ -359,14 +359,14 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>The entry that matches <paramref name="predicate"/>.</returns>
         /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/> is <see langword="null"/></exception>
-        ValueTask<TResult> SingleAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<TResult> SingleAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the single <typeparamref name="TEntry"/> of the repository.
         /// Throws <see cref="ArgumentException"/> if there's more than one entry in the repository
         /// </summary>
         /// <returns><see cref="Option.None{T}"/> if there no entry in the repository</returns>
-        ValueTask<Option<TEntry>> SingleOrDefaultAsync(CancellationToken cancellationToken = default);
+        Task<Option<TEntry>> SingleOrDefaultAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the single <typeparamref name="TEntry"/> of the repository.
@@ -375,7 +375,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="includedProperties">Properties to eagerly fetch and load</param>
         /// <param name="cancellationToken"></param>
         /// <returns><see langword="null"/> if there no entry in the repository</returns>
-        ValueTask<Option<TEntry>> SingleOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default);
+        Task<Option<TEntry>> SingleOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the single <typeparamref name="TEntry"/> element of the repository that fullfill the
@@ -385,7 +385,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="cancellationToken"></param>
         /// <returns>the corresponding entry or <see langword="null"/> if no entry found</returns>
         /// <exception cref="InvalidOperationException">if more than one entry matches <paramref name="predicate"/>.</exception>
-        ValueTask<Option<TEntry>> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<Option<TEntry>> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the single <typeparamref name="TEntry"/> element of the repository that fullfill the
@@ -397,7 +397,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>the corresponding entry or <see langword="null"/> if no entry found</returns>
         /// <exception cref="InvalidOperationException">if more than one entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if either <paramref name="predicate"/> or <paramref name="includedProperties"/> is <see langword="null"/></exception>
-        ValueTask<Option<TEntry>> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default);
+        Task<Option<TEntry>> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the one and only entry that match <paramref name="predicate"/>.
@@ -412,7 +412,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>The entry that matches <paramref name="predicate"/> or <see langword="null"/> if no matches found</returns>
         /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/> is <see langword="null"/></exception>
-        ValueTask<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the one and only entry that match <paramref name="predicate"/>.
@@ -427,14 +427,14 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>The entry that matches <paramref name="predicate"/> or <see langword="null"/> if no matches found</returns>
         /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/> is <see langword="null"/></exception>
-        ValueTask<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the first entry of the repository
         /// </summary>
         /// <returns>The first entry of the repository</returns>
         /// <exception cref="InvalidOperationException">if no entry found.</exception>
-        ValueTask<TEntry> FirstAsync(CancellationToken cancellationToken = default);
+        Task<TEntry> FirstAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the first entry of the repository
@@ -443,17 +443,17 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="cancellationToken"></param>
         /// <returns>The first entry of the repository</returns>
         /// <exception cref="InvalidOperationException">if no entry found.</exception>
-        ValueTask<TEntry> FirstAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default);
+        Task<TEntry> FirstAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the first entry of the repository
         /// </summary>
         /// <returns>The first entry or <see langword="null"/> if there's no entry.</returns>
 #if !NETSTANDARD2_0
-        public async ValueTask<Option<TEntry>> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
+        public async Task<Option<TEntry>> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
             => await FirstOrDefaultAsync(Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
 #else
-        ValueTask<Option<TEntry>> FirstOrDefaultAsync(CancellationToken cancellationToken = default);
+        Task<Option<TEntry>> FirstOrDefaultAsync(CancellationToken cancellationToken = default);
 #endif
         /// <summary>
         /// Gets the first entry of the repository
@@ -461,7 +461,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="includedProperties">properties to eagerly include</param>
         /// <param name="cancellation"></param>
         /// <returns>The first entry of the repository or <see langword="null"/> is there's no entry</returns>
-        ValueTask<Option<TEntry>> FirstOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellation = default);
+        Task<Option<TEntry>> FirstOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellation = default);
 
         /// <summary>
         /// Gets the first entry of the repository that fullfill the specified <paramref name="predicate"/>
@@ -472,10 +472,10 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <exception cref="InvalidOperationException">if no entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <see langword="null"/></exception>
 #if !NETSTANDARD2_0
-        public async ValueTask<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public async Task<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
            => await FirstAsync(predicate, Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
 #else
-        ValueTask<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 #endif
 
         /// <summary>
@@ -487,7 +487,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>The first entry that mat</returns>
         /// <exception cref="InvalidOperationException">if no entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <see langword="null"/></exception>
-        ValueTask<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default);
+        Task<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the first entry of the repository that fullfill the specified <paramref name="predicate"/>
@@ -498,10 +498,10 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <exception cref="InvalidOperationException">if no entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <see langword="null"/></exception>
 #if !NETSTANDARD2_0
-        async ValueTask<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        async Task<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
             => await FirstOrDefaultAsync(predicate, Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
 #else
-        ValueTask<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 #endif
         /// <summary>
         /// Gets the first entry of the repository that fullfill the specified <paramref name="predicate"/>
@@ -512,7 +512,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>The first entry that mat</returns>
         /// <exception cref="InvalidOperationException">if no entry matches <paramref name="predicate"/>.</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <see langword="null"/></exception>
-        ValueTask<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default);
+        Task<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete all entries that match <paramref name="predicate"/>
@@ -520,12 +520,12 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="predicate">Defines which <typeparamref name="TEntry"/> will be deleted.</param>
         /// <param name="ct">Notifies to cancel the execution of the request.</param>
         /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <c>nuull</c></exception>
-        ValueTask Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
+        Task Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
 
         /// <summary>
         /// Delete all entries of the underlying datastore
         /// </summary>
-        ValueTask Clear(CancellationToken ct = default);
+        Task Clear(CancellationToken ct = default);
 
         /// <summary>
         /// Gets the first entry that matches <paramref name="predicate"/>
@@ -536,7 +536,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="cancellationToken"></param>
         /// <returns>The entry that matches <paramref name="predicate"/>.</returns>
         /// <exception cref="InvalidOperationException">if the repository is empty or no entry matches <paramref name="predicate"/></exception>
-        ValueTask<TResult> FirstAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<TResult> FirstAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the first entry that matches <paramref name="predicate"/>
@@ -546,7 +546,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="predicate">Filter to match</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The entry that matches <paramref name="predicate"/> or <see langword="null"/> if no entry found.</returns>
-        ValueTask<Option<TResult>> FirstOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<Option<TResult>> FirstOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Creates the specified entry
@@ -568,7 +568,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="predicate">The predicate</param>
         /// <param name="cancellationToken"></param>
         /// <returns><see langword="true"/> if all entries matches <paramref name="predicate"/> and <see langword="false"/> otherwise.</returns>
-        ValueTask<bool> AllAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<bool> AllAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Checks if all entries of the repository satisfy the specified <paramref name="predicate"/>
@@ -577,6 +577,6 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="predicate">predicate to evaluate all the entries against</param>
         /// <param name="cancellationToken"></param>
         /// <returns><see langword="true"/> if all entries statifies the <paramref name="predicate"/> and <see langword="false"/> otherwise</returns>
-        ValueTask<bool> AllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<bool> AllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default);
     }
 }
