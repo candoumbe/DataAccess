@@ -38,14 +38,14 @@ namespace Candoumbe.DataAccess.Repositories
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask Clear(CancellationToken ct = default) => await Delete(_ => true, ct).ConfigureAwait(false);
+        public virtual async Task Clear(CancellationToken ct = default) => await Delete(_ => true, ct).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Page<TEntry>> ReadPageAsync(PageSize pageSize, PageIndex page, IOrder<TEntry> orderBy, CancellationToken ct = default)
+        public virtual async Task<Page<TEntry>> ReadPageAsync(PageSize pageSize, PageIndex page, IOrder<TEntry> orderBy, CancellationToken ct = default)
             => await ReadPageAsync(pageSize, page, Enumerable.Empty<IncludeClause<TEntry>>(), orderBy, ct).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Page<TEntry>> ReadPageAsync(PageSize pageSize, PageIndex page, IEnumerable<IncludeClause<TEntry>> includedProperties, IOrder<TEntry> orderBy, CancellationToken ct = default)
+        public virtual async Task<Page<TEntry>> ReadPageAsync(PageSize pageSize, PageIndex page, IEnumerable<IncludeClause<TEntry>> includedProperties, IOrder<TEntry> orderBy, CancellationToken ct = default)
         {
             DbSet<TEntry> entries = Context.Set<TEntry>();
             int total = await entries.CountAsync(ct)
@@ -66,7 +66,7 @@ namespace Candoumbe.DataAccess.Repositories
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TResult> orderBy, CancellationToken ct = default)
+        public virtual async Task<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TResult> orderBy, CancellationToken ct = default)
         {
             DbSet<TEntry> entries = Context.Set<TEntry>();
             int total = await entries.CountAsync(ct)
@@ -89,7 +89,7 @@ namespace Candoumbe.DataAccess.Repositories
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TEntry> orderBy, CancellationToken ct = default)
+        public virtual async Task<Page<TResult>> ReadPageAsync<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TEntry> orderBy, CancellationToken ct = default)
         {
             DbSet<TEntry> entries = Context.Set<TEntry>();
             IQueryable<TEntry> resultQuery = entries;
@@ -122,15 +122,15 @@ namespace Candoumbe.DataAccess.Repositories
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken ct = default)
+        public virtual async Task<IEnumerable<TResult>> ReadAllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken ct = default)
             => await Context.Set<TEntry>().Select(selector)
                             .ToArrayAsync(ct).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IEnumerable<TEntry>> ReadAllAsync(CancellationToken ct = default) => await ReadAllAsync(item => item, ct).ConfigureAwait(false);
+        public virtual async Task<IEnumerable<TEntry>> ReadAllAsync(CancellationToken ct = default) => await ReadAllAsync(item => item, ct).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default)
+        public virtual async Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default)
             => await Context.Set<TEntry>()
                             .Where(predicate)
                             .Select(selector)
@@ -138,7 +138,7 @@ namespace Candoumbe.DataAccess.Repositories
                             .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IEnumerable<TResult>> WhereAsync<TKey, TResult>(
+        public virtual async Task<IEnumerable<TResult>> WhereAsync<TKey, TResult>(
             Expression<Func<TEntry, bool>> predicate,
             Expression<Func<TEntry, TKey>> keySelector,
             Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupSelector,
@@ -159,11 +159,11 @@ namespace Candoumbe.DataAccess.Repositories
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default)
+        public virtual async Task<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default)
             => await WhereAsync(item => item, predicate, ct).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate,
+        public virtual async Task<IEnumerable<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate,
             IOrder<TEntry> orderBy = null,
             IEnumerable<IncludeClause<TEntry>> includedProperties = null,
             CancellationToken ct = default) => await WhereAsync(
@@ -171,7 +171,7 @@ namespace Candoumbe.DataAccess.Repositories
             .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+        public virtual async Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                                                  Expression<Func<TEntry, bool>> predicate,
                                                                                  IOrder<TResult> orderBy = null,
                                                                                  IEnumerable<IncludeClause<TEntry>> includedProperties = null,
@@ -185,7 +185,7 @@ namespace Candoumbe.DataAccess.Repositories
                             .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+        public virtual async Task<IEnumerable<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                                                  Expression<Func<TResult, bool>> predicate,
                                                                                  IOrder<TResult> orderBy = null,
                                                                                  CancellationToken cancellationToken = default)
@@ -197,7 +197,7 @@ namespace Candoumbe.DataAccess.Repositories
                             .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Page<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, IOrder<TEntry> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default)
+        public virtual async Task<Page<TEntry>> WhereAsync(Expression<Func<TEntry, bool>> predicate, IOrder<TEntry> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default)
         {
             if (orderBy == null)
             {
@@ -216,7 +216,7 @@ namespace Candoumbe.DataAccess.Repositories
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Page<TResult>> WhereAsync<TResult>(
+        public virtual async Task<Page<TResult>> WhereAsync<TResult>(
             Expression<Func<TEntry, TResult>> selector,
             Expression<Func<TEntry, bool>> predicate,
             IOrder<TResult> orderBy,
@@ -236,7 +236,7 @@ namespace Candoumbe.DataAccess.Repositories
             IQueryable<TResult> results = query.Skip(pageSize * (page < 1 ? 1 : page - 1))
                 .Take(pageSize);
 
-            //we compute both ValueTask
+            //we compute both Task
             IEnumerable<TResult> result = await results.ToArrayAsync(cancellationToken)
                 .ConfigureAwait(false);
             int total = await CountAsync(predicate, cancellationToken)
@@ -246,7 +246,7 @@ namespace Candoumbe.DataAccess.Repositories
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Page<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+        public virtual async Task<Page<TResult>> WhereAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                                           Expression<Func<TResult, bool>> predicate,
                                                                           IOrder<TResult> orderBy,
                                                                           PageSize pageSize,
@@ -264,7 +264,7 @@ namespace Candoumbe.DataAccess.Repositories
                                                .Skip(pageSize * (page < 1 ? 1 : page - 1))
                                                .Take(pageSize);
 
-            // we compute both ValueTask
+            // we compute both Task
             IEnumerable<TResult> result = await query.ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
             long total = await entries.Select(selector).LongCountAsync(predicate, cancellationToken)
@@ -276,46 +276,46 @@ namespace Candoumbe.DataAccess.Repositories
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<bool> AnyAsync(CancellationToken cancellationToken = default)
+        public virtual async Task<bool> AnyAsync(CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().AnyAsync(cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<TResult> MaxAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default)
+        public virtual async Task<TResult> MaxAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().MaxAsync(selector, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<TResult> MinAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default)
+        public virtual async Task<TResult> MinAsync<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().MinAsync(selector, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<bool> AnyAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public virtual async Task<bool> AnyAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().AnyAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<int> CountAsync(CancellationToken cancellationToken = default)
+        public virtual async Task<int> CountAsync(CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().CountAsync(cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<int> CountAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public virtual async Task<int> CountAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().CountAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<TEntry> SingleAsync(CancellationToken cancellationToken = default)
+        public virtual async Task<TEntry> SingleAsync(CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().SingleAsync(cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().SingleAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate,
+        public virtual async Task<TEntry> SingleAsync(Expression<Func<TEntry, bool>> predicate,
                                                            IEnumerable<IncludeClause<TEntry>> includedProperties,
                                                            CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().Include(includedProperties).SingleAsync(predicate, cancellationToken)
                 .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<TResult> SingleAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+        public virtual async Task<TResult> SingleAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                                      Expression<Func<TEntry, bool>> predicate,
                                                                      CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().Where(predicate).Select(selector)
@@ -323,13 +323,13 @@ namespace Candoumbe.DataAccess.Repositories
                 .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Option<TEntry>> SingleOrDefaultAsync(CancellationToken cancellationToken = default)
+        public virtual async Task<Option<TEntry>> SingleOrDefaultAsync(CancellationToken cancellationToken = default)
             => (await Context.Set<TEntry>().SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false))
                 .NoneWhen(result => Equals(default, result));
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Option<TEntry>> SingleOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
+        public virtual async Task<Option<TEntry>> SingleOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
             => (await Context.Set<TEntry>()
                 .Include(includedProperties)
                 .SingleOrDefaultAsync(cancellationToken)
@@ -337,13 +337,13 @@ namespace Candoumbe.DataAccess.Repositories
                 .NoneWhen(result => Equals(default, result));
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Option<TEntry>> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public virtual async Task<Option<TEntry>> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
             => (await Context.Set<TEntry>().SingleOrDefaultAsync(predicate, cancellationToken)
                 .ConfigureAwait(false))
                 .NoneWhen(result => Equals(default, result));
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Option<TEntry>> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate,
+        public virtual async Task<Option<TEntry>> SingleOrDefaultAsync(Expression<Func<TEntry, bool>> predicate,
                                                                             IEnumerable<IncludeClause<TEntry>> includedProperties,
                                                                             CancellationToken cancellationToken = default)
             => (await Context.Set<TEntry>()
@@ -353,7 +353,7 @@ namespace Candoumbe.DataAccess.Repositories
                 .NoneWhen(result => Equals(default, result));
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+        public virtual async Task<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                                                       Expression<Func<TEntry, bool>> predicate,
                                                                                       CancellationToken cancellationToken = default)
             => (await Context.Set<TEntry>().Where(predicate)
@@ -363,7 +363,7 @@ namespace Candoumbe.DataAccess.Repositories
                 .NoneWhen(result => Equals(default, result));
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
+        public virtual async Task<Option<TResult>> SingleOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                                                       Expression<Func<TResult, bool>> predicate,
                                                                                       CancellationToken cancellationToken = default)
             => (await Context.Set<TEntry>()
@@ -373,40 +373,40 @@ namespace Candoumbe.DataAccess.Repositories
                 .NoneWhen(result => Equals(default, result));
 
         /// <inheritdoc/>
-        public virtual async ValueTask<TEntry> FirstAsync(CancellationToken cancellationToken = default)
+        public virtual async Task<TEntry> FirstAsync(CancellationToken cancellationToken = default)
             => await FirstAsync(_ => true, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
             => await FirstAsync(predicate, Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<TEntry> FirstAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntry> FirstAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().Include(includedProperties).FirstAsync(cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntry> FirstAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>().Include(includedProperties)
                             .FirstAsync(predicate, cancellationToken)
                             .ConfigureAwait(false);
         /// <inheritdoc/>
-        public virtual async ValueTask<Option<TEntry>> FirstOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellation = default)
+        public virtual async Task<Option<TEntry>> FirstOrDefaultAsync(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellation = default)
             => (await Context.Set<TEntry>().Include(includedProperties)
                              .FirstOrDefaultAsync(cancellation)
                              .ConfigureAwait(false))
                              .NoneWhen(result => Equals(default, result));
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Option<TEntry>> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
+        public virtual async Task<Option<TEntry>> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
             => await FirstOrDefaultAsync(Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
         /// <inheritdoc/>
-        public virtual async ValueTask<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public virtual async Task<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
             => (await Context.Set<TEntry>().FirstOrDefaultAsync(cancellationToken)
                              .ConfigureAwait(false))
                              .NoneWhen(result => Equals(default, result));
 
         /// <inheritdoc/>
-        public virtual async ValueTask<TResult> FirstAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public virtual async Task<TResult> FirstAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>()
                 .Where(predicate)
                 .Select(selector)
@@ -414,7 +414,7 @@ namespace Candoumbe.DataAccess.Repositories
                 .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Option<TResult>> FirstOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public virtual async Task<Option<TResult>> FirstOrDefaultAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
             => (await Context.Set<TEntry>()
                              .Where(predicate)
                              .Select(selector)
@@ -423,7 +423,7 @@ namespace Candoumbe.DataAccess.Repositories
                              .NoneWhen(result => Equals(default, result));
 
         /// <inheritdoc/>
-        public virtual async ValueTask<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
+        public virtual async Task<Option<TEntry>> FirstOrDefaultAsync(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
             => (await Context.Set<TEntry>().Include(includedProperties)
                              .FirstOrDefaultAsync(predicate, cancellationToken)
                              .ConfigureAwait(false))
@@ -433,7 +433,7 @@ namespace Candoumbe.DataAccess.Repositories
         public abstract TEntry Create(TEntry entry);
 
         /// <inheritdoc/>
-        public abstract ValueTask Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
+        public abstract Task Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
 
         /// <inheritdoc/>
         public abstract IEnumerable<TEntry> Create(IEnumerable<TEntry> entries);
@@ -490,13 +490,13 @@ namespace Candoumbe.DataAccess.Repositories
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<bool> AllAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public virtual async Task<bool> AllAsync(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>()
                 .AllAsync(predicate, cancellationToken)
                 .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async ValueTask<bool> AllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default)
+        public virtual async Task<bool> AllAsync<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default)
             => await Context.Set<TEntry>()
                 .Select(selector)
                 .AllAsync(predicate, cancellationToken)
