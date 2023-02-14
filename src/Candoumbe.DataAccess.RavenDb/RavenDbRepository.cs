@@ -75,7 +75,7 @@
         /// <inheritdoc/>
         public async Task Clear(CancellationToken ct = default)
         {
-            IAsyncEnumerable<T> elements = _session.Query<T>().AsAsyncEnumerable();
+            IAsyncEnumerable<T> elements = RavenQueryableExtensions.AsAsyncEnumerable(_session.Query<T>());
             await foreach (T item in elements.WithCancellation(ct))
             {
                 _session.Delete(item);
