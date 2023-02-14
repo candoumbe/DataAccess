@@ -102,10 +102,7 @@ namespace ContinuousIntegration
         ///<inheritdoc/>
         Solution IHaveSolution.Solution => Solution;
 
-        ///<inheritdoc/>
-        AbsolutePath IHaveSourceDirectory.SourceDirectory => RootDirectory / "src";
-
-        IEnumerable<AbsolutePath> IClean.DirectoriesToClean => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
+        IEnumerable<AbsolutePath> IClean.DirectoriesToDelete => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
             .Concat(this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj"));
 
         /// <summary>
