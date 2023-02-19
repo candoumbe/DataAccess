@@ -430,13 +430,13 @@ namespace Candoumbe.DataAccess.Repositories
                              .NoneWhen(result => Equals(default, result));
 
         /// <inheritdoc/>
-        public abstract TEntry Create(TEntry entry);
+        public abstract Task<TEntry> Create(TEntry entry, CancellationToken cancellationToken = default);
 
         /// <inheritdoc/>
         public abstract Task Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default);
 
         /// <inheritdoc/>
-        public abstract IEnumerable<TEntry> Create(IEnumerable<TEntry> entries);
+        public abstract Task<IEnumerable<TEntry>> Create(IEnumerable<TEntry> entries, CancellationToken cancellationToken = default);
 
         /// <inheritdoc/>
         public IAsyncEnumerable<TEntry> Stream(Expression<Func<TEntry, bool>> predicate, CancellationToken ct = default)

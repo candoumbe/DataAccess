@@ -552,15 +552,17 @@ namespace Candoumbe.DataAccess.Abstractions
         /// Creates the specified entry
         /// </summary>
         /// <param name="entry"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        TEntry Create(TEntry entry);
+        Task<TEntry> Create(TEntry entry, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Create the specified entries
         /// </summary>
         /// <param name="entries"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        IEnumerable<TEntry> Create(IEnumerable<TEntry> entries);
+        Task<IEnumerable<TEntry>> Create(IEnumerable<TEntry> entries, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Checks if all entries of the repository matches the specified <paramref name="predicate"/>

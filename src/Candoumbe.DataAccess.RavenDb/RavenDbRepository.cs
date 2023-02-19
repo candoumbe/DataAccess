@@ -95,17 +95,30 @@
             => await _session.Query<T>().CountAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public T Create(T entry) => throw new NotImplementedException();
-
-        /// <inheritdoc/>
-        public IEnumerable<T> Create(IEnumerable<T> entries)
+        public async Task<T> Create(T entry, CancellationToken cancellationToken = default)
         {
-            entries.ForEach(async entry => await _session.StoreAsync(entry).ConfigureAwait(false));
-            return entries;
+            await _session.StoreAsync(entry, cancellationToken);
+
+            return entry;
         }
 
         /// <inheritdoc/>
-        public Task Delete(Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<IEnumerable<T>> Create(IEnumerable<T> entries, CancellationToken cancellationToken = default)
+        {
+            entries.ForEach(async entry => await _session.StoreAsync(entry, cancellationToken).ConfigureAwait(false));
+            return Task.FromResult(entries);
+        }
+
+        /// <inheritdoc/>
+        public async Task Delete(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        {
+            IAsyncEnumerable<T> entriesToDelete = Stream(predicate, ct);
+
+            await foreach (T entry in entriesToDelete.WithCancellation(ct))
+            {
+                _session.Delete(entry);
+            }
+        }
 
         /// <inheritdoc/>
         public async Task<T> FirstAsync(CancellationToken cancellationToken = default)
