@@ -5,7 +5,6 @@
 
     public class SqliteDbContextDesignTimeDbContextFactory : IDesignTimeDbContextFactory<SqliteDbContext>
     {
-
         ///<inheritdoc/>
         public SqliteDbContext CreateDbContext(string[] args)
         {
@@ -14,5 +13,4 @@
             return new SqliteDbContext(optionsBuilder.Options);
         }
     }
-
 }

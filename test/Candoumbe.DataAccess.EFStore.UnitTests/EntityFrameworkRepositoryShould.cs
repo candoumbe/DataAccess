@@ -21,7 +21,6 @@
             ctor.Should()
                 .ThrowExactly<ArgumentNullException>("The dbcontext cannot be null")
                 .Which.Message.Should().NotBeNullOrWhiteSpace();
-
         }
     }
 }

@@ -12,9 +12,9 @@
         /// <summary>
         /// Asynchronously saves changes made to the context
         /// </summary>
-        /// <param name="ct"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns>the number of elements modified</returns>
-        Task SaveChangesAsync(CancellationToken ct = default);
+        Task SaveChangesAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves the repository

@@ -22,9 +22,9 @@
     using Xunit.Categories;
 
     [UnitTest]
-    public class SingleOrDefaultAsyncTests : EntityFrameworkRepositoryTestsBase, IClassFixture<SqliteDatabaseFixture>, IAsyncLifetime
+    public class SingleOrDefaultTests : EntityFrameworkRepositoryTestsBase, IClassFixture<SqliteDatabaseFixture>, IAsyncLifetime
     {
-        public SingleOrDefaultAsyncTests(SqliteDatabaseFixture databaseFixture) : base(databaseFixture)
+        public SingleOrDefaultTests(SqliteDatabaseFixture databaseFixture) : base(databaseFixture)
         {
         }
 
@@ -46,7 +46,7 @@
             EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
 
             // Act
-            Option<Hero> maybeHero = await repository.SingleOrDefaultAsync(x => x.Id == hero.Id, default)
+            Option<Hero> maybeHero = await repository.SingleOrDefault(x => x.Id == hero.Id, default)
                                           .ConfigureAwait(false);
 
             // Assert
@@ -54,9 +54,9 @@
                 hero => hero.Acolytes.Should()
                                      .BeEmpty("No instruction were defined to automatically include the acolytes property"),
 #if NET7_0_OR_GREATER
-                () => throw new UnreachableException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.SingleOrDefaultAsync)}' must return the entity when it exists")
+                () => throw new UnreachableException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.SingleOrDefault)}' must return the entity when it exists")
 #else
-                () => throw new NotSupportedException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.SingleOrDefaultAsync)}' must return the entity when it exists")
+                () => throw new NotSupportedException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.SingleOrDefault)}' must return the entity when it exists")
 #endif
                 );
         }
@@ -80,9 +80,9 @@
             EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
 
             // Act
-            Option<Hero> maybeHero = await repository.SingleOrDefaultAsync(x => x.Id == hero.Id,
-                                                                        new[] { IncludeClause<Hero>.Create(x => x.Acolytes.Where(item => item.Name == acolyte.Name)) },
-                                                                        default)
+            Option<Hero> maybeHero = await repository.SingleOrDefault(predicate : x => x.Id == hero.Id,
+                                                                      includedProperties: new[] { IncludeClause<Hero>.Create(x => x.Acolytes.Where(item => item.Name == acolyte.Name)) },
+                                                                      cancellationToken: default)
                                                   .ConfigureAwait(false);
 
             // Assert
@@ -91,12 +91,11 @@
                                      .HaveSameCount(hero.Acolytes, $"'{nameof(Hero.Acolytes)}' was explicitely included").And
                                      .OnlyContain(acolyteActual => acolyteActual.Name == acolyte.Name),
 #if NET7_0_OR_GREATER
-                () => throw new UnreachableException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.SingleOrDefaultAsync)}' must return the entity when it exists")
+                () => throw new UnreachableException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.SingleOrDefault)}' must return the entity when it exists")
 #else
-                () => throw new NotSupportedException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.SingleOrDefaultAsync)}' must return the entity when it exists")
+                () => throw new NotSupportedException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.SingleOrDefault)}' must return the entity when it exists")
 #endif
             );
-
         }
     }
 }

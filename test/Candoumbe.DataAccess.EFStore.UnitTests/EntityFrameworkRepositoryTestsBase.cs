@@ -10,6 +10,9 @@
 
     using Xunit;
 
+    /// <summary>
+    /// Base class to extend when writing unit tests for <see cref="EFStore.EntityFrameworkRepository{TEntry, TContext}"/>
+    /// </summary>
     public abstract class EntityFrameworkRepositoryTestsBase : IAsyncLifetime
     {
         protected static readonly Faker Faker = new Faker();
@@ -18,7 +21,6 @@
 
         protected EntityFrameworkRepositoryTestsBase(SqliteDatabaseFixture databaseFixture)
         {
-
             DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
             optionsBuilder.UseSqlite(databaseFixture.Connection);
             SqliteDbContext = new SqliteDbContext(optionsBuilder.Options);
