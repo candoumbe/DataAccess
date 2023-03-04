@@ -30,14 +30,19 @@
         }
 
         /// <inheritdoc/>
-        public override TEntry Create(TEntry entry) => Context.Set<TEntry>().Add(entry).Entity;
+        public override Task<TEntry> Create(TEntry entry, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(Context.Set<TEntry>().Add(entry).Entity);
+        }
 
         /// <inheritdoc/>
-        public override IEnumerable<TEntry> Create(IEnumerable<TEntry> entries)
+        public override Task<IEnumerable<TEntry>> Create(IEnumerable<TEntry> entries, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             Context.Set<TEntry>().AddRange(entries);
 
-            return entries;
+            return Task.FromResult(entries);
         }
 
         /// <inheritdoc/>

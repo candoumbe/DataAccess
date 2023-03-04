@@ -22,6 +22,5 @@
                         .ApplyConfiguration(new AcolyteEntityTypeConfiguration())
                         .ApplyConfiguration(new WeaponEntityTypeConfiguration());
         }
-
     }
 }

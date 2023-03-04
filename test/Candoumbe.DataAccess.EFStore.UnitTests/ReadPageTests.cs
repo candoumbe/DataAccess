@@ -24,9 +24,9 @@
     using Xunit.Categories;
 
     [UnitTest]
-    public class ReadPageAsyncTests : EntityFrameworkRepositoryTestsBase, IClassFixture<SqliteDatabaseFixture>
+    public class ReadPageTests : EntityFrameworkRepositoryTestsBase, IClassFixture<SqliteDatabaseFixture>
     {
-        public ReadPageAsyncTests(SqliteDatabaseFixture databaseFixture) : base(databaseFixture)
+        public ReadPageTests(SqliteDatabaseFixture databaseFixture) : base(databaseFixture)
         {
         }
 
@@ -158,10 +158,10 @@
             EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
 
             // Act
-            Page<Hero> page = await repository.ReadPageAsync(pageSize,
-                                                             pageIndex,
-                                                             orderBy,
-                                                             ct: default)
+            Page<Hero> page = await repository.ReadPage(pageSize: pageSize,
+                                                        page: pageIndex,
+                                                        orderBy: orderBy,
+                                                        cancellationToken: default)
                                               .ConfigureAwait(false);
 
             // Assert
@@ -306,10 +306,10 @@
             EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
 
             // Act
-            Page<Hero> page = await repository.ReadPageAsync(pageSize,
-                                                             pageIndex,
-                                                             orderBy,
-                                                             ct: default)
+            Page<Hero> page = await repository.ReadPage(pageSize,
+                                                        pageIndex,
+                                                        orderBy,
+                                                        cancellationToken: default)
                                               .ConfigureAwait(false);
 
             // Assert
@@ -337,14 +337,14 @@
             IRepository<Hero> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
 
             // Act
-            Page<Hero> page = await repository.ReadPageAsync(pageSize,
+            Page<Hero> page = await repository.ReadPage(pageSize,
                                                              PageIndex.From(1),
                                                              new[]
                                                              {
                                                                  IncludeClause<Hero>.Create(h => h.Acolytes)
                                                              },
                                                              orderBy: new Order<Hero>(nameof(Hero.Id)),
-                                                             ct: default)
+                                                             cancellationToken: default)
                                               .ConfigureAwait(false);
 
             // Assert
@@ -357,7 +357,6 @@
                         .Acolytes.Should()
                                  .HaveSameCount(hero.Acolytes).And
                                  .Contain(ac => ac.Id == acolyte.Id);
-
         }
     }
 }

@@ -19,9 +19,9 @@
     using Xunit.Categories;
 
     [UnitTest]
-    public class SingleAsyncTests : EntityFrameworkRepositoryTestsBase, IClassFixture<SqliteDatabaseFixture>, IAsyncLifetime
+    public class SingleTests : EntityFrameworkRepositoryTestsBase, IClassFixture<SqliteDatabaseFixture>, IAsyncLifetime
     {
-        public SingleAsyncTests(SqliteDatabaseFixture databaseFixture) : base(databaseFixture)
+        public SingleTests(SqliteDatabaseFixture databaseFixture) : base(databaseFixture)
         {
         }
 
@@ -43,7 +43,7 @@
             EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
 
             // Act
-            Hero actual = await repository.SingleAsync(x => x.Id == hero.Id, default).ConfigureAwait(false);
+            Hero actual = await repository.Single(x => x.Id == hero.Id, default).ConfigureAwait(false);
 
             // Assert
             actual.Acolytes.Should()
@@ -69,7 +69,7 @@
             EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
 
             // Act
-            Hero actual = await repository.SingleAsync(x => x.Id == hero.Id,
+            Hero actual = await repository.Single(x => x.Id == hero.Id,
                                                        new[] { IncludeClause<Hero>.Create(x => x.Acolytes.Where(item => item.Name == acolyte.Name)) },
                                                       default).ConfigureAwait(false);
 
@@ -77,7 +77,6 @@
             actual.Acolytes.Should()
                            .HaveSameCount(hero.Acolytes, $"'{nameof(Hero.Acolytes)}' was explicitely included").And
                            .OnlyContain(acolyteActual => acolyteActual.Name == acolyte.Name);
-
         }
     }
 }

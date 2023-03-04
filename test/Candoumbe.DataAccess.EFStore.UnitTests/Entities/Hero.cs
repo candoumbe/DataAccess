@@ -27,7 +27,6 @@
             _acolytes = new List<Acolyte>();
         }
 
-
         public void Enrolls(Acolyte acolyte)
         {
             if (acolyte is null)
@@ -43,6 +42,5 @@
             _acolytes.SingleOrNone(acc => acc.Id == acolyteId)
                     .MatchSome(acolyte => _acolytes.Remove(acolyte));
         }
-
     }
 }

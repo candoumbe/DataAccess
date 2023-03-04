@@ -35,6 +35,5 @@
             return Gen.OneOf(randomPageIndexGenerator, Gen.Constant(PageIndex.MinValue), Gen.Constant(PageIndex.MaxValue))
                       .ToArbitrary();
         }
-
     }
 }
