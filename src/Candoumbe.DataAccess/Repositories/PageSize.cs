@@ -1,5 +1,7 @@
 ﻿namespace Candoumbe.DataAccess.Repositories
 {
+    using Candoumbe.Types.Numerics;
+
     using System;
     using System.Numerics;
 
@@ -9,18 +11,22 @@
     /// <remarks>
     /// An instance of this class behave mostly like an <see langword="int"/>.
     /// </remarks>
-    public sealed record PageSize
+    public readonly record struct PageSize
 #if NET7_0_OR_GREATER
-        : IMultiplyOperators<PageSize, PageIndex, int>,
+        : IMultiplyOperators<PageSize, PageIndex, NonNegativeInteger>,
           IMultiplyOperators<PageSize, int, int>,
           IComparisonOperators<PageSize, int, bool>,
-          IEqualityOperators<PageSize, int, bool>,
           IEqualityOperators<PageSize, long, bool>,
           IMinMaxValue<PageSize>,
           ISubtractionOperators<PageSize, int, PageSize>
 #endif
 
     {
+
+        private static readonly Lazy<PageSize> MaxPageSize = new(() => new PageSize(PositiveInteger.MaxValue));
+        private static readonly Lazy<PageSize> MinPageSize = new(() => new PageSize(PositiveInteger.MinValue));
+        private static readonly Lazy<PageSize> OnePageSize = new(() => new PageSize(PositiveInteger.One));
+
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
 #else
@@ -37,32 +43,23 @@
         /// Represents the largest possible value of <see cref="PageSize"/>.
         /// </summary>
 #endif
-        public static PageSize MaxValue => From(int.MaxValue);
+        public static PageSize MaxValue => MaxPageSize.Value;
 
         /// <summary>
         /// The value <c>1</c> for the current type
         /// </summary>
-        public static PageSize One => From(1);
+        public static PageSize One => OnePageSize.Value;
 
         /// <summary>
         /// The value of the page size
         /// </summary>
-        public int Value { get; }
-
-        private PageSize(int value) => Value = value;
+        public PositiveInteger Value { get; }
 
         /// <summary>
-        /// Creates a <see cref="PageSize"/> from <paramref name="size"/>.
+        /// Builds a <see cref="PageSize"/> instance with the specified <paramref name="value"/>.
         /// </summary>
-        /// <param name="size"></param>
-        /// <returns>a <see cref="PageSize"/> that holds <paramref name="size"/>.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"> <paramref name="size"/> is negative.</exception>
-        public static PageSize From(int size)
-        {
-            return size < 0
-                ? throw new ArgumentOutOfRangeException(nameof(size), size, $"{nameof(size)} cannot be less than 0")
-                : new PageSize(size);
-        }
+        /// <param name="value"></param>
+        public PageSize(PositiveInteger value) => Value = value;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -74,8 +71,8 @@
         /// <param name="right"></param>
         /// <returns>The result of <paramref name="left"/> * <paramref name="right"/>.</returns>
 #endif
-        public static int operator *(PageSize left, PageIndex right)
-            => left * right.Value;
+        public static NonNegativeInteger operator *(PageSize left, PageIndex right)
+            => NonNegativeInteger.From(left * right.Value);
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -206,16 +203,7 @@
         /// <returns>The sum of <paramref name="left"/> and <paramref name="right"/>.</returns>
 #endif
         public static PageSize operator +(PageSize left, int right)
-            => (left.Value, right) switch
-            {
-                (int.MaxValue, _) or (_, int.MaxValue) => MaxValue,
-                (_, 0) => left,
-                _ => (left.Value + right) switch
-                {
-                    <= 0 => One,
-                    int result => From(result)
-                }
-            };
+            => new PageSize(PositiveInteger.From(left.Value * right));
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -228,10 +216,6 @@
         /// <returns>The result of <paramref name="left"/> <c>-</c> <paramref name="right"/>.</returns>
 #endif
         public static PageSize operator -(PageSize left, int right)
-            => From((left.Value - right) switch
-            {
-                < 1 => 1,
-                int result => result
-            });
+            => new PageSize(PositiveInteger.From(left.Value * right));
     }
 }

@@ -7,6 +7,7 @@
     using Candoumbe.DataAccess.EFStore.UnitTests;
     using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
     using Candoumbe.DataAccess.Repositories;
+    using Candoumbe.Types.Numerics;
 
     using DataFilters;
 
@@ -37,7 +38,7 @@
                 yield return new object[]
                 {
                     Enumerable.Empty<Hero>(),
-                    PageSize.From(10),
+                    new PageSize(PositiveInteger.From(10)),
                     PageIndex.From(1),
                     new Order<Hero>(nameof(Hero.Name)),
                     (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
@@ -56,7 +57,7 @@
                     yield return new object[]
                     {
                         new []{hero},
-                        PageSize.From(10),
+                        new PageSize(PositiveInteger.From(10)),
                         PageIndex.From(1),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
@@ -85,11 +86,11 @@
                     yield return new object[]
                     {
                         new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(10),
+                        new PageSize(PositiveInteger.From(10)),
                         PageIndex.From(1),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
-                                                                     && page.Size == PageSize.From(10)
+                                                                     && page.Size == 10
                                                                      && page.Total == 3
                                                                      && page.Entries.Exactly(3)
                                                                      && page.Entries.Once(h => h.Id == batman.Id && h.Acolytes.Exactly(0))
@@ -100,11 +101,11 @@
                     yield return new object[]
                     {
                         new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
+                        new PageSize(PositiveInteger.From(1)),
                         PageIndex.From(1),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
+                                                                     && page.Size == 1
                                                                      && page.Total == 3
                                                                      && page.Entries.Once()
                                                                      && page.Entries.Once(h => h.Id == batman.Id && h.Acolytes.Exactly(0)))
@@ -113,11 +114,11 @@
                     yield return new object[]
                     {
                         new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
+                        new PageSize(PositiveInteger.From(1)),
                         PageIndex.From(2),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
+                                                                     && page.Size == 1
                                                                      && page.Total == 3
                                                                      && page.Entries.Once()
                                                                      && page.Entries.Once(h => h.Id == greenArrow.Id && h.Acolytes.Exactly(0)))
@@ -126,11 +127,11 @@
                     yield return new object[]
                     {
                         new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
+                        new PageSize(PositiveInteger.From(1)),
                         PageIndex.From(3),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
+                                                                     && page.Size == 1
                                                                      && page.Total == 3
                                                                      && page.Entries.Once()
                                                                      && page.Entries.Once(h => h.Id == wonderWoman.Id && h.Acolytes.Exactly(0)))
@@ -175,7 +176,7 @@
                 yield return new object[]
                 {
                     Enumerable.Empty<Hero>(),
-                    PageSize.From(10),
+                    new PageSize(PositiveInteger.From(10)),
                     PageIndex.From(1),
                     new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                     new Order<Hero>(nameof(Hero.Name)),
@@ -195,7 +196,7 @@
                     yield return new object[]
                     {
                         new []{hero},
-                        PageSize.From(10),
+                        new PageSize(PositiveInteger.From(10)),
                         PageIndex.From(1),
                         new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                         new Order<Hero>(nameof(Hero.Name)),
@@ -225,12 +226,12 @@
                     yield return new object[]
                     {
                         new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(10),
+                        new PageSize(PositiveInteger.From(10)),
                         PageIndex.From(1),
                         new Order<Hero>(nameof(Hero.Name)),
                         new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
-                                                                     && page.Size == PageSize.From(10)
+                                                                     && page.Size == 10
                                                                      && page.Total == 3
                                                                      && page.Entries.Exactly(3)
                                                                      && page.Entries.Once(h => h.Id == batman.Id && h.Acolytes.Exactly(0))
@@ -241,12 +242,12 @@
                     yield return new object[]
                     {
                         new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
+                        new PageSize(PositiveInteger.From(1)),
                         PageIndex.From(1),
                         new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
+                                                                     && page.Size == PageSize.One
                                                                      && page.Total == 3
                                                                      && page.Entries.Once()
                                                                      && page.Entries.Once(h => h.Id == batman.Id
@@ -257,12 +258,12 @@
                     yield return new object[]
                     {
                         new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
+                        new PageSize(PositiveInteger.From(1)),
                         PageIndex.From(2),
                         new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
+                                                                     && page.Size == 1
                                                                      && page.Total == 3
                                                                      && page.Entries.Once()
                                                                      && page.Entries.Once(h => h.Id == greenArrow.Id
@@ -273,12 +274,12 @@
                     yield return new object[]
                     {
                         new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
+                        new PageSize(PositiveInteger.From(1)),
                         PageIndex.From(3),
                         new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
+                                                                     && page.Size == 1
                                                                      && page.Total == 3
                                                                      && page.Entries.Once()
                                                                      && page.Entries.Once(h => h.Id == wonderWoman.Id && h.Acolytes.Exactly(0)))
@@ -320,7 +321,7 @@
         public async Task Given_hero_exists_and_has_an_acolyte_When_calling_ReadPageAsync_with_including_acolytes_Then_result_should_not_have_acolyte()
         {
             // Arrange
-            PageSize pageSize = PageSize.From(10);
+            PageSize pageSize = new PageSize(PositiveInteger.From(10));
             Hero hero = new Hero(Guid.NewGuid(), Faker.Person.FullName);
             Acolyte acolyte = new Acolyte(Guid.NewGuid(), Faker.Person.FullName);
             Weapon weapon = new Weapon(Guid.NewGuid(), "Bow", 1);
@@ -348,8 +349,8 @@
                                               .ConfigureAwait(false);
 
             // Assert
-            page.Count.Should().Be(1);
-            page.Size.Value.Should().Be(pageSize);
+            page.Count.Should().Be(PositiveInteger.One);
+            page.Size.Value.Should().Be(pageSize.Value);
             page.Entries.Should()
                         .HaveCount(1).And
                         .Contain(item => item.Id == hero.Id)

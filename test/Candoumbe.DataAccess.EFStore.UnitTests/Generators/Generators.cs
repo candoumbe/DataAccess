@@ -1,6 +1,7 @@
 ﻿namespace Candoumbe.DataAccess.Tests
 {
     using Candoumbe.DataAccess.Repositories;
+    using Candoumbe.Types.Numerics;
 
     using FsCheck;
     using FsCheck.Fluent;
@@ -17,9 +18,9 @@
         /// </summary>
         public static Arbitrary<PageSize> PageSizes()
         {
-            Gen<PageSize> randomPageSizeGenerator = ArbMap.Default.ArbFor<NonNegativeInt>()
+            Gen<PageSize> randomPageSizeGenerator = ArbMap.Default.ArbFor<PositiveInt>()
                                               .Generator
-                                              .Select(nonNegativeInt => PageSize.From(nonNegativeInt.Item));
+                                              .Select(positiveInt => new PageSize(PositiveInteger.From(positiveInt.Item)));
             return Gen.OneOf(randomPageSizeGenerator, Gen.Constant(PageSize.MinValue), Gen.Constant(PageSize.MaxValue))
                       .ToArbitrary();
         }

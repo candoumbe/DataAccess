@@ -2,17 +2,16 @@
 {
     using Bogus;
 
-    using Candoumbe.DataAccess.Abstractions;
     using Candoumbe.DataAccess.EFStore;
     using Candoumbe.DataAccess.EFStore.UnitTests;
     using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
     using Candoumbe.DataAccess.Repositories;
+    using Candoumbe.Types.Numerics;
 
     using DataFilters;
 
     using FluentAssertions;
 
-    using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.EntityFrameworkCore;
 
     using System;
@@ -43,7 +42,7 @@
                 {
                     Enumerable.Empty<Hero>(),
                     (Expression<Func<Hero, bool>>)(hero => hero.Name == "Superman"),
-                    PageSize.From(10),
+                    new PageSize(PositiveInteger.From(10)),
                     PageIndex.From(1),
                     new Order<Hero>(nameof(Hero.Name)),
                     (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
@@ -63,11 +62,11 @@
                     {
                         new []{hero},
                         (Expression<Func<Hero, bool>>)(h => h.Id == hero.Id),
-                        PageSize.From(10),
+                        new PageSize(PositiveInteger.From(10)),
                         PageIndex.From(1),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
-                                                                     && page.Size == PageSize.From(10)
+                                                                     && page.Size == 10
                                                                      && page.Total == 1
                                                                      && page.Entries.Once()
                                                                      && page.Entries.Once(h => h.Id == hero.Id
@@ -94,11 +93,11 @@
                     {
                         new []{batman, greenArrow, wonderWoman },
                         (Expression<Func<Hero, bool>>)(h => h.Id == batman.Id || h.Id == greenArrow.Id || h.Id == wonderWoman.Id),
-                        PageSize.From(10),
+                        new PageSize(PositiveInteger.From(10)),
                         PageIndex.From(1),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
-                                                                     && page.Size == PageSize.From(10)
+                                                                     && page.Size == 10
                                                                      && page.Total == 3
                                                                      && page.Entries.Exactly(3)
                                                                      && page.Entries.Once(h => h.Id == batman.Id && h.Acolytes.Exactly(0))
@@ -110,11 +109,11 @@
                     {
                         new []{batman, greenArrow, wonderWoman },
                         (Expression<Func<Hero, bool>>)(h => h.Id == batman.Id),
-                        PageSize.From(1),
+                        new PageSize (PositiveInteger.From(1)),
                         PageIndex.From(1),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
-                                                                     && page.Size == PageSize.From(1)
+                                                                     && page.Size ==1
                                                                      && page.Total == 1
                                                                      && page.Entries.Once()
                                                                      && page.Entries.Once(h => h.Id == batman.Id && h.Acolytes.Exactly(0)))
@@ -124,11 +123,11 @@
                     {
                         new []{batman, greenArrow, wonderWoman },
                         (Expression<Func<Hero, bool>>)(h => h.Id == batman.Id || h.Id == greenArrow.Id),
-                        PageSize.From(1),
+                        new PageSize(PositiveInteger.From(1)),
                         PageIndex.From(2),
                         new Order<Hero>(nameof(Hero.Name), OrderDirection.Descending),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 2
-                                                                     && page.Size == PageSize.From(1)
+                                                                     && page.Size == 1
                                                                      && page.Total == 2
                                                                      && page.Entries.Once()
                                                                      && page.Entries.Once(h => h.Id == batman.Id && h.Acolytes.Exactly(0)))

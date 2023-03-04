@@ -2,6 +2,7 @@
 {
     using Candoumbe.DataAccess.Abstractions;
     using Candoumbe.DataAccess.Repositories;
+    using Candoumbe.Types.Numerics;
 
     using DataFilters;
 
@@ -46,8 +47,8 @@
         public virtual async Task<Page<T>> ReadPage(PageSize pageSize, PageIndex page, IEnumerable<IncludeClause<T>> includedProperties, IOrder<T> orderBy, CancellationToken ct = default)
         {
             IRavenQueryable<T> entries = _session.Query<T>();
-            int total = await entries.CountAsync(ct)
-                                     .ConfigureAwait(false);
+            NonNegativeInteger total = NonNegativeInteger.From(await entries.CountAsync(ct)
+                                                         .ConfigureAwait(false));
 
             Page<T> pageOfResult = Page<T>.Empty(pageSize);
 
@@ -82,8 +83,8 @@
             }
         }
         /// <inheritdoc/>
-        public async Task<int> Count(CancellationToken cancellationToken = default)
-            => await _session.Query<T>().CountAsync(cancellationToken).ConfigureAwait(false);
+        public async Task<NonNegativeInteger> Count(CancellationToken cancellationToken = default)
+            => NonNegativeInteger.From(await _session.Query<T>().CountAsync(cancellationToken).ConfigureAwait(false));
 
         /// <summary>
         /// Asynchronously count the number of entries in the underlying repository that matches <paramref name="predicate"/>.
@@ -91,8 +92,8 @@
         /// <param name="predicate"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<int> Count(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
-            => await _session.Query<T>().CountAsync(predicate, cancellationToken).ConfigureAwait(false);
+        public async Task<NonNegativeInteger> Count(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+            => NonNegativeInteger.From(await _session.Query<T>().CountAsync(predicate, cancellationToken).ConfigureAwait(false));
 
         /// <inheritdoc/>
         public async Task<T> Create(T entry, CancellationToken cancellationToken = default)

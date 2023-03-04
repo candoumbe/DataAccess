@@ -1,6 +1,7 @@
 namespace Candoumbe.DataAccess.Repositories
 {
     using Candoumbe.DataAccess.Abstractions;
+    using Candoumbe.Types.Numerics;
 
     using DataFilters;
 
@@ -48,8 +49,8 @@ namespace Candoumbe.DataAccess.Repositories
         public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex page, IEnumerable<IncludeClause<TEntry>> includedProperties, IOrder<TEntry> orderBy, CancellationToken cancellationToken = default)
         {
             DbSet<TEntry> entries = Context.Set<TEntry>();
-            int total = await entries.CountAsync(cancellationToken)
-                                     .ConfigureAwait(false);
+            NonNegativeInteger total = NonNegativeInteger.From(await entries.CountAsync(cancellationToken)
+                                                                            .ConfigureAwait(false));
             Page<TEntry> pageOfResult = Page<TEntry>.Empty(pageSize);
             if (total > 0)
             {
@@ -69,8 +70,8 @@ namespace Candoumbe.DataAccess.Repositories
         public virtual async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TResult> orderBy, CancellationToken cancellationToken = default)
         {
             DbSet<TEntry> entries = Context.Set<TEntry>();
-            int total = await entries.CountAsync(cancellationToken)
-                                     .ConfigureAwait(false);
+            NonNegativeInteger total = NonNegativeInteger.From(await entries.CountAsync(cancellationToken)
+                                                         .ConfigureAwait(false));
 
             Page<TResult> pageOfResult = Page<TResult>.Empty(pageSize);
 
@@ -99,11 +100,11 @@ namespace Candoumbe.DataAccess.Repositories
                 resultQuery = resultQuery.OrderBy(orderBy);
             }
 
-            long total = await entries.CountAsync(cancellationToken).ConfigureAwait(false);
+            NonNegativeInteger total = NonNegativeInteger.From(await entries.CountAsync(cancellationToken).ConfigureAwait(false));
 
             Page<TResult> pageResult;
 
-            if (total > 0)
+            if (total != NonNegativeInteger.Zero)
             {
                 IEnumerable<TResult> results = await resultQuery
                         .Skip(page < 1 ? 0 : (page - 1) * pageSize)
@@ -210,7 +211,7 @@ namespace Candoumbe.DataAccess.Repositories
                                               .Take(pageSize);
 
             IEnumerable<TEntry> result = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
-            int total = await Count(predicate, cancellationToken).ConfigureAwait(false);
+            NonNegativeInteger total = await Count(predicate, cancellationToken).ConfigureAwait(false);
 
             return new Page<TEntry>(result, total, pageSize);
         }
@@ -239,7 +240,7 @@ namespace Candoumbe.DataAccess.Repositories
             //we compute both Task
             IEnumerable<TResult> result = await results.ToArrayAsync(cancellationToken)
                 .ConfigureAwait(false);
-            int total = await Count(predicate, cancellationToken)
+            NonNegativeInteger total = await Count(predicate, cancellationToken)
                 .ConfigureAwait(false);
 
             return new Page<TResult>(result, total, pageSize);
@@ -267,8 +268,9 @@ namespace Candoumbe.DataAccess.Repositories
             // we compute both Task
             IEnumerable<TResult> result = await query.ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
-            long total = await entries.Select(selector).LongCountAsync(predicate, cancellationToken)
-                .ConfigureAwait(false);
+            NonNegativeInteger total = NonNegativeInteger.From(await entries.Select(selector)
+                                                                            .CountAsync(predicate, cancellationToken)
+                                                                            .ConfigureAwait(false));
 
             return total == 0
                 ? Page<TResult>.Empty(pageSize)
@@ -292,12 +294,12 @@ namespace Candoumbe.DataAccess.Repositories
             => await Context.Set<TEntry>().AnyAsync(predicate, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async Task<int> Count(CancellationToken cancellationToken = default)
-            => await Context.Set<TEntry>().CountAsync(cancellationToken).ConfigureAwait(false);
+        public virtual async Task<NonNegativeInteger> Count(CancellationToken cancellationToken = default)
+            => NonNegativeInteger.From(await Context.Set<TEntry>().CountAsync(cancellationToken).ConfigureAwait(false));
 
         /// <inheritdoc/>
-        public virtual async Task<int> Count(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
-            => await Context.Set<TEntry>().CountAsync(predicate, cancellationToken).ConfigureAwait(false);
+        public virtual async Task<NonNegativeInteger> Count(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+            => NonNegativeInteger.From(await Context.Set<TEntry>().CountAsync(predicate, cancellationToken).ConfigureAwait(false));
 
         /// <inheritdoc/>
         public virtual async Task<TEntry> Single(CancellationToken cancellationToken = default)

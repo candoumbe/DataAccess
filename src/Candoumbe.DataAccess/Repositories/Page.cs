@@ -1,5 +1,7 @@
 namespace Candoumbe.DataAccess.Repositories
 {
+    using Candoumbe.Types.Numerics;
+
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -18,12 +20,12 @@ namespace Candoumbe.DataAccess.Repositories
         /// <summary>
         /// Number of items the result that the current <see cref="Page{T}"/> contains
         /// </summary>
-        public long Total { get; }
+        public NonNegativeInteger Total { get; }
 
         /// <summary>
         /// Number of pages of result the current <see cref="Page{T}"/> is a part of.
         /// </summary>
-        public long Count { get; }
+        public PositiveInteger Count { get; }
 
         /// <summary>
         /// Number of items per <see cref="Page{T}"/>
@@ -36,28 +38,22 @@ namespace Candoumbe.DataAccess.Repositories
         /// <param name="entries">Items of the current page</param>
         /// <param name="total">Number of items</param>
         /// <param name="size">Number of items per page.</param>
-        /// <exception cref="ArgumentOutOfRangeException">if either<paramref name="total"/> or <paramref name="size"/> are negative</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="entries"/> is <see langword="null"/></exception>
-        public Page(IEnumerable<T> entries, long total, PageSize size)
+        public Page(IEnumerable<T> entries, NonNegativeInteger total, PageSize size)
         {
-            if (total < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(total), total, $"{nameof(total)} must not be a negative value");
-            }
-
             Entries = entries ?? throw new ArgumentNullException(nameof(entries));
             Total = total;
             Size = size;
-            Count = (int)Math.Ceiling(Total / (decimal)Size.Value) switch
+            Count = (int)Math.Ceiling((decimal)Total / Size.Value) switch
             {
-                < 1 => 1,
-                int result => result
+                < 1 => PositiveInteger.One,
+                int result => PositiveInteger.From(result)
             };
         }
 
         /// <summary>
         /// Gets an empty <see cref="Page{T}"/> instance.
         /// </summary>
-        public static Page<T> Empty(in PageSize pageSize) => new Page<T>(Enumerable.Empty<T>(), 0, pageSize);
+        public static Page<T> Empty(in PageSize pageSize) => new Page<T>(Enumerable.Empty<T>(), NonNegativeInteger.Zero, pageSize);
     }
 }

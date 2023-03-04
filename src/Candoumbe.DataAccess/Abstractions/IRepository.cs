@@ -2,6 +2,8 @@ using Candoumbe.DataAccess.Repositories;
 
 namespace Candoumbe.DataAccess.Abstractions
 {
+    using Candoumbe.Types.Numerics;
+
     using DataFilters;
 
     using Optional;
@@ -304,7 +306,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>
         ///     the number of entries in the repository
         /// </returns>
-        Task<int> Count(CancellationToken cancellationToken = default);
+        Task<NonNegativeInteger> Count(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the number of entries in the repository that honor the <paramref name="predicate"/>.
@@ -314,7 +316,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>
         ///     the number of entries in the repository
         /// </returns>
-        Task<int> Count(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<NonNegativeInteger> Count(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the entry of the repository

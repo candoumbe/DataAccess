@@ -1,6 +1,7 @@
 ﻿namespace Candoumbe.DataAccess.Tests.Repositories
 {
     using Candoumbe.DataAccess.Repositories;
+    using Candoumbe.Types.Numerics;
 
     using FluentAssertions;
 
@@ -10,7 +11,6 @@
     using System;
     using System.Linq;
 
-    using Xunit;
     using Xunit.Abstractions;
     using Xunit.Categories;
 
@@ -24,11 +24,14 @@
             _outputTestHelper = outputHelper;
         }
 
-        [Fact]
-        public void CtorWithNullEntriesShouldThrowArgumentNullException()
+        [Property(Arbitrary = new[] { typeof(Generators) })]
+        public void CtorWithNullEntriesShouldThrowArgumentNullException(NonNegativeInt totalGenerator, PageSize pageSize)
         {
+            // Arrange
+            NonNegativeInteger total = NonNegativeInteger.From(totalGenerator.Item);
+
             //Act
-            Action action = () => new Page<object>(null, 0, PageSize.From(0));
+            Action action = () => new Page<object>(null, total, pageSize);
 
             //Assert
             action.Should()
@@ -37,56 +40,33 @@
                   .Where(ex => !string.IsNullOrWhiteSpace(ex.Message));
         }
 
-        [Property]
-        public void Given_a_pageSize_When_calling_Empty_Then_the_resulting_instance_should_have_correct_values_for_all_properties(PositiveInt pageSize)
+        [Property(Arbitrary = new[] { typeof(Generators) })]
+        public void Given_a_pageSize_When_calling_Empty_Then_the_resulting_instance_should_have_correct_values_for_all_properties(PageSize pageSize)
         {
             //Act
-            Page<object> pagedResult = Page<object>.Empty(PageSize.From(pageSize.Item));
+            Page<object> pagedResult = Page<object>.Empty(pageSize);
 
             //Assert
             pagedResult.Should().NotBeNull();
-            pagedResult.Size.Value.Should().Be(pageSize.Item);
-            pagedResult.Count.Should().Be(1);
-            pagedResult.Total.Should().Be(0);
+            pagedResult.Size.Should().Be(pageSize);
+            pagedResult.Count.Should().Be(PositiveInteger.One);
+            pagedResult.Total.Should().Be(NonNegativeInteger.Zero);
             pagedResult.Entries.Should().BeEmpty();
         }
 
-        [Property]
-        public void CtorWithNegativePageSizeShouldThrowArgumentOutOfRangeException(NegativeInt pageSize)
-        {
-            _outputTestHelper.WriteLine($"Page size : {pageSize.Item}");
-            Action action = () => new Page<object>(Enumerable.Empty<object>(), 0, PageSize.From(pageSize.Item));
-            action.Should().Throw<ArgumentOutOfRangeException>().Which
-                .ParamName.Should()
-                    .BeEquivalentTo(nameof(Page<object>.Size));
-        }
-
-        [Property]
-        public void CtorWithNegativeTotalShouldThrowArgumentOutOfRangeException(NegativeInt total)
-        {
-            _outputTestHelper.WriteLine($"{nameof(Page<object>.Total)} : {total.Item}");
-
-            //Act
-            Action action = () => new Page<object>(Enumerable.Empty<object>(), total.Item, PageSize.One);
-
-            // Assert
-            action.Should().Throw<ArgumentOutOfRangeException>().Which
-                .ParamName.Should()
-                    .BeEquivalentTo(nameof(Page<object>.Total));
-        }
-
         [Property(Arbitrary = new[] { typeof(Generators) })]
-        public void CheckPageCount(NonNegativeInt total, PageSize pageSize)
+        public void CheckPageCount(NonNegativeInt totalGenerator, PageSize pageSize)
         {
             // Arrange 
-            (int expected, string reason) = (int)Math.Ceiling((double)total.Item / pageSize) switch
+            NonNegativeInteger total = NonNegativeInteger.From(totalGenerator.Item);
+            (PositiveInteger expected, string reason) = (int)Math.Ceiling((double)total.Value / pageSize) switch
             {
-                < 1 => (1, "page count cannot be less than 1"),
-                int count => (count, "Page count must be an numeric value")
+                < 1 => (PositiveInteger.One, "page count cannot be less than 1"),
+                int count => (PositiveInteger.From(count), "Page count must be an numeric value")
             };
 
             //Act
-            Page<object> page = new(Enumerable.Empty<object>(), total.Item, pageSize);
+            Page<object> page = new(Enumerable.Empty<object>(), total, pageSize);
 
             //Assert
             page.Count.Should().Be(expected, reason);
