@@ -34,7 +34,7 @@
         /// Represents the smallest possible value of <see cref="PageSize"/>.
         /// </summary>
 #endif
-        public static PageSize MinValue => One;
+        public static PageSize MinValue => MinPageSize.Value;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>

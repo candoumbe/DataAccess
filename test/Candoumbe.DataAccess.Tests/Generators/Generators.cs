@@ -19,8 +19,8 @@
         public static Arbitrary<PageSize> PageSizes()
         {
             Gen<PageSize> randomPageSizeGenerator = ArbMap.Default.ArbFor<PositiveInt>()
-                                              .Generator
-                                              .Select(positiveInt => new PageSize(PositiveInteger.From(positiveInt.Item)));
+                                                                  .Generator
+                                                                  .Select(positiveInt => new PageSize(PositiveInteger.From(positiveInt.Item)));
             return Gen.OneOf(randomPageSizeGenerator, Gen.Constant(PageSize.MinValue), Gen.Constant(PageSize.MaxValue))
                       .ToArbitrary();
         }
@@ -31,10 +31,17 @@
         public static Arbitrary<PageIndex> PageIndexes()
         {
             Gen<PageIndex> randomPageIndexGenerator = ArbMap.Default.ArbFor<PositiveInt>()
-                                              .Generator
-                                              .Select(positiveInt => PageIndex.From(positiveInt.Item));
+                                                            .Generator
+                                                            .Select(positiveInt => new PageIndex(PositiveInteger.From(positiveInt.Item)));
             return Gen.OneOf(randomPageIndexGenerator, Gen.Constant(PageIndex.MinValue), Gen.Constant(PageIndex.MaxValue))
                       .ToArbitrary();
         }
+
+
+        public static Arbitrary<PositiveInteger> PositiveIntegers()
+            => ArbMap.Default.ArbFor<PositiveInt>().Generator
+                             .Select(positiveInt => PositiveInteger.From(positiveInt.Item))
+                             .ToArbitrary();
+
     }
 }

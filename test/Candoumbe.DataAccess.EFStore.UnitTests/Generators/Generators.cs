@@ -32,7 +32,7 @@
         {
             Gen<PageIndex> randomPageIndexGenerator = ArbMap.Default.ArbFor<PositiveInt>()
                                               .Generator
-                                              .Select(positiveInt => PageIndex.From(positiveInt.Item));
+                                              .Select(positiveInt => new PageIndex(PositiveInteger.From(positiveInt.Item)));
             return Gen.OneOf(randomPageIndexGenerator, Gen.Constant(PageIndex.MinValue), Gen.Constant(PageIndex.MaxValue))
                       .ToArbitrary();
         }

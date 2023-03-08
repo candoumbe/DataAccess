@@ -43,7 +43,7 @@
                     Enumerable.Empty<Hero>(),
                     (Expression<Func<Hero, bool>>)(hero => hero.Name == "Superman"),
                     new PageSize(PositiveInteger.From(10)),
-                    PageIndex.From(1),
+                    new PageIndex(PositiveInteger.From(1)),
                     new Order<Hero>(nameof(Hero.Name)),
                     (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
                                                                  && page.Size == 10
@@ -63,7 +63,7 @@
                         new []{hero},
                         (Expression<Func<Hero, bool>>)(h => h.Id == hero.Id),
                         new PageSize(PositiveInteger.From(10)),
-                        PageIndex.From(1),
+                        new PageIndex(PositiveInteger.From(1)),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
                                                                      && page.Size == 10
@@ -94,7 +94,7 @@
                         new []{batman, greenArrow, wonderWoman },
                         (Expression<Func<Hero, bool>>)(h => h.Id == batman.Id || h.Id == greenArrow.Id || h.Id == wonderWoman.Id),
                         new PageSize(PositiveInteger.From(10)),
-                        PageIndex.From(1),
+                        new PageIndex(PositiveInteger.From(1)),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
                                                                      && page.Size == 10
@@ -110,7 +110,7 @@
                         new []{batman, greenArrow, wonderWoman },
                         (Expression<Func<Hero, bool>>)(h => h.Id == batman.Id),
                         new PageSize (PositiveInteger.From(1)),
-                        PageIndex.From(1),
+                        new PageIndex(PositiveInteger.From(1)),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
                                                                      && page.Size ==1
@@ -124,7 +124,7 @@
                         new []{batman, greenArrow, wonderWoman },
                         (Expression<Func<Hero, bool>>)(h => h.Id == batman.Id || h.Id == greenArrow.Id),
                         new PageSize(PositiveInteger.From(1)),
-                        PageIndex.From(2),
+                        new PageIndex(PositiveInteger.From(2)),
                         new Order<Hero>(nameof(Hero.Name), OrderDirection.Descending),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 2
                                                                      && page.Size == 1

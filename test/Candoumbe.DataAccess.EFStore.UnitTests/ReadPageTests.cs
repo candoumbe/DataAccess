@@ -39,7 +39,7 @@
                 {
                     Enumerable.Empty<Hero>(),
                     new PageSize(PositiveInteger.From(10)),
-                    PageIndex.From(1),
+                    new PageIndex(PositiveInteger.From(1)),
                     new Order<Hero>(nameof(Hero.Name)),
                     (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
                                                                  && page.Size == 10
@@ -58,7 +58,7 @@
                     {
                         new []{hero},
                         new PageSize(PositiveInteger.From(10)),
-                        PageIndex.From(1),
+                        new PageIndex(PositiveInteger.From(1)),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
                                                                      && page.Size == 10
@@ -87,7 +87,7 @@
                     {
                         new []{batman, greenArrow, wonderWoman },
                         new PageSize(PositiveInteger.From(10)),
-                        PageIndex.From(1),
+                        new PageIndex(PositiveInteger.From(1)),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
                                                                      && page.Size == 10
@@ -102,7 +102,7 @@
                     {
                         new []{batman, greenArrow, wonderWoman },
                         new PageSize(PositiveInteger.From(1)),
-                        PageIndex.From(1),
+                        new PageIndex(PositiveInteger.From(1)),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
                                                                      && page.Size == 1
@@ -115,7 +115,7 @@
                     {
                         new []{batman, greenArrow, wonderWoman },
                         new PageSize(PositiveInteger.From(1)),
-                        PageIndex.From(2),
+                        new PageIndex(PositiveInteger.From(2)),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
                                                                      && page.Size == 1
@@ -128,7 +128,7 @@
                     {
                         new []{batman, greenArrow, wonderWoman },
                         new PageSize(PositiveInteger.From(1)),
-                        PageIndex.From(3),
+                        new PageIndex(PositiveInteger.From(3)),
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
                                                                      && page.Size == 1
@@ -177,7 +177,7 @@
                 {
                     Enumerable.Empty<Hero>(),
                     new PageSize(PositiveInteger.From(10)),
-                    PageIndex.From(1),
+                    new PageIndex(PositiveInteger.From(1)),
                     new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                     new Order<Hero>(nameof(Hero.Name)),
                     (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
@@ -197,7 +197,7 @@
                     {
                         new []{hero},
                         new PageSize(PositiveInteger.From(10)),
-                        PageIndex.From(1),
+                        new PageIndex(PositiveInteger.From(1)),
                         new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
@@ -227,7 +227,7 @@
                     {
                         new []{batman, greenArrow, wonderWoman },
                         new PageSize(PositiveInteger.From(10)),
-                        PageIndex.From(1),
+                        new PageIndex(PositiveInteger.From(1)),
                         new Order<Hero>(nameof(Hero.Name)),
                         new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
@@ -243,7 +243,7 @@
                     {
                         new []{batman, greenArrow, wonderWoman },
                         new PageSize(PositiveInteger.From(1)),
-                        PageIndex.From(1),
+                        new PageIndex(PositiveInteger.From(1)),
                         new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
@@ -259,7 +259,7 @@
                     {
                         new []{batman, greenArrow, wonderWoman },
                         new PageSize(PositiveInteger.From(1)),
-                        PageIndex.From(2),
+                        new PageIndex(PositiveInteger.From(2)),
                         new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
@@ -275,7 +275,7 @@
                     {
                         new []{batman, greenArrow, wonderWoman },
                         new PageSize(PositiveInteger.From(1)),
-                        PageIndex.From(3),
+                        new PageIndex(PositiveInteger.From(3)),
                         new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
                         new Order<Hero>(nameof(Hero.Name)),
                         (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
@@ -339,7 +339,7 @@
 
             // Act
             Page<Hero> page = await repository.ReadPage(pageSize,
-                                                             PageIndex.From(1),
+                                                             new PageIndex(PositiveInteger.From(1)),
                                                              new[]
                                                              {
                                                                  IncludeClause<Hero>.Create(h => h.Acolytes)

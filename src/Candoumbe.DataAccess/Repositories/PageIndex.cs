@@ -1,5 +1,7 @@
 ﻿namespace Candoumbe.DataAccess.Repositories
 {
+    using Candoumbe.Types.Numerics;
+
     using System;
 #if NET7_0_OR_GREATER
     using System.Numerics;
@@ -8,24 +10,27 @@
     /// <summary>
     /// A class that allow to specify the index of a page in a result set.
     /// </summary>
-    public record PageIndex
+    public record struct PageIndex
 #if NET7_0_OR_GREATER
-       : IAdditionOperators<PageIndex, int, PageIndex>,
-         IAdditiveIdentity<PageIndex, PageIndex>,
-         ISubtractionOperators<PageIndex, int, PageIndex>,
+       : IAdditionOperators<PageIndex, PositiveInteger, PageIndex>,
+         ISubtractionOperators<PageIndex, PositiveInteger, PageIndex>,
          IMinMaxValue<PageIndex>,
-         IMultiplyOperators<PageIndex, int, PageIndex>,
-         IComparisonOperators<PageIndex, int, bool>
+         IMultiplyOperators<PageIndex, PositiveInteger, PageIndex>,
+         IComparisonOperators<PageIndex, NonNegativeInteger, bool>
 #endif
     {
+        private static readonly Lazy<PageIndex> MaxPageIndex = new(() => new PageIndex(PositiveInteger.MaxValue));
+        private static readonly Lazy<PageIndex> MinPageIndex = new(() => new PageIndex(PositiveInteger.MinValue));
+        private static readonly Lazy<PageIndex> OnePageIndex = new(() => new PageIndex(PositiveInteger.One));
+
         /// <summary>
         /// The value of the page size
         /// </summary>
-        public int Value
+        public PositiveInteger Value
         {
             get;
 #if NET6_0_OR_GREATER
-            private init;
+            init;
 #else
             private set;
 #endif
@@ -38,7 +43,7 @@
         /// Gets the maximum value of <see cref="PageIndex"/>
         /// </summary>
 #endif
-        public static PageIndex MaxValue => From(int.MaxValue);
+        public static PageIndex MaxValue => MaxPageIndex.Value;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -52,30 +57,13 @@
         /// <summary>
         /// The minimum acceptable value for a <see cref="PageIndex"/>
         /// </summary>
-        public static PageIndex One => From(1);
-
-        ///<inheritdoc/>
-        public static PageIndex AdditiveIdentity => Zero;
+        public static PageIndex One => OnePageIndex.Value;
 
         /// <summary>
-        /// The zero value for the current type
-        /// </summary>
-        public static PageIndex Zero => new PageIndex(0);
-
-        private PageIndex(int value) => Value = value;
-
-        /// <summary>
-        /// Creates a <see cref="PageIndex"/> from <paramref name="value"/>.
+        /// Builds a new <see cref="PageIndex"/> instance.
         /// </summary>
         /// <param name="value"></param>
-        /// <returns>a <see cref="PageIndex"/> that holds <paramref name="value"/>.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"> <paramref name="value"/> &lt; 1 </exception>
-        public static PageIndex From(int value)
-        {
-            return value < 1
-                ? throw new ArgumentOutOfRangeException(nameof(value), value, $"'{nameof(value)}' cannot be less than 1")
-                : new PageIndex(value);
-        }
+        public PageIndex(PositiveInteger value) => Value = value;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -87,34 +75,7 @@
         /// <param name="right"></param>
         /// <returns>The sum of <paramref name="left"/> and <paramref name="right"/></returns>
 #endif
-        public static PageIndex operator +(PageIndex left, int right)
-        {
-            PageIndex pageIndex;
-            if (left.Value == int.MaxValue || right == int.MaxValue)
-            {
-                pageIndex = MaxValue;
-            }
-            else
-            {
-                checked
-                {
-                    try
-                    {
-                        pageIndex = (left.Value + right) switch
-                        {
-                            <= 0 => new PageIndex(Math.Min(1, left.Value)),
-                            int result => From(result)
-                        };
-                    }
-                    catch (OverflowException)
-                    {
-                        pageIndex = MaxValue;
-                    }
-                }
-            }
-
-            return pageIndex;
-        }
+        public static PageIndex operator +(PageIndex left, PositiveInteger right) => left with { Value = left.Value + right };
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -126,14 +87,7 @@
         /// <param name="right"></param>
         /// <returns>The sum of <paramref name="left"/> and <paramref name="right"/></returns>
 #endif
-        public static PageIndex operator -(PageIndex left, int right)
-        {
-            int result = left.Value - right;
-
-            return result < 1
-                ? Zero
-                : left with { Value = left.Value - right };
-        }
+        public static PageIndex operator -(PageIndex left, PositiveInteger right) => left with { Value = left.Value - right };
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -145,12 +99,7 @@
         /// <param name="right"></param>
         /// <returns>The product of <paramref name="left"/> multiplied by <paramref name="right"/>.</returns>
 #endif
-        public static PageIndex operator *(PageIndex left, int right)
-            => (left.Value * right) switch
-            {
-                <= 0 => Zero,
-                int result => From(result)
-            };
+        public static PageIndex operator *(PageIndex left, PositiveInteger right) => left with { Value = left.Value * right };
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -162,7 +111,7 @@
         /// <param name="right">the value to compare with <paramref name="left"/>.</param>
         /// <returns><see langword="true"/> if <paramref name="left"/> is strictly greater than <paramref name="right"/> and <see langword="false"/> otherwise</returns>
 #endif
-        public static bool operator >(PageIndex left, int right) => left.Value > right;
+        public static bool operator >(PageIndex left, NonNegativeInteger right) => left.Value > right;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -174,7 +123,7 @@
         /// <param name="right">the value to compare with <paramref name="left"/>.</param>
         /// <returns><see langword="true"/> if <paramref name="left"/> is greater than <paramref name="right"/> and <see langword="false"/> otherwise</returns>
 #endif
-        public static bool operator >=(PageIndex left, int right) => left.Value >= right;
+        public static bool operator >=(PageIndex left, NonNegativeInteger right) => left.Value >= right;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -186,8 +135,7 @@
         /// <param name="right">the value to compare with <paramref name="left"/>.</param>
         /// <returns><see langword="true"/> if <paramref name="left"/> is less than <paramref name="right"/> and <see langword="false"/> otherwise</returns>
 #endif
-        public static bool operator <(PageIndex left, int right)
-            => left.Value < right;
+        public static bool operator <(PageIndex left, NonNegativeInteger right) => left.Value < right;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -199,7 +147,7 @@
         /// <param name="right">the value to compare with <paramref name="left"/>.</param>
         /// <returns><see langword="true"/> if <paramref name="left"/> is strictly greater than <paramref name="right"/> and <see langword="false"/> otherwise</returns>
 #endif
-        public static bool operator <=(PageIndex left, int right)
+        public static bool operator <=(PageIndex left, NonNegativeInteger right)
             => left.Value <= right;
 
 #if NET7_0_OR_GREATER
@@ -212,7 +160,7 @@
         /// <param name="right">the value to compare with <paramref name="left"/>.</param>
         /// <returns><see langword="true"/> if <paramref name="left"/> and <paramref name="right"/> are equal and <see langword="false"/> otherwise</returns>
 #endif
-        public static bool operator ==(PageIndex left, int right)
+        public static bool operator ==(PageIndex left, NonNegativeInteger right)
             => left.Value == right;
 
 #if NET7_0_OR_GREATER
@@ -225,7 +173,7 @@
         /// <param name="right">the value to compare with <paramref name="left"/>.</param>
         /// <returns><see langword="true"/> if <paramref name="left"/> and <paramref name="right"/> are not equal and <see langword="false"/> otherwise</returns>
 #endif
-        public static bool operator !=(PageIndex left, int right)
+        public static bool operator !=(PageIndex left, NonNegativeInteger right)
             => !(left == right);
 
         /// <summary>

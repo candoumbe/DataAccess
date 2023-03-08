@@ -3,6 +3,7 @@
     using Bogus;
 
     using Candoumbe.DataAccess.Repositories;
+    using Candoumbe.Types.Numerics;
 
     using FluentAssertions;
 
@@ -24,41 +25,25 @@
     {
         private static readonly Faker Faker = new();
 
-        [Property]
-        public void Given_input_is_negative_When_calling_From_Then_ArgumentOutOfRangeException_should_be_thrown(NonNegativeInt value)
-        {
-            // Act
-            Action ctorWithValueLessThanOne = () => PageIndex.From(-value.Item);
-
-            // Assert
-            ctorWithValueLessThanOne.Should()
-                .Throw<ArgumentOutOfRangeException>("the input value cannot be less than 1")
-                .Which.Message.Should().MatchEquivalentOf("'?*' cannot be less than 1 *");
-        }
-
-        [Property(Arbitrary = new[] { typeof(Generators) })]
-        public void Given_an_initial_PageIndex_When_adding_AdditiveIdentity_Then_the_resulting_PageIndex_should_be_equal_initial_value(PageIndex expected)
-            => (expected + PageIndex.AdditiveIdentity == expected).ToProperty();
-
-        [Property(Arbitrary = new[] { typeof(Generators) })]
-        public Property Given_an_initial_PageIndex_When_substracting_by_AdditiveIdentity_Then_the_resulting_PageIndex_should_be_equal_initial_value(PageIndex value)
-            => (value + PageIndex.AdditiveIdentity == value).ToProperty();
-
         [Property(Arbitrary = new[] { typeof(Generators) })]
         public void Given_an_initial_PageIndex_When_incrementing_by_positive_integer_Then_the_resulting_PageIndex_should_be_incremented_by_one(PageIndex pageIndex)
         {
             // Arrange
-            PageIndex expected = PageIndex.From(pageIndex + 1);
+#if NET6_0
+            PageIndex expected = new PageIndex(pageIndex.Value + PositiveInteger.From(1));
+#else
+            PageIndex expected = pageIndex with { Value = pageIndex.Value + PositiveInteger.From(1) }; 
+#endif
 
             // Act
-            PageIndex actual = PageIndex.From(pageIndex) + 1;
+            PageIndex actual = pageIndex + PositiveInteger.From(1);
 
             // Assert
             actual.Should().Be(expected);
         }
 
         [Property(Arbitrary = new[] { typeof(Generators) })]
-        public void Given_an_initial_PageIndex_When_substracting_any_integer_Then_the_resulting_PageIndex_should_be_decremented_by_one(PageIndex index, int value)
+        public void Given_an_initial_PageIndex_When_substracting_any_integer_Then_the_resulting_PageIndex_should_be_decremented_by_one(PageIndex index, PositiveInteger value)
         {
             // Arrange
 
@@ -66,10 +51,8 @@
             PageIndex actual = index + value;
 
             // Assert
-            object _ = (index.Value, value) switch
+            object _ = (index.Value.Value, value.Value) switch
             {
-                (0, <= 0) => actual.Should().Be(PageIndex.Zero),
-                ( >= 1, <= 0) => actual.Value.Should().BeGreaterThanOrEqualTo(PageIndex.MinValue),
                 (int.MaxValue, _) or (_, int.MaxValue) => PageIndex.MaxValue,
                 ( >= 1, >= 0) => actual.Value.Should()
                                              .BeInRange(index.Value, PageIndex.MaxValue.Value),
@@ -86,7 +69,7 @@
         public void Given_an_initial_PageIndex_that_contain_max_value_When_calling_increment_operator_Then_the_result_should_be_MaxValue()
         {
             // Act
-            PageIndex actual = PageIndex.MaxValue + 1;
+            PageIndex actual = PageIndex.MaxValue + PositiveInteger.From(1);
 
             // Assert
             actual.Should().Be(PageIndex.MaxValue);
@@ -153,23 +136,23 @@
              => (pageIndex.Value != right == (pageIndex != right)).ToProperty();
 
         [Property(Arbitrary = new[] { typeof(Generators) })]
-        public void Given_a_PageIndex_When_multiplying_by_an_integer_Then_result_should_stay_withing_min_an_max_PageIndex_ranges(PageIndex initialValue, int right)
+        public void Given_a_PageIndex_When_multiplying_by_an_integer_Then_result_should_stay_withing_min_an_max_PageIndex_ranges(PageIndex initialValue, PositiveInteger right)
         {
             // Act
             PageIndex actual = initialValue * right;
 
             // Assert
-            actual.Value.Should().BeInRange(PageIndex.Zero, PageIndex.MaxValue);
+            actual.Value.Should().BeInRange(PageIndex.One.Value, PageIndex.MaxValue.Value);
         }
 
         [Property(Arbitrary = new[] { typeof(Generators) })]
-        public void Given_a_PageIndex_When_summing_with_an_integer_Then_result_should_stay_within_min_an_max_PageIndex_ranges(PageIndex initialValue, int right)
+        public void Given_a_PageIndex_When_summing_with_an_integer_Then_result_should_stay_within_min_an_max_PageIndex_ranges(PageIndex initialValue, PositiveInteger right)
         {
             // Act
             PageIndex actual = initialValue + right;
 
             // Assert
-            actual.Value.Should().BeInRange(PageIndex.Zero, PageIndex.MaxValue);
+            actual.Value.Should().BeInRange(PageIndex.One.Value, PageIndex.MaxValue.Value);
         }
     }
 }

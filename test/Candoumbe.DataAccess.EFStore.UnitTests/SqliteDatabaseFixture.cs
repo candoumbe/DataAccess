@@ -30,4 +30,9 @@
         ///<inheritdoc/>
         public async Task InitializeAsync() => await Connection.OpenAsync().ConfigureAwait(false);
     }
+
+    public class DatabaseFixture<TDatabase> : IAsyncLifetime
+    {
+
+    }
 }
