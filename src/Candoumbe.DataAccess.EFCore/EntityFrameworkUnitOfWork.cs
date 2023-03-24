@@ -22,7 +22,7 @@ namespace Candoumbe.DataAccess.Abstractions
     public class EntityFrameworkUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext, IDbContext
     {
         private readonly TContext _context;
-        private readonly IRepositoryFactory _repositoryFactory;
+        private readonly IRepositoryFactory<TContext> _repositoryFactory;
         private readonly IDictionary<Type, object> _repositories;
         private bool _disposed;
 
@@ -31,7 +31,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// </summary>
         /// <param name="context">instance of <typeparamref name="TContext"/> that the current <see cref="EntityFrameworkUnitOfWork{TContext}"/> will wrap</param>
         /// <param name="repositoryFactory"></param>
-        public EntityFrameworkUnitOfWork(TContext context, IRepositoryFactory repositoryFactory)
+        public EntityFrameworkUnitOfWork(TContext context, IRepositoryFactory<TContext> repositoryFactory)
         {
             _context = context;
             _repositoryFactory = repositoryFactory;
