@@ -13,6 +13,13 @@ public class EntityFrameworkUnitOfWorkFactory<TContext> : UnitOfWorkFactory
     where TContext : DbContext, IStore
 {
     private readonly IRepositoryFactory _repositoryFactory;
+    /// <summary>
+    /// Defines a unit of work factory wrapper around Entity Framework
+    /// </summary>
+    public class EntityFrameworkUnitOfWorkFactory<TContext> : UnitOfWorkFactory
+        where TContext : DbContext, IDbContext
+    {
+        private readonly IRepositoryFactory<TContext> _repositoryFactory;
 
     /// <summary>
     /// Options used to create the unit of work instances
@@ -37,6 +44,19 @@ public class EntityFrameworkUnitOfWorkFactory<TContext> : UnitOfWorkFactory
         ContextGenerator = contextGenerator ?? throw new ArgumentNullException(nameof(contextGenerator));
         _repositoryFactory = repositoryFactory ?? throw new ArgumentNullException(nameof(repositoryFactory));
     }
+        /// <summary>
+        /// Builds a new <see cref="EntityFrameworkUnitOfWorkFactory{TContext}"/> instance
+        /// </summary>
+        /// <param name="options">options that will be used by the <see cref="EntityFrameworkUnitOfWork{TContext}"/> returned by calling <see cref="NewUnitOfWork"/></param>
+        /// <param name="contextGenerator">Function to call to create new <typeparamref name="TContext"/> instances.</param>
+        /// <param name="repositoryFactory">A factory that will be used to build repositories</param>
+        /// <exception cref="ArgumentNullException">if either <paramref name="contextGenerator"/> or <paramref name="repositoryFactory"/> is <see langword="null"/>.</exception>
+        public EntityFrameworkUnitOfWorkFactory(DbContextOptions<TContext> options, Func<DbContextOptions<TContext>, TContext> contextGenerator, IRepositoryFactory<TContext> repositoryFactory)
+        {
+            Options = options;
+            ContextGenerator = contextGenerator ?? throw new ArgumentNullException(nameof(contextGenerator));
+            _repositoryFactory = repositoryFactory ?? throw new ArgumentNullException(nameof(repositoryFactory));
+        }
 
     /// <summary>
     /// Creates new <see cref="IUnitOfWork"/> instances.
