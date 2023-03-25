@@ -6,11 +6,11 @@
     public interface IRepositoryFactory<TContext> where TContext : IDbContext
     {
         /// <summary>
-        /// Creates a new repository to handle <typeparamref name="TEntity"/>.
+        /// Creates a new <see cref="IRepository{TEntry}"/> that can handle <typeparamref name="TEntity"/>.
         /// </summary>
         /// <typeparam name="TEntity">Type of entities <see cref="IRepository{TEntry}"/> will help interact with.</typeparam>
         /// <param name="dbContext"></param>
-        /// <returns></returns>
+        /// <returns>a new <see cref="IRepository{TEntry}"/></returns>
         IRepository<TEntity> NewRepository<TEntity>(TContext dbContext) where TEntity : class;
     }
 }
