@@ -44,7 +44,7 @@ namespace Candoumbe.DataAccess.Abstractions
         {
             IRepository<TEntry> repository;
             // Checks if the Dictionary Key contains the Type class
-            if (!_repositories.TryGetValue(typeof(TEntry), out object value))
+            if (_repositories.TryGetValue(typeof(TEntry), out object value))
             {
                 repository = value as IRepository<TEntry>;
             }
