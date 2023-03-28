@@ -1,6 +1,6 @@
-﻿using Candoumbe.Pipelines;
-using Candoumbe.Pipelines.Components;
+﻿using Candoumbe.Pipelines.Components;
 using Candoumbe.Pipelines.Components.GitHub;
+using Candoumbe.Pipelines.Components.NuGet;
 using Candoumbe.Pipelines.Components.Workflows;
 
 using Nuke.Common;
@@ -20,7 +20,7 @@ namespace ContinuousIntegration
     [GitHubActions("integration", GitHubActionsImage.UbuntuLatest,
         AutoGenerate = true,
         FetchDepth = 0,
-        InvokedTargets = new[] { nameof(IUnitTest.Compile), nameof(IUnitTest.UnitTests), nameof(IPublish.Pack), nameof(IPublish.Publish) },
+        InvokedTargets = new[] { nameof(IUnitTest.Compile), nameof(IUnitTest.UnitTests), nameof(IPushNugetPackages.Pack), nameof(IPushNugetPackages.Publish) },
         CacheKeyFiles = new[] {
             "src/**/*.csproj",
             "test/**/*.csproj",
@@ -45,7 +45,7 @@ namespace ContinuousIntegration
     [GitHubActions("delivery", GitHubActionsImage.UbuntuLatest,
         AutoGenerate = true,
         FetchDepth = 0,
-        InvokedTargets = new[] { nameof(IUnitTest.Compile), nameof(IPublish.Pack), nameof(IPublish.Publish) },
+        InvokedTargets = new[] { nameof(IUnitTest.Compile), nameof(IPushNugetPackages.Pack), nameof(IPushNugetPackages.Publish) },
         CacheKeyFiles = new[] {
             "src/**/*.csproj",
             "test/**/*.csproj",
@@ -87,7 +87,7 @@ namespace ContinuousIntegration
         IMutationTest,
         IReportCoverage,
         IPack,
-        IPublish,
+        IPushNugetPackages,
         ICreateGithubRelease,
         IGitFlowWithPullRequest,
         IHaveArtifacts
@@ -125,14 +125,14 @@ namespace ContinuousIntegration
 
 
         ///<inheritdoc/>
-        IEnumerable<PublishConfiguration> IPublish.PublishConfigurations => new PublishConfiguration[]
+        IEnumerable<PushNugetPackageConfiguration> IPushNugetPackages.PublishConfigurations => new PushNugetPackageConfiguration[]
         {
-            new NugetPublishConfiguration(
+            new NugetPushConfiguration(
                 apiKey: NugetApiKey,
                 source: new Uri("https://api.nuget.org/v3/index.json"),
                 canBeUsed: () => NugetApiKey is not null
             ),
-            new GitHubPublishConfiguration(
+            new GitHubPushNugetConfiguration(
                 githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
                 source: new Uri($"https://nuget.pkg.github.com/{GitHubActions?.RepositoryOwner}/index.json"),
                 canBeUsed: () => this is ICreateGithubRelease createRelease && createRelease.GitHubToken is not null
