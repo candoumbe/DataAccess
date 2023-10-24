@@ -16,12 +16,12 @@
     </When>
     <When Condition="'$(TargetFramework)' == 'net6.0'">
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.23" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.24" />
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.12" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.13" />
       </ItemGroup>
     </Otherwise>
   </Choose>
