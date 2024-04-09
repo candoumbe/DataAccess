@@ -9,7 +9,7 @@
       ]
     },
     "dotnet-ef": {
-      "version": "7.0.17",
+      "version": "7.0.18",
       "commands": [
         "dotnet-ef"
       ]
