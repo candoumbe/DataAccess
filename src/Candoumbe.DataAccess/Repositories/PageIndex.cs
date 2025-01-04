@@ -1,31 +1,31 @@
-﻿namespace Candoumbe.DataAccess.Repositories
-{
-    using System;
+﻿namespace Candoumbe.DataAccess.Repositories;
+
+using System;
 #if NET7_0_OR_GREATER
-    using System.Numerics;
+using System.Numerics;
 #endif
 
-    /// <summary>
-    /// A class that allow to specify the index of a page in a result set.
-    /// </summary>
-    public record PageIndex
+/// <summary>
+/// A class that allow to specify the index of a page in a result set.
+/// </summary>
+public record PageIndex
 #if NET7_0_OR_GREATER
-       : IAdditionOperators<PageIndex, int, PageIndex>,
-         IAdditiveIdentity<PageIndex, PageIndex>,
-         ISubtractionOperators<PageIndex, int, PageIndex>,
-         IMinMaxValue<PageIndex>,
-         IMultiplyOperators<PageIndex, int, PageIndex>,
-         IComparisonOperators<PageIndex, int, bool>
+        : IAdditionOperators<PageIndex, int, PageIndex>,
+                IAdditiveIdentity<PageIndex, PageIndex>,
+                ISubtractionOperators<PageIndex, int, PageIndex>,
+                IMinMaxValue<PageIndex>,
+                IMultiplyOperators<PageIndex, int, PageIndex>,
+                IComparisonOperators<PageIndex, int, bool>
 #endif
-    {
+{
         /// <summary>
         /// The value of the page size
         /// </summary>
         public int Value
         {
-            get;
+                get;
 #if NET6_0_OR_GREATER
-            private init;
+                private init;
 #else
             private set;
 #endif
@@ -60,7 +60,7 @@
         /// <summary>
         /// The zero value for the current type
         /// </summary>
-        public static PageIndex Zero => new PageIndex(0);
+        public static PageIndex Zero => new(0);
 
         private PageIndex(int value) => Value = value;
 
@@ -72,9 +72,9 @@
         /// <exception cref="ArgumentOutOfRangeException"> <paramref name="value"/> &lt; 1 </exception>
         public static PageIndex From(int value)
         {
-            return value < 1
-                ? throw new ArgumentOutOfRangeException(nameof(value), value, $"'{nameof(value)}' cannot be less than 1")
-                : new PageIndex(value);
+                return value < 1
+                        ? throw new ArgumentOutOfRangeException(nameof(value), value, $"'{nameof(value)}' cannot be less than 1")
+                        : new PageIndex(value);
         }
 
 #if NET7_0_OR_GREATER
@@ -89,31 +89,31 @@
 #endif
         public static PageIndex operator +(PageIndex left, int right)
         {
-            PageIndex pageIndex;
-            if (left.Value == int.MaxValue || right == int.MaxValue)
-            {
-                pageIndex = MaxValue;
-            }
-            else
-            {
-                checked
+                PageIndex pageIndex;
+                if (left.Value == int.MaxValue || right == int.MaxValue)
                 {
-                    try
-                    {
-                        pageIndex = (left.Value + right) switch
-                        {
-                            <= 0 => new PageIndex(Math.Min(1, left.Value)),
-                            int result => From(result)
-                        };
-                    }
-                    catch (OverflowException)
-                    {
                         pageIndex = MaxValue;
-                    }
                 }
-            }
+                else
+                {
+                        checked
+                        {
+                                try
+                                {
+                                        pageIndex = (left.Value + right) switch
+                                        {
+                                                <= 0 => new PageIndex(Math.Min(1, left.Value)),
+                                                int result => From(result)
+                                        };
+                                }
+                                catch (OverflowException)
+                                {
+                                        pageIndex = MaxValue;
+                                }
+                        }
+                }
 
-            return pageIndex;
+                return pageIndex;
         }
 
 #if NET7_0_OR_GREATER
@@ -128,11 +128,11 @@
 #endif
         public static PageIndex operator -(PageIndex left, int right)
         {
-            int result = left.Value - right;
+                int result = left.Value - right;
 
-            return result < 1
-                ? Zero
-                : left with { Value = left.Value - right };
+                return result < 1
+                        ? Zero
+                        : left with { Value = left.Value - right };
         }
 
 #if NET7_0_OR_GREATER
@@ -146,11 +146,11 @@
         /// <returns>The product of <paramref name="left"/> multiplied by <paramref name="right"/>.</returns>
 #endif
         public static PageIndex operator *(PageIndex left, int right)
-            => (left.Value * right) switch
-            {
-                <= 0 => Zero,
-                int result => From(result)
-            };
+                => (left.Value * right) switch
+                {
+                        <= 0 => Zero,
+                        int result => From(result)
+                };
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -187,7 +187,7 @@
         /// <returns><see langword="true"/> if <paramref name="left"/> is less than <paramref name="right"/> and <see langword="false"/> otherwise</returns>
 #endif
         public static bool operator <(PageIndex left, int right)
-            => left.Value < right;
+                => left.Value < right;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -200,7 +200,7 @@
         /// <returns><see langword="true"/> if <paramref name="left"/> is strictly greater than <paramref name="right"/> and <see langword="false"/> otherwise</returns>
 #endif
         public static bool operator <=(PageIndex left, int right)
-            => left.Value <= right;
+                => left.Value <= right;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -213,7 +213,7 @@
         /// <returns><see langword="true"/> if <paramref name="left"/> and <paramref name="right"/> are equal and <see langword="false"/> otherwise</returns>
 #endif
         public static bool operator ==(PageIndex left, int right)
-            => left.Value == right;
+                => left.Value == right;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -226,12 +226,11 @@
         /// <returns><see langword="true"/> if <paramref name="left"/> and <paramref name="right"/> are not equal and <see langword="false"/> otherwise</returns>
 #endif
         public static bool operator !=(PageIndex left, int right)
-            => !(left == right);
+                => !(left == right);
 
         /// <summary>
         /// Implicit cast of <see cref="PageIndex"/> into <see langword="int"/>.
         /// </summary>
         /// <param name="index"></param>
         public static implicit operator int(PageIndex index) => index.Value;
-    }
 }

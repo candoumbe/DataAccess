@@ -2,13 +2,15 @@ root = true
 [*]
 end_of_line = crlf
 
+[{*.json,*.xml,*.csproj}]
+indent_size = 2
 [*.cs]
 # Style options
 csharp_style_expression_bodied_accessors = when_on_single_line:suggestion
 csharp_style_var_for_built_in_types = false:error
 csharp_style_var_when_type_is_apparent = false:error
 
-# IDE0065: Directive using mal placée
+# IDE0065: Directive using mal placï¿½e
 csharp_using_directive_placement = inside_namespace
 
 # Indentation Options

@@ -1,26 +1,26 @@
-﻿namespace Candoumbe.DataAccess.Repositories
-{
-    using System;
-    using System.Numerics;
+﻿namespace Candoumbe.DataAccess.Repositories;
 
-    /// <summary>
-    /// Value object that holds a page size.
-    /// </summary>
-    /// <remarks>
-    /// An instance of this class behave mostly like an <see langword="int"/>.
-    /// </remarks>
-    public sealed record PageSize
+using System;
+using System.Numerics;
+
+/// <summary>
+/// Value object that holds a page size.
+/// </summary>
+/// <remarks>
+/// An instance of this class behave mostly like an <see langword="int"/>.
+/// </remarks>
+public sealed record PageSize
 #if NET7_0_OR_GREATER
         : IMultiplyOperators<PageSize, PageIndex, int>,
-          IMultiplyOperators<PageSize, int, int>,
-          IComparisonOperators<PageSize, int, bool>,
-          IEqualityOperators<PageSize, int, bool>,
-          IEqualityOperators<PageSize, long, bool>,
-          IMinMaxValue<PageSize>,
-          ISubtractionOperators<PageSize, int, PageSize>
+                IMultiplyOperators<PageSize, int, int>,
+                IComparisonOperators<PageSize, int, bool>,
+                IEqualityOperators<PageSize, int, bool>,
+                IEqualityOperators<PageSize, long, bool>,
+                IMinMaxValue<PageSize>,
+                ISubtractionOperators<PageSize, int, PageSize>
 #endif
 
-    {
+{
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
 #else
@@ -59,9 +59,9 @@
         /// <exception cref="ArgumentOutOfRangeException"> <paramref name="size"/> is negative.</exception>
         public static PageSize From(int size)
         {
-            return size < 0
-                ? throw new ArgumentOutOfRangeException(nameof(size), size, $"{nameof(size)} cannot be less than 0")
-                : new PageSize(size);
+                return size < 0
+                        ? throw new ArgumentOutOfRangeException(nameof(size), size, $"{nameof(size)} cannot be less than 0")
+                        : new PageSize(size);
         }
 
 #if NET7_0_OR_GREATER
@@ -75,7 +75,7 @@
         /// <returns>The result of <paramref name="left"/> * <paramref name="right"/>.</returns>
 #endif
         public static int operator *(PageSize left, PageIndex right)
-            => left * right.Value;
+                => left * right.Value;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -88,7 +88,7 @@
         /// <returns>the result of <paramref name="left"/> multiplied by <paramref name="right"/>.</returns>
 #endif
         public static int operator *(PageSize left, int right)
-            => left.Value * right;
+                => left.Value * right;
 
         ///<inheritdoc/>
         public static implicit operator int(PageSize right) => right.Value;
@@ -128,7 +128,7 @@
         /// <returns><see langword="true"/> if <paramref name="left"/> is less than <paramref name="right"/> and <see langword="false"/> otherwise</returns>
 #endif
         public static bool operator <(PageSize left, int right)
-            => left.Value < right;
+                => left.Value < right;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -141,7 +141,7 @@
         /// <returns><see langword="true"/> if <paramref name="left"/> is strictly greater than <paramref name="right"/> and <see langword="false"/> otherwise</returns>
 #endif
         public static bool operator <=(PageSize left, int right)
-            => left.Value <= right;
+                => left.Value <= right;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -154,7 +154,7 @@
         /// <returns><see langword="true"/> if <paramref name="left"/> and <paramref name="right"/> are equal and <see langword="false"/> otherwise</returns>
 #endif
         public static bool operator ==(PageSize left, int right)
-            => left.Value == right;
+                => left.Value == right;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -167,7 +167,7 @@
         /// <returns><see langword="true"/> if <paramref name="left"/> and <paramref name="right"/> are not equal and <see langword="false"/> otherwise</returns>
 #endif
         public static bool operator !=(PageSize left, int right)
-            => !(left == right);
+                => !(left == right);
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -180,7 +180,7 @@
         /// <returns><see langword="true"/> if <paramref name="left"/> and <paramref name="right"/> are equal and <see langword="false"/> otherwise</returns>
 #endif
         public static bool operator ==(PageSize left, long right)
-            => left.Value == right;
+                => left.Value == right;
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -193,7 +193,7 @@
         /// <returns><see langword="true"/> if <paramref name="left"/> and <paramref name="right"/> are not equal and <see langword="false"/> otherwise</returns>
 #endif
         public static bool operator !=(PageSize left, long right)
-            => !(left == right);
+                => !(left == right);
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -206,16 +206,16 @@
         /// <returns>The sum of <paramref name="left"/> and <paramref name="right"/>.</returns>
 #endif
         public static PageSize operator +(PageSize left, int right)
-            => (left.Value, right) switch
-            {
-                (int.MaxValue, _) or (_, int.MaxValue) => MaxValue,
-                (_, 0) => left,
-                _ => (left.Value + right) switch
+                => (left.Value, right) switch
                 {
-                    <= 0 => One,
-                    int result => From(result)
-                }
-            };
+                        (int.MaxValue, _) or (_, int.MaxValue) => MaxValue,
+                        (_, 0) => left,
+                        _ => (left.Value + right) switch
+                        {
+                                <= 0 => One,
+                                int result => From(result)
+                        }
+                };
 
 #if NET7_0_OR_GREATER
         ///<inheritdoc/>
@@ -228,10 +228,9 @@
         /// <returns>The result of <paramref name="left"/> <c>-</c> <paramref name="right"/>.</returns>
 #endif
         public static PageSize operator -(PageSize left, int right)
-            => From((left.Value - right) switch
-            {
-                < 1 => 1,
-                int result => result
-            });
-    }
+                => From((left.Value - right) switch
+                {
+                        < 1 => 1,
+                        int result => result
+                });
 }
