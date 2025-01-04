@@ -10,14 +10,14 @@
   <Choose>
      <When Condition="'$(TargetFramework)' == 'net6.0'">
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.36" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.36" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" />
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.20" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.20" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" />
       </ItemGroup>
     </Otherwise>
   </Choose>
