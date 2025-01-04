@@ -110,14 +110,17 @@
         }
 
         /// <inheritdoc/>
-        public async Task Delete(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        public async Task<int> Delete(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
         {
             IAsyncEnumerable<T> entriesToDelete = Stream(predicate, ct);
-
-            await foreach (T entry in entriesToDelete.WithCancellation(ct))
+            int deletion = 0;
+            await foreach (T entry in entriesToDelete)
             {
                 _session.Delete(entry);
+                deletion++;
             }
+
+            return deletion;
         }
 
         /// <inheritdoc/>

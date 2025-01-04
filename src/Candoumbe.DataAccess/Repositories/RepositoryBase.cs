@@ -433,7 +433,7 @@ namespace Candoumbe.DataAccess.Repositories
         public abstract Task<TEntry> Create(TEntry entry, CancellationToken cancellationToken = default);
 
         /// <inheritdoc/>
-        public abstract Task Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        public abstract Task<int> Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <inheritdoc/>
         public abstract Task<IEnumerable<TEntry>> Create(IEnumerable<TEntry> entries, CancellationToken cancellationToken = default);

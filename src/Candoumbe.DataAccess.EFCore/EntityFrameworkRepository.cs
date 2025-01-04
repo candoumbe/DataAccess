@@ -46,13 +46,17 @@
         }
 
         /// <inheritdoc/>
-        public override async Task Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+        public override async Task<int> Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
         {
             IAsyncEnumerable<TEntry> entries = Context.Set<TEntry>().Where(predicate).AsAsyncEnumerable();
+            int deletion = 0;
             await foreach (TEntry item in entries.WithCancellation(cancellationToken))
             {
                 Context.Set<TEntry>().Remove(item);
+                deletion++;
             }
+
+            return deletion;
         }
     }
 }

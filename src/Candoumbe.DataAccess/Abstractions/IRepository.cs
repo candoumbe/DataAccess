@@ -517,12 +517,13 @@ namespace Candoumbe.DataAccess.Abstractions
         Task<Option<TEntry>> FirstOrDefault(Expression<Func<TEntry, bool>> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Delete all entries that match <paramref name="predicate"/>
+        /// Delete all entries that match <paramref name="predicate"/>.
         /// </summary>
         /// <param name="predicate">Defines which <typeparamref name="TEntry"/> will be deleted.</param>
         /// <param name="cancellationToken">Notifies to cancel the execution of the request.</param>
         /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <c>nuull</c></exception>
-        Task Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
+        /// <returns>The number of elements that will be delete or 0 if no element matching <paramref name="predicate"/> found.</returns>
+        Task<int> Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete all entries of the underlying datastore

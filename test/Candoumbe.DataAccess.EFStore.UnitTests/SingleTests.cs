@@ -13,6 +13,7 @@
 
     using System;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Xunit;
@@ -29,21 +30,21 @@
         public async Task Given_hero_exists_and_has_an_acolyte_When_calling_SingleAsync_without_including_acolytes_Then_result_should_not_have_acolyte()
         {
             // Arrange
-            Hero hero = new Hero(Guid.NewGuid(), Faker.Person.FullName);
-            Acolyte acolyte = new Acolyte(Guid.NewGuid(), Faker.Person.FullName);
+            Hero hero = new(Guid.NewGuid(), Faker.Person.FullName);
+            Acolyte acolyte = new(Guid.NewGuid(), Faker.Person.FullName);
 
             hero.Enrolls(acolyte);
 
             SqliteDbContext.Heroes.Add(hero);
-            await SqliteDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await SqliteDbContext.SaveChangesAsync();
 
-            DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
+            DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new();
             optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-            SqliteDbContext context = new SqliteDbContext(optionsBuilder.Options);
-            EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
+            SqliteDbContext context = new(optionsBuilder.Options);
+            EntityFrameworkRepository<Hero, SqliteDbContext> repository = new(context);
 
             // Act
-            Hero actual = await repository.Single(x => x.Id == hero.Id, default).ConfigureAwait(false);
+            Hero actual = await repository.Single(x => x.Id == hero.Id, CancellationToken.None);
 
             // Assert
             actual.Acolytes.Should()
@@ -54,19 +55,19 @@
         public async Task Given_hero_exists_and_has_an_acolyte_When_calling_SingleAsync_with_including_acolytes_Then_result_should_not_have_acolyte()
         {
             // Arrange
-            Hero hero = new Hero(Guid.NewGuid(), Faker.Person.FullName);
-            Acolyte acolyte = new Acolyte(Guid.NewGuid(), Faker.Person.FullName);
-            Weapon weapon = new Weapon(Guid.NewGuid(), "Bow", 1);
+            Hero hero = new(Guid.NewGuid(), Faker.Person.FullName);
+            Acolyte acolyte = new(Guid.NewGuid(), Faker.Person.FullName);
+            Weapon weapon = new(Guid.NewGuid(), "Bow", 1);
             acolyte.Take(weapon);
             hero.Enrolls(acolyte);
 
             SqliteDbContext.Heroes.Add(hero);
             await SqliteDbContext.SaveChangesAsync().ConfigureAwait(false);
 
-            DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
+            DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new();
             optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-            SqliteDbContext context = new SqliteDbContext(optionsBuilder.Options);
-            EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
+            SqliteDbContext context = new(optionsBuilder.Options);
+            EntityFrameworkRepository<Hero, SqliteDbContext> repository = new(context);
 
             // Act
             Hero actual = await repository.Single(x => x.Id == hero.Id,
