@@ -1,23 +1,18 @@
 ﻿namespace Candoumbe.DataAccess.RavenDb;
 
-using Candoumbe.DataAccess.Abstractions;
-using Candoumbe.DataAccess.Repositories;
-
-using DataFilters;
-
-using Microsoft.EntityFrameworkCore;
-
-using Optional;
-
-using Raven.Client.Documents.Linq;
-using Raven.Client.Documents.Session;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Abstractions;
+using DataFilters;
+using Optional;
+using Raven.Client.Documents;
+using Raven.Client.Documents.Linq;
+using Raven.Client.Documents.Session;
+using Repositories;
 
 /// <summary>
 /// RavenDb implementation of <see cref="IRepository{TEntry}"/>
@@ -26,21 +21,29 @@ using System.Threading.Tasks;
 public class RavenDbRepository<T> : IRepository<T> where T : class
 {
     private readonly IAsyncDocumentSession _session;
-    /// <inheritdoc/>
+    
+    /// <summary>
+    /// Builds a new <see cref="RavenDbRepository{T}"/> instance.
+    /// </summary>
+    /// <param name="session">The underlying document session that will be used to </param>
     public RavenDbRepository(IAsyncDocumentSession session)
     {
         _session = session;
     }
     /// <inheritdoc/>
     public async Task<bool> All(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
-        => await _session.Query<T>().AllAsync(predicate, cancellationToken).ConfigureAwait(false);
+    {
+        IRavenQueryable<T> query = _session.Query<T>().Where(predicate);
+
+        return (await query.CountAsync(cancellationToken).ConfigureAwait(false)) == await _session.Query<T>().CountAsync(cancellationToken).ConfigureAwait(false);
+    }
 
     /// <inheritdoc/>
     public async Task<bool> All<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default)
-        => await _session.Query<T>()
-            .Select(selector)
-            .AllAsync(predicate, cancellationToken)
-            .ConfigureAwait(false);
+    {
+        IRavenQueryable<TResult> query = _session.Query<T>().Select(selector).Where(predicate);
+        return (await query.CountAsync(cancellationToken).ConfigureAwait(false)) == await _session.Query<T>().CountAsync(cancellationToken).ConfigureAwait(false);
+    }
 
     /// <inheritdoc/>
     public virtual async Task<Page<T>> ReadPage(PageSize pageSize, PageIndex page, IEnumerable<IncludeClause<T>> includedProperties, IOrder<T> orderBy, CancellationToken ct = default)
@@ -70,7 +73,7 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
         => await _session.Query<T>().AnyAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public Task<bool> Any(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<bool> Any(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => await _session.Query<T>().AnyAsync(predicate, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
     public async Task Clear(CancellationToken ct = default)
@@ -149,76 +152,177 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
         => (await _session.Query<T>().FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false)).SomeNotNull();
 
     /// <inheritdoc/>
-    public Task<Option<T>> FirstOrDefault(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    public async Task<Option<T>> FirstOrDefault(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        => (await _session.Query<T>().FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false)).SomeNotNull();
 
     /// <inheritdoc/>
-    public Task<Option<T>> FirstOrDefault(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    public async Task<Option<T>> FirstOrDefault(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
+        => (await _session.Query<T>().FirstOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false)).SomeNotNull();
 
     /// <inheritdoc/>
-    public Task<Option<TResult>> FirstOrDefault<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<Option<TResult>> FirstOrDefault<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) 
+        => (await _session.Query<T>().Select(selector).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false)).SomeNotNull();
 
     /// <inheritdoc/>
-    public Task<TResult> Max<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-    /// <inheritdoc/>
-    public Task<TResult> Min<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-    /// <inheritdoc/>
-    public Task<IEnumerable<T>> ReadAll(CancellationToken ct = default) => throw new NotImplementedException();
-    /// <inheritdoc/>
-    public Task<IEnumerable<TResult>> ReadAll<TResult>(Expression<Func<T, TResult>> selector, CancellationToken ct = default) => throw new NotImplementedException();
-    /// <inheritdoc/>
-    public Task<Page<TResult>> ReadPage<TResult>(Expression<Func<T, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TResult> orderBy = null, CancellationToken ct = default) => throw new NotImplementedException();
-    /// <inheritdoc/>
-    public Task<Page<TResult>> ReadPage<TResult>(Expression<Func<T, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<T> orderBy = null, CancellationToken ct = default) => throw new NotImplementedException();
-    /// <inheritdoc/>
-    public Task<T> Single(CancellationToken cancellationToken = default) => throw new NotImplementedException();
-    /// <inheritdoc/>
-    public Task<T> Single(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public Task<TResult> Max<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default)
+    {
+        IRavenQueryable<TResult> query = _session.Query<T>().Select(selector).OrderBy(x => x);
+        return Task.FromResult(query.Last());
+    }
 
     /// <inheritdoc/>
-    public Task<T> Single(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public Task<TResult> Min<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default)
+    {
+        IRavenQueryable<TResult> query = _session.Query<T>().Select(selector).OrderBy(x => x);
+        return Task.FromResult(query.First());
+    }
 
     /// <inheritdoc/>
-    public Task<TResult> Single<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<IEnumerable<T>> ReadAll(CancellationToken ct = default)
+        => await _session.Query<T>().ToListAsync(ct).ConfigureAwait(false);
+
     /// <inheritdoc/>
-    public Task<Option<T>> SingleOrDefault(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<IEnumerable<TResult>> ReadAll<TResult>(Expression<Func<T, TResult>> selector, CancellationToken ct = default)
+        => await _session.Query<T>().Select(selector).ToListAsync(ct).ConfigureAwait(false);
+
     /// <inheritdoc/>
-    public Task<Option<T>> SingleOrDefault(IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<T, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TResult> orderBy = null, CancellationToken ct = default)
+    {
+        IRavenQueryable<TResult> query = _session.Query<T>().Select(selector);
+        IEnumerable<TResult> items = orderBy is not null
+            ? await query.OrderBy(orderBy).Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync(ct).ConfigureAwait(false)
+            : await query.Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync(ct).ConfigureAwait(false);
+
+        long total = await query.CountAsync(ct).ConfigureAwait(false);
+
+       return new Page<TResult>(items, total, pageSize);
+    }
+
     /// <inheritdoc/>
-    public Task<Option<T>> SingleOrDefault(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<T, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<T> orderBy = null, CancellationToken ct = default)
+    {
+        IRavenQueryable<T> query = _session.Query<T>();
+        IEnumerable<TResult> items = orderBy is not null
+            ? await query.OrderBy(orderBy).Select(selector).Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync(ct).ConfigureAwait(false)
+            : await query.Select(selector).Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync(ct).ConfigureAwait(false);
+
+        long total = await query.CountAsync(ct).ConfigureAwait(false);
+
+        return new Page<TResult>(items, total, pageSize);
+    }
+
     /// <inheritdoc/>
-    public Task<Option<T>> SingleOrDefault(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<T> Single(CancellationToken cancellationToken = default)
+        => await _session.Query<T>().SingleAsync(cancellationToken).ConfigureAwait(false);
+
     /// <inheritdoc/>
-    public Task<Option<TResult>> SingleOrDefault<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<T> Single(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        => await _session.Query<T>().SingleAsync(predicate, cancellationToken).ConfigureAwait(false);
+
     /// <inheritdoc/>
-    public Task<Option<TResult>> SingleOrDefault<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<T> Single(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
+        => await _session.Query<T>().SingleAsync(predicate, cancellationToken).ConfigureAwait(false);
+
+    /// <inheritdoc/>
+    public async Task<TResult> Single<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) 
+        => await _session.Query<T>().Where(predicate).Select(selector).SingleAsync(cancellationToken).ConfigureAwait(false);
+
+    /// <inheritdoc/>
+    public async Task<Option<T>> SingleOrDefault(CancellationToken cancellationToken = default)
+        => (await _session.Query<T>().SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false)).SomeNotNull();
+
+    /// <inheritdoc/>
+    public async Task<Option<T>> SingleOrDefault(IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
+        => (await _session.Query<T>().SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false)).SomeNotNull();
+
+    /// <inheritdoc/>
+    public async Task<Option<T>> SingleOrDefault(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        => (await _session.Query<T>().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false)).SomeNotNull();
+
+    /// <inheritdoc/>
+    public async Task<Option<T>> SingleOrDefault(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
+        => (await _session.Query<T>().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false)).SomeNotNull();
+
+    /// <inheritdoc/>
+    public async Task<Option<TResult>> SingleOrDefault<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        => (await _session.Query<T>().Where(predicate).Select(selector).SingleOrDefaultAsync( cancellationToken).ConfigureAwait(false)).SomeNotNull();
+
+    /// <inheritdoc/>
+    public async Task<Option<TResult>> SingleOrDefault<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default)
+        => (await _session.Query<T>().Select(selector).Where(predicate).SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false)).SomeNotNull();
+
     /// <inheritdoc/>
     public IAsyncEnumerable<T> Stream(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
+        => Stream(ExpressionExtensions.Identity<T>(), predicate, ct);
+
     /// <inheritdoc/>
     public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
+        => RavenQueryableExtensions.AsAsyncEnumerable(_session.Query<T>().Where(predicate).Select(selector));
+
     /// <inheritdoc/>
-    public Task<IEnumerable<T>> Where(Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
+    public async Task<IEnumerable<T>> Where(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        => await Where(ExpressionExtensions.Identity<T>(), predicate, ct).ConfigureAwait(false);
+
     /// <inheritdoc/>
-    public Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
+    public async Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        => await _session.Query<T>().Where(predicate).Select(selector).ToListAsync(ct).ConfigureAwait(false);
+
     /// <inheritdoc/>
-    public Task<IEnumerable<TResult>> Where<TKey, TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> keySelector, Expression<Func<IGrouping<TKey, T>, TResult>> groupSelector, CancellationToken ct = default) => throw new NotImplementedException();
+    public Task<IEnumerable<TResult>> Where<TKey, TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> keySelector, Expression<Func<IGrouping<TKey, T>, TResult>> groupSelector, CancellationToken ct = default) 
+        => throw new NotImplementedException();
+
     /// <inheritdoc/>
-    public Task<IEnumerable<T>> Where(Expression<Func<T, bool>> predicate, IOrder<T> orderBy = null, IEnumerable<IncludeClause<T>> includedProperties = null, CancellationToken ct = default) => throw new NotImplementedException();
+    public Task<IEnumerable<T>> Where(Expression<Func<T, bool>> predicate, IOrder<T> orderBy = null, IEnumerable<IncludeClause<T>> includedProperties = null, CancellationToken ct = default)
+        => throw new NotImplementedException();
+
     /// <inheritdoc/>
     public Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, IOrder<TResult> orderBy = null, IEnumerable<IncludeClause<T>> includedProperties = null, CancellationToken ct = default) => throw new NotImplementedException();
+
     /// <inheritdoc/>
     public Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, IOrder<TResult> orderBy = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
     /// <inheritdoc/>
-    public Task<Page<T>> Where(Expression<Func<T, bool>> predicate, IOrder<T> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<Page<T>> Where(Expression<Func<T, bool>> predicate, IOrder<T> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default)
+    {
+        IRavenQueryable<T> query = _session.Query<T>().Where(predicate);
+        long total = await query.CountAsync(cancellationToken).ConfigureAwait(false);
+
+        IEnumerable<T> items = total switch
+        {
+            > 0 when orderBy is not null => await query.OrderBy(orderBy).Skip(pageSize * ( page - 1 )).Take(pageSize).ToListAsync(cancellationToken).ConfigureAwait(false),
+            > 0 => await query.Skip(pageSize * ( page - 1 )).Take(pageSize).ToListAsync(cancellationToken).ConfigureAwait(false),
+            _ => []
+        };
+
+        return new Page<T>(items, total, pageSize);
+    }
+
     /// <inheritdoc/>
-    public Task<Page<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<Page<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default)
+    {
+        IRavenQueryable<TResult> query = _session.Query<T>().Where(predicate).Select(selector);
+        long total = await query.CountAsync(cancellationToken).ConfigureAwait(false);
+
+        IEnumerable<TResult> items = total switch
+        {
+            > 0 when orderBy is not null => await query.OrderBy(orderBy).Skip(pageSize * ( page - 1 )).Take(pageSize).ToListAsync(cancellationToken).ConfigureAwait(false),
+            > 0 => await query.Skip(pageSize * ( page - 1 )).Take(pageSize).ToListAsync(cancellationToken).ConfigureAwait(false),
+            _ => []
+        };
+
+        return new Page<TResult>(items, total, pageSize);
+    }
+
     /// <inheritdoc/>
-    public Task<Page<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public async Task<Page<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default)
+    {
+        IRavenQueryable<TResult> query = _session.Query<T>().Select(selector).Where(predicate);
+        IEnumerable<TResult> items = orderBy is not null
+            ? await query.OrderBy(orderBy).Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync(cancellationToken).ConfigureAwait(false)
+            : await query.Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        long total = await query.Where(predicate).CountAsync(cancellationToken).ConfigureAwait(false);
+
+        return new Page<TResult>(items, total, pageSize);
+    }
 }

@@ -1,8 +1,8 @@
 ﻿namespace Candoumbe.DataAccess.EFStore.UnitTests.Generators;
 
-using Candoumbe.DataAccess.Repositories;
 using FsCheck;
 using FsCheck.Fluent;
+using Repositories;
 
 /// <summary>
 /// Generators for FsCheck

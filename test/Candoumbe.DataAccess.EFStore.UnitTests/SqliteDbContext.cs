@@ -1,7 +1,7 @@
 ﻿namespace Candoumbe.DataAccess.EFStore.UnitTests;
 
-using Candoumbe.DataAccess.Abstractions;
-using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
+using Abstractions;
+using Entities;
 using Microsoft.EntityFrameworkCore;
 
 public class SqliteDbContext : DbContext, IDbContext

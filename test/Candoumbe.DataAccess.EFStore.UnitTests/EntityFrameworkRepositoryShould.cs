@@ -1,10 +1,8 @@
 ﻿namespace Candoumbe.DataAccess.EFStore.UnitTests;
 
-using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
-using FluentAssertions;
-
 using System;
-
+using Entities;
+using FluentAssertions;
 using Xunit;
 
 public class EntityFrameworkRepositoryShould

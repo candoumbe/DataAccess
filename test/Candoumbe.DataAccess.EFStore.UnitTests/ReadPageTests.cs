@@ -6,13 +6,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Candoumbe.DataAccess.Abstractions;
-using Candoumbe.DataAccess.EFStore;
-using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
-using Candoumbe.DataAccess.Repositories;
+using Abstractions;
 using DataFilters;
+using Entities;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Repositories;
 using Xunit;
 using Xunit.Categories;
 

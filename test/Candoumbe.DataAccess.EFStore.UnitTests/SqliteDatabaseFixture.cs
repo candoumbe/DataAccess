@@ -1,9 +1,7 @@
 ﻿namespace Candoumbe.DataAccess.EFStore.UnitTests;
 
-using Microsoft.Data.Sqlite;
-
 using System.Threading.Tasks;
-
+using Microsoft.Data.Sqlite;
 using Xunit;
 
 /// <summary>

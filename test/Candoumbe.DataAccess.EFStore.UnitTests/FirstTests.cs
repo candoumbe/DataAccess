@@ -4,11 +4,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Candoumbe.DataAccess.EFStore;
-using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
-using Candoumbe.DataAccess.Repositories;
+using Entities;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Repositories;
 using Xunit;
 using Xunit.Categories;
 

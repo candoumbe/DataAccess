@@ -1,4 +1,4 @@
-﻿namespace Candoumbe.DataAccess.EFStore.UnitTests.Entities;
+﻿namespace Candoumbe.DataAccess.RavenDb.UnitTests.Entities;
 
 using System;
 using System.Collections.Generic;
@@ -7,15 +7,15 @@ using Optional.Collections;
 
 public class Hero
 {
-    public Guid Id { get; set; }
+    public string Id { get; init; }
 
-    public string Name { get; set; }
+    public string Name { get; init; }
 
     public IEnumerable<Acolyte> Acolytes => _acolytes.ToImmutableList();
 
     private readonly IList<Acolyte> _acolytes;
 
-    public Hero(Guid id, string name)
+    public Hero(string id, string name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -36,7 +36,7 @@ public class Hero
         _acolytes.Add(acolyte);
     }
 
-    public void Dismiss(Guid acolyteId)
+    public void Dismiss(string acolyteId)
     {
         _acolytes.SingleOrNone(acc => acc.Id == acolyteId)
             .MatchSome(acolyte => _acolytes.Remove(acolyte));

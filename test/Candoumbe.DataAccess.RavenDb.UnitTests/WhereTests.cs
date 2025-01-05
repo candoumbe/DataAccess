@@ -1,4 +1,4 @@
-﻿namespace Candoumbe.DataAccess.EFStore.UnitTests;
+﻿namespace Candoumbe.DataAccess.RavenDb.UnitTests;
 
 using System;
 using System.Collections.Generic;
@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 using DataFilters;
 using Entities;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Repositories;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
+using Xunit.Extensions.AssemblyFixture;
 
 [UnitTest]
-public class WhereTests(SqliteDatabaseFixture databaseFixture, ITestOutputHelper outputHelper)
-    : EntityFrameworkRepositoryTestsBase(databaseFixture), IClassFixture<SqliteDatabaseFixture>
+public class WhereTests(RavenDbFixture databaseFixture, ITestOutputHelper outputHelper)
+    : RavenDbRepositoryTestsBase(databaseFixture), IAssemblyFixture<RavenDbFixture>
 {
     public static TheoryData<IReadOnlyList<Hero>, Expression<Func<Hero, bool>>, PageSize, PageIndex, IOrder<Hero>, Expression<Func<Page<Hero>, bool>>> WhereWithNoIncludesCases
     {
@@ -38,9 +38,9 @@ public class WhereTests(SqliteDatabaseFixture databaseFixture, ITestOutputHelper
             };
 
             {
-                Hero hero = new(Guid.NewGuid(), Faker.Person.FullName);
-                Acolyte acolyte = new(Guid.NewGuid(), Faker.Person.FullName);
-                Weapon weapon = new(Guid.NewGuid(), "Bow", 1);
+                Hero hero = new(Guid.NewGuid().ToString(), Faker.Person.FullName);
+                Acolyte acolyte = new(Guid.NewGuid().ToString(), Faker.Person.FullName);
+                Weapon weapon = new(Guid.NewGuid().ToString(), "Bow", 1);
                 acolyte.Take(weapon);
                 hero.Enrolls(acolyte);
 
@@ -60,19 +60,19 @@ public class WhereTests(SqliteDatabaseFixture databaseFixture, ITestOutputHelper
             }
 
             {
-                Hero batman = new(Guid.NewGuid(), "Batman");
-                Acolyte robin = new(Guid.NewGuid(), "Robin");
-                Weapon longStick = new(Guid.NewGuid(), "Long stick", 2);
+                Hero batman = new(Guid.NewGuid().ToString(), "Batman");
+                Acolyte robin = new(Guid.NewGuid().ToString(), "Robin");
+                Weapon longStick = new(Guid.NewGuid().ToString(), "Long stick", 2);
                 robin.Take(longStick);
                 batman.Enrolls(robin);
 
-                Hero greenArrow = new(Guid.NewGuid(), "Green Arrow");
-                Acolyte redArrow = new(Guid.NewGuid(), "Red Arrow");
-                Weapon bow = new(Guid.NewGuid(), "Bow & arrow", 2);
+                Hero greenArrow = new(Guid.NewGuid().ToString(), "Green Arrow");
+                Acolyte redArrow = new(Guid.NewGuid().ToString(), "Red Arrow");
+                Weapon bow = new(Guid.NewGuid().ToString(), "Bow & arrow", 2);
                 redArrow.Take(bow);
                 greenArrow.Enrolls(robin);
 
-                Hero wonderWoman = new(Guid.NewGuid(), "Wonder Woman");
+                Hero wonderWoman = new(Guid.NewGuid().ToString(), "Wonder Woman");
 
                 cases.Add
                 (
@@ -133,22 +133,21 @@ public class WhereTests(SqliteDatabaseFixture databaseFixture, ITestOutputHelper
         Expression<Func<Page<Hero>, bool>> pageExpectation)
     {
         // Arrange
-        SqliteDbContext.Heroes.AddRange(heroes);
-        await SqliteDbContext.SaveChangesAsync();
+        using var session = Store.OpenAsyncSession();
+        foreach (var hero in heroes)
+        {
+            await session.StoreAsync(hero, $"hero/{hero.Id}");
+        }
+        await session.SaveChangesAsync();
 
-        DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new();
-        optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-        SqliteDbContext context = new(optionsBuilder.Options);
-
-        EntityFrameworkRepository<Hero, SqliteDbContext> repository = new(context);
+        RavenDbRepository<Hero> repository = new (Store.OpenAsyncSession());
 
         // Act
         Page<Hero> page = await repository.Where(predicate: predicate,
                 pageSize: pageSize,
                 page: pageIndex,
                 orderBy: orderBy,
-                cancellationToken: CancellationToken.None)
-            ;
+                cancellationToken: CancellationToken.None);
 
         // Assert
         outputHelper.WriteLine($"Page expectation is {pageExpectation}");
