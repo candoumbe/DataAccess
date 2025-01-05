@@ -1,14 +1,13 @@
-namespace Candoumbe.DataAccess.Abstractions
+namespace Candoumbe.DataAccess.Abstractions;
+
+/// <summary>
+/// Factory to create <see cref="IUnitOfWork"/>s.
+/// </summary>
+public abstract class UnitOfWorkFactory : IUnitOfWorkFactory
 {
     /// <summary>
-    /// Factory to create <see cref="IUnitOfWork"/>s.
+    /// Starts a new unit of work
     /// </summary>
-    public abstract class UnitOfWorkFactory : IUnitOfWorkFactory
-    {
-        /// <summary>
-        /// Starts a new unit of work
-        /// </summary>
-        /// <returns></returns>
-        public abstract IUnitOfWork NewUnitOfWork();
-    }
+    /// <returns></returns>
+    public abstract IUnitOfWork NewUnitOfWork();
 }

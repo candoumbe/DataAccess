@@ -54,6 +54,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContinuousIntegration", "bu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.DataAccess.EFStore.UnitTests", "test\Candoumbe.DataAccess.EFStore.UnitTests\Candoumbe.DataAccess.EFStore.UnitTests.csproj", "{CDF8B290-A866-406A-BABD-EBD901B80925}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Candoumbe.DataAccess.RavenDb.UnitTests", "test\Candoumbe.DataAccess.RavenDb.UnitTests\Candoumbe.DataAccess.RavenDb.UnitTests.csproj", "{73290AEE-04BF-4769-8E36-D611C26301B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +84,10 @@ Global
 		{CDF8B290-A866-406A-BABD-EBD901B80925}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDF8B290-A866-406A-BABD-EBD901B80925}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDF8B290-A866-406A-BABD-EBD901B80925}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73290AEE-04BF-4769-8E36-D611C26301B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73290AEE-04BF-4769-8E36-D611C26301B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73290AEE-04BF-4769-8E36-D611C26301B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73290AEE-04BF-4769-8E36-D611C26301B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,6 +100,7 @@ Global
 		{8DBACAE3-D521-4FE0-B69E-4059878BE503} = {453627F0-00A6-4EB6-86D4-8DB93A6F5FA6}
 		{3E307E4F-33A2-4034-A817-00BA772CCB39} = {BFD57C4D-D69D-4E12-98C9-501A976CEA18}
 		{CDF8B290-A866-406A-BABD-EBD901B80925} = {91B90448-4C57-49AC-9A49-E4919035E1EF}
+		{73290AEE-04BF-4769-8E36-D611C26301B7} = {91B90448-4C57-49AC-9A49-E4919035E1EF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {624C7BF3-659F-4D2B-8470-C37A28C6B740}

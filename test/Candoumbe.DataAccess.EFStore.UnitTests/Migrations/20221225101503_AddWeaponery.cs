@@ -1,10 +1,10 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
-
-#nullable disable
+﻿#nullable disable
 
 namespace Candoumbe.DataAccess.EFStore.UnitTests.Migrations
 {
+    using System;
+    using Microsoft.EntityFrameworkCore.Migrations;
+
     public partial class AddWeaponery : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

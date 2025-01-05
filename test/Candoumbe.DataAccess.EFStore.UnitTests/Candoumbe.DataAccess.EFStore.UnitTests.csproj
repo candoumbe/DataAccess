@@ -1,29 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\tests.props" />
+  <Import Project="..\..\tests.props"/>
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;</TargetFrameworks>
-
+    <TargetFrameworks>net8.0;</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <Choose>
-     <When Condition="'$(TargetFramework)' == 'net6.0'">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
-
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Candoumbe.DataAccess.EFCore\Candoumbe.DataAccess.EFStore.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Candoumbe.DataAccess.EFCore\Candoumbe.DataAccess.EFStore.csproj"/>
   </ItemGroup>
 
 </Project>
