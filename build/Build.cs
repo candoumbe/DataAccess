@@ -79,8 +79,9 @@ namespace ContinuousIntegration
         IHaveTestDirectory,
         IClean,
         IRestore,
+        IUnitTest,
         IMutationTest,
-        IReportUnitTestCoverage,
+        IReportCoverage,
         IPushNugetPackages,
         ICreateGithubRelease,
         IGitFlowWithPullRequest

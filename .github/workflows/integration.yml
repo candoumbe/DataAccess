@@ -53,16 +53,6 @@ jobs:
         with:
           name: unit-tests
           path: output/artifacts/tests-results/unit-tests
-      - name: 'Publish: unit-tests'
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit-tests
-          path: output/artifacts/reports/coverage-report/unit-tests
-      - name: 'Publish: unit-tests'
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit-tests
-          path: output/artifacts/reports/coverage-history/unit-tests
       - name: 'Publish: packages'
         uses: actions/upload-artifact@v4
         with:
