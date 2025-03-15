@@ -2,26 +2,21 @@
 
   <Import Project="..\..\core.props" />
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <Description>Couche d'accès générique.</Description>
     <RepositoryType>Github</RepositoryType>
     <PackageTags>DAL, EF, EF core</PackageTags>
   </PropertyGroup>
 
   <Choose>
-    <When Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <When Condition="'$(TargetFramework)' == 'net8.0'">
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
-      </ItemGroup>
-    </When>
-    <When Condition="'$(TargetFramework)' == 'net6.0'">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.14" />
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
       </ItemGroup>
     </Otherwise>
   </Choose>
