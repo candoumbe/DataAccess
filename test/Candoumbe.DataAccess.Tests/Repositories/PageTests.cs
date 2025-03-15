@@ -28,7 +28,7 @@
         public void CtorWithNullEntriesShouldThrowArgumentNullException()
         {
             //Act
-            Action action = () => new Page<object>(null, 0, PageSize.From(0));
+            Action action = () => _ = new Page<object>(null, 0, PageSize.From(0));
 
             //Assert
             action.Should()
@@ -55,7 +55,7 @@
         public void CtorWithNegativePageSizeShouldThrowArgumentOutOfRangeException(NegativeInt pageSize)
         {
             _outputTestHelper.WriteLine($"Page size : {pageSize.Item}");
-            Action action = () => new Page<object>(Enumerable.Empty<object>(), 0, PageSize.From(pageSize.Item));
+            Action action = () => _ = new Page<object>([], 0, PageSize.From(pageSize.Item));
             action.Should().Throw<ArgumentOutOfRangeException>().Which
                 .ParamName.Should()
                     .BeEquivalentTo(nameof(Page<object>.Size));
@@ -67,7 +67,7 @@
             _outputTestHelper.WriteLine($"{nameof(Page<object>.Total)} : {total.Item}");
 
             //Act
-            Action action = () => new Page<object>(Enumerable.Empty<object>(), total.Item, PageSize.One);
+            Action action = () => _ = new Page<object>([], total.Item, PageSize.One);
 
             // Assert
             action.Should().Throw<ArgumentOutOfRangeException>().Which
@@ -75,18 +75,18 @@
                     .BeEquivalentTo(nameof(Page<object>.Total));
         }
 
-        [Property(Arbitrary = new[] { typeof(Generators) })]
+        [Property(Arbitrary = [typeof(Generators)])]
         public void CheckPageCount(NonNegativeInt total, PageSize pageSize)
         {
             // Arrange 
             (int expected, string reason) = (int)Math.Ceiling((double)total.Item / pageSize) switch
             {
                 < 1 => (1, "page count cannot be less than 1"),
-                int count => (count, "Page count must be an numeric value")
+                var count => (count, "Page count must be an numeric value")
             };
 
             //Act
-            Page<object> page = new(Enumerable.Empty<object>(), total.Item, pageSize);
+            Page<object> page = new([], total.Item, pageSize);
 
             //Assert
             page.Count.Should().Be(expected, reason);
