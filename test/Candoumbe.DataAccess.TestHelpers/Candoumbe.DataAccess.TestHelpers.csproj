@@ -2,7 +2,7 @@
 
   <Import Project="..\..\tests.props" />
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Candoumbe.DataAccess\Candoumbe.DataAccess.csproj" />
