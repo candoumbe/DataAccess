@@ -478,3 +478,5 @@ $RECYCLE.BIN/
 /.nuke/temp
 
 .qodo
+# Jetbrains Rider config file
+/.idea
