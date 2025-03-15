@@ -10,7 +10,7 @@
     <NukeTelemetryVersion>1</NukeTelemetryVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Candoumbe.Pipelines" Version="0.12.1" />
+    <PackageReference Include="Candoumbe.Pipelines" Version="0.13.0-rc.39" />
   </ItemGroup>
   <ItemGroup>
     <PackageDownload Include="GitVersion.Tool" Version="[5.11.1]" />
