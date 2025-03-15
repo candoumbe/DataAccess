@@ -17,59 +17,60 @@ namespace ContinuousIntegration
 {
     using Candoumbe.Pipelines.Components.NuGet;
 
-    [GitHubActions("integration", GitHubActionsImage.UbuntuLatest,
+    [GitHubActions("integration", GitHubActionsImage.Ubuntu2204,
         AutoGenerate = true,
         FetchDepth = 0,
-        InvokedTargets = new[] { nameof(IUnitTest.Compile), nameof(IUnitTest.UnitTests), nameof(IPack.Pack), nameof(IPushNugetPackages.Publish) },
-        CacheKeyFiles = new[]
-        {
+        InvokedTargets = [nameof(IUnitTest.Compile), nameof(IUnitTest.UnitTests), nameof(IPack.Pack), nameof(IPushNugetPackages.Publish)
+        ],
+        CacheKeyFiles =
+        [
             "src/**/*.csproj",
             "test/**/*.csproj",
             "stryker-config.json",
             "test/**/*/xunit.runner.json"
-        },
-        OnPushBranchesIgnore = new[] { IHaveMainBranch.MainBranchName },
+        ],
+        OnPushBranchesIgnore = [IHaveMainBranch.MainBranchName],
         EnableGitHubToken = true,
-        ImportSecrets = new[]
-        {
+        ImportSecrets =
+        [
             nameof(NugetApiKey),
             nameof(IReportCoverage.CodecovToken)
-        },
+        ],
         PublishArtifacts = true,
-        OnPullRequestExcludePaths = new[]
-        {
+        OnPullRequestExcludePaths =
+        [
             "docs/*",
             "README.md",
             "CHANGELOG.md",
             "LICENSE"
-        }
+        ]
     )]
-    [GitHubActions("delivery", GitHubActionsImage.UbuntuLatest,
+    [GitHubActions("delivery", GitHubActionsImage.Ubuntu2204,
         AutoGenerate = true,
         FetchDepth = 0,
-        InvokedTargets = new[] { nameof(IUnitTest.Compile), nameof(IPack.Pack), nameof(IPushNugetPackages.Publish) },
-        CacheKeyFiles = new[]
-        {
+        InvokedTargets = [nameof(IUnitTest.Compile), nameof(IPack.Pack), nameof(IPushNugetPackages.Publish)],
+        CacheKeyFiles =
+        [
             "src/**/*.csproj",
             "test/**/*.csproj",
             "stryker-config.json",
             "test/**/*/xunit.runner.json"
-        },
-        OnPushBranches = new[] { IHaveMainBranch.MainBranchName },
+        ],
+        OnPushBranches = [IHaveMainBranch.MainBranchName],
         EnableGitHubToken = true,
-        ImportSecrets = new[]
-        {
+        ImportSecrets =
+        [
             nameof(NugetApiKey),
             nameof(IReportCoverage.CodecovToken)
-        },
+        ],
         PublishArtifacts = true,
-        OnPullRequestExcludePaths = new[]
-        {
+        OnPullRequestExcludePaths =
+        [
             "docs/*",
             "README.md",
             "CHANGELOG.md",
             "LICENSE"
-        }
+        ]
     )]
     [DotNetVerbosityMapping]
     [ShutdownDotNetAfterServerBuild]
@@ -124,8 +125,8 @@ namespace ContinuousIntegration
 
 
         ///<inheritdoc/>
-        IEnumerable<PushNugetPackageConfiguration> IPushNugetPackages.PublishConfigurations => new PushNugetPackageConfiguration[]
-        {
+        IEnumerable<PushNugetPackageConfiguration> IPushNugetPackages.PublishConfigurations =>
+        [
             new NugetPushConfiguration(
                 apiKey: NugetApiKey,
                 source: new Uri("https://api.nuget.org/v3/index.json"),
@@ -135,7 +136,7 @@ namespace ContinuousIntegration
                 githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
                 source: new Uri($"https://nuget.pkg.github.com/{GitHubActions?.RepositoryOwner}/index.json"),
                 canBeUsed: () => this is ICreateGithubRelease createRelease && createRelease.GitHubToken is not null)
-        };
+        ];
 
         ///<inheritdoc/>
         IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(this.Get<IHaveSolution>().Solution.GetAllProjects("*.UnitTests"));
