@@ -25,9 +25,9 @@
         public SqliteConnection Connection { get; }
 
         ///<inheritdoc/>
-        public async Task DisposeAsync() => await Connection.CloseAsync().ConfigureAwait(false);
+        public async Task DisposeAsync() => await Connection.CloseAsync();
 
         ///<inheritdoc/>
-        public async Task InitializeAsync() => await Connection.OpenAsync().ConfigureAwait(false);
+        public async Task InitializeAsync() => await Connection.OpenAsync();
     }
 }

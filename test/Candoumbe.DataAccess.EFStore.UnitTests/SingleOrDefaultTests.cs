@@ -38,7 +38,7 @@
             hero.Enrolls(acolyte);
 
             SqliteDbContext.Heroes.Add(hero);
-            await SqliteDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await SqliteDbContext.SaveChangesAsync();
 
             DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
             optionsBuilder.UseSqlite(DatabaseFixture.Connection);
@@ -46,8 +46,7 @@
             EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
 
             // Act
-            Option<Hero> maybeHero = await repository.SingleOrDefault(x => x.Id == hero.Id, default)
-                                          .ConfigureAwait(false);
+            Option<Hero> maybeHero = await repository.SingleOrDefault(x => x.Id == hero.Id, default);
 
             // Assert
             maybeHero.Match(
@@ -72,7 +71,7 @@
             hero.Enrolls(acolyte);
 
             SqliteDbContext.Heroes.Add(hero);
-            await SqliteDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await SqliteDbContext.SaveChangesAsync();
 
             DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
             optionsBuilder.UseSqlite(DatabaseFixture.Connection);
@@ -82,8 +81,7 @@
             // Act
             Option<Hero> maybeHero = await repository.SingleOrDefault(predicate : x => x.Id == hero.Id,
                                                                       includedProperties: new[] { IncludeClause<Hero>.Create(x => x.Acolytes.Where(item => item.Name == acolyte.Name)) },
-                                                                      cancellationToken: default)
-                                                  .ConfigureAwait(false);
+                                                                      cancellationToken: default);
 
             // Assert
             maybeHero.Match(

@@ -148,7 +148,7 @@
         {
             // Arrange
             SqliteDbContext.Heroes.AddRange(heroes);
-            await SqliteDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await SqliteDbContext.SaveChangesAsync();
 
             DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
             optionsBuilder.UseSqlite(DatabaseFixture.Connection);
@@ -161,8 +161,7 @@
                                                      pageSize: pageSize,
                                                      page: pageIndex,
                                                      orderBy: orderBy,
-                                                     cancellationToken: default)
-                                              .ConfigureAwait(false);
+                                                     cancellationToken: default);
 
             // Assert
             _outputHelper.WriteLine($"Page expectation is {pageExpectation}");
