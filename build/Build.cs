@@ -75,26 +75,15 @@ namespace ContinuousIntegration
     [DotNetVerbosityMapping]
     [ShutdownDotNetAfterServerBuild]
     public class Build : EnhancedNukeBuild,
-        IHaveSolution,
         IHaveSourceDirectory,
         IHaveTestDirectory,
-        IHaveConfiguration,
-        IHaveGitVersion,
-        IHaveGitHubRepository,
-        IHaveChangeLog,
-        IHaveMainBranch,
-        IHaveDevelopBranch,
         IClean,
         IRestore,
-        ICompile,
-        IUnitTest,
         IMutationTest,
-        IReportCoverage,
-        IPack,
+        IReportUnitTestCoverage,
         IPushNugetPackages,
         ICreateGithubRelease,
-        IGitFlowWithPullRequest,
-        IHaveArtifacts
+        IGitFlowWithPullRequest
     {
         [CI] public GitHubActions GitHubActions;
 
@@ -135,7 +124,7 @@ namespace ContinuousIntegration
             new GitHubPushNugetConfiguration(
                 githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
                 source: new Uri($"https://nuget.pkg.github.com/{GitHubActions?.RepositoryOwner}/index.json"),
-                canBeUsed: () => this is ICreateGithubRelease createRelease && createRelease.GitHubToken is not null)
+                canBeUsed: () => this is ICreateGithubRelease { GitHubToken: not null })
         ];
 
         ///<inheritdoc/>
