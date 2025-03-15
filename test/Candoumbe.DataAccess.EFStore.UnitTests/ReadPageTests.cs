@@ -149,7 +149,7 @@
         {
             // Arrange
             SqliteDbContext.Heroes.AddRange(heroes);
-            await SqliteDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await SqliteDbContext.SaveChangesAsync();
 
             DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
             optionsBuilder.UseSqlite(DatabaseFixture.Connection);
@@ -161,8 +161,7 @@
             Page<Hero> page = await repository.ReadPage(pageSize: pageSize,
                                                         page: pageIndex,
                                                         orderBy: orderBy,
-                                                        cancellationToken: default)
-                                              .ConfigureAwait(false);
+                                                        cancellationToken: default);
 
             // Assert
             page.Should().Match(pageExpectation);
@@ -297,7 +296,7 @@
         {
             // Arrange
             SqliteDbContext.Heroes.AddRange(heroes);
-            await SqliteDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await SqliteDbContext.SaveChangesAsync();
 
             DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
             optionsBuilder.UseSqlite(DatabaseFixture.Connection);
@@ -309,8 +308,7 @@
             Page<Hero> page = await repository.ReadPage(pageSize,
                                                         pageIndex,
                                                         orderBy,
-                                                        cancellationToken: default)
-                                              .ConfigureAwait(false);
+                                                        cancellationToken: default);
 
             // Assert
             page.Should().Match(pageExpectation);
@@ -329,7 +327,7 @@
             hero.Enrolls(acolyte);
 
             SqliteDbContext.Heroes.Add(hero);
-            await SqliteDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await SqliteDbContext.SaveChangesAsync();
 
             DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
             optionsBuilder.UseSqlite(DatabaseFixture.Connection);
@@ -344,8 +342,7 @@
                                                                  IncludeClause<Hero>.Create(h => h.Acolytes)
                                                              },
                                                              orderBy: new Order<Hero>(nameof(Hero.Id)),
-                                                             cancellationToken: default)
-                                              .ConfigureAwait(false);
+                                                             cancellationToken: default);
 
             // Assert
             page.Count.Should().Be(1);

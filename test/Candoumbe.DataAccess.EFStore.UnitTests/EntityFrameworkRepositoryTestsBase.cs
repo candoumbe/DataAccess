@@ -30,16 +30,16 @@
         ///<inheritdoc/>
         public async Task InitializeAsync()
         {
-            await DatabaseFixture.InitializeAsync().ConfigureAwait(false);
-            await SqliteDbContext.Database.EnsureDeletedAsync().ConfigureAwait(false);
-            await SqliteDbContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
+            await DatabaseFixture.InitializeAsync();
+            await SqliteDbContext.Database.EnsureDeletedAsync();
+            await SqliteDbContext.Database.EnsureCreatedAsync();
         }
 
         ///<inheritdoc/>
         public async Task DisposeAsync()
         {
-            await DatabaseFixture.DisposeAsync().ConfigureAwait(false);
-            await SqliteDbContext.DisposeAsync().ConfigureAwait(false);
+            await DatabaseFixture.DisposeAsync();
+            await SqliteDbContext.DisposeAsync();
         }
     }
 }

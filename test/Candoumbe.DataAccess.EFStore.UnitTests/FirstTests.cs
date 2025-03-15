@@ -35,7 +35,7 @@
             hero.Enrolls(acolyte);
 
             SqliteDbContext.Heroes.Add(hero);
-            await SqliteDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await SqliteDbContext.SaveChangesAsync();
 
             DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
             optionsBuilder.UseSqlite(DatabaseFixture.Connection);
@@ -43,7 +43,7 @@
             EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
 
             // Act
-            Hero actual = await repository.First(predicate: x => x.Id == hero.Id, cancellationToken: default).ConfigureAwait(false);
+            Hero actual = await repository.First(predicate: x => x.Id == hero.Id, cancellationToken: default);
 
             // Assert
             actual.Acolytes.Should()
@@ -61,7 +61,7 @@
             hero.Enrolls(acolyte);
 
             SqliteDbContext.Heroes.Add(hero);
-            await SqliteDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await SqliteDbContext.SaveChangesAsync();
 
             DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
             optionsBuilder.UseSqlite(DatabaseFixture.Connection);
@@ -71,7 +71,7 @@
             // Act
             Hero actual = await repository.First(predicate: x => x.Id == hero.Id,
                                                  includedProperties: new[] { IncludeClause<Hero>.Create(x => x.Acolytes.Where(item => item.Name == acolyte.Name)) },
-                                                 cancellationToken: default).ConfigureAwait(false);
+                                                 cancellationToken: default);
 
             // Assert
             actual.Acolytes.Should()
@@ -90,7 +90,7 @@
             hero.Enrolls(acolyte);
 
             SqliteDbContext.Heroes.Add(hero);
-            await SqliteDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await SqliteDbContext.SaveChangesAsync();
 
             DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
             optionsBuilder.UseSqlite(DatabaseFixture.Connection);
@@ -100,7 +100,7 @@
             // Act
             string actual = await repository.First(predicate: x => x.Id == hero.Id,
                                                    selector: x => x.Name,
-                                                   cancellationToken: default).ConfigureAwait(false);
+                                                   cancellationToken: default);
 
             // Assert
             actual.Should().Be(acolyte.Name);
