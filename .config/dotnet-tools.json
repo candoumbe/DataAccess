@@ -3,22 +3,25 @@
   "isRoot": true,
   "tools": {
     "nuke.globaltool": {
-      "version": "8.1.4",
+      "version": "9.0.4",
       "commands": [
         "nuke"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-ef": {
       "version": "9.0.0",
       "commands": [
         "dotnet-ef"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-stryker": {
       "version": "4.5.0",
       "commands": [
         "dotnet-stryker"
-      ]
+      ],
+      "rollForward": false
     }
   }
 }

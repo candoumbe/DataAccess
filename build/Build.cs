@@ -16,6 +16,7 @@ using System.Linq;
 namespace ContinuousIntegration
 {
     using Candoumbe.Pipelines.Components.NuGet;
+    using Nuke.Common.Tools.GitHub;
 
     [GitHubActions("integration", GitHubActionsImage.Ubuntu2204,
         AutoGenerate = true,
@@ -86,8 +87,6 @@ namespace ContinuousIntegration
         ICreateGithubRelease,
         IGitFlowWithPullRequest
     {
-        [CI] public GitHubActions GitHubActions;
-
         [Required] [Solution] public Solution Solution;
 
         ///<inheritdoc/>
@@ -124,29 +123,21 @@ namespace ContinuousIntegration
             ),
             new GitHubPushNugetConfiguration(
                 githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
-                source: new Uri($"https://nuget.pkg.github.com/{GitHubActions?.RepositoryOwner}/index.json"),
+                source: new Uri($"https://nuget.pkg.github.com/{this.Get<IHaveGitHubRepository>().GitRepository.GetGitHubOwner()}/index.json"),
                 canBeUsed: () => this is ICreateGithubRelease { GitHubToken: not null })
         ];
 
         ///<inheritdoc/>
-        IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(this.Get<IHaveSolution>().Solution.GetAllProjects("*.UnitTests"));
+        IEnumerable<Project> IUnitTest.UnitTestsProjects => this.Get<IHaveSolution>().Solution.GetAllProjects("*.UnitTests");
 
         ///<inheritdoc/>
         IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects
-            => new[] { "Candoumbe.DataAccess", "Candoumbe.DataAccess.EFCore", "Candoumbe.DataAccess.RavenDb" }
-                .Select(projectName => new MutationProjectConfiguration(Solution.GetProject(projectName),
+            => Projects.Select(projectName => new MutationProjectConfiguration(Solution.GetProject(projectName),
                     this.Get<IUnitTest>().UnitTestsProjects.Where(csproj => csproj.Name == $"{projectName}.UnitTests")));
 
         ///<inheritdoc/>
         bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
 
-        ///<inheritdoc/>
-        protected override void OnBuildCreated()
-        {
-            if (IsServerBuild)
-            {
-                Environment.SetEnvironmentVariable("DOTNET_ROLL_FORWARD", "LatestMajor");
-            }
-        }
+        private static readonly string[] Projects = ["Candoumbe.DataAccess", "Candoumbe.DataAccess.EFCore", "Candoumbe.DataAccess.RavenDb"];
     }
 }
