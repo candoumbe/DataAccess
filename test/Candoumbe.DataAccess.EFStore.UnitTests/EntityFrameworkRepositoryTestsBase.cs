@@ -28,7 +28,7 @@
         }
 
         ///<inheritdoc/>
-        public async Task InitializeAsync()
+        public virtual async Task InitializeAsync()
         {
             await DatabaseFixture.InitializeAsync();
             await SqliteDbContext.Database.EnsureDeletedAsync();
@@ -36,7 +36,7 @@
         }
 
         ///<inheritdoc/>
-        public async Task DisposeAsync()
+        public virtual async Task DisposeAsync()
         {
             await DatabaseFixture.DisposeAsync();
             await SqliteDbContext.DisposeAsync();

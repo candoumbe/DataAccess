@@ -41,11 +41,11 @@ namespace Candoumbe.DataAccess.Repositories
         public virtual async Task Clear(CancellationToken cancellationToken = default) => await Delete(_ => true, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex page, IOrder<TEntry> orderBy, CancellationToken cancellationToken = default)
-            => await ReadPage(pageSize, page, Enumerable.Empty<IncludeClause<TEntry>>(), orderBy, cancellationToken).ConfigureAwait(false);
+        public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex pageIndex, IOrder<TEntry> orderBy, CancellationToken cancellationToken = default)
+            => await ReadPage(pageSize, pageIndex, [], orderBy, cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex page, IEnumerable<IncludeClause<TEntry>> includedProperties, IOrder<TEntry> orderBy, CancellationToken cancellationToken = default)
+        public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex pageIndex, IEnumerable<IncludeClause<TEntry>> includedProperties, IOrder<TEntry> orderBy, CancellationToken cancellationToken = default)
         {
             DbSet<TEntry> entries = Context.Set<TEntry>();
             int total = await entries.CountAsync(cancellationToken)
@@ -53,9 +53,9 @@ namespace Candoumbe.DataAccess.Repositories
             Page<TEntry> pageOfResult = Page<TEntry>.Empty(pageSize);
             if (total > 0)
             {
-                IEnumerable<TEntry> results = await entries.Include(includedProperties)
+                IReadOnlyList<TEntry> results =await entries.Include(includedProperties)
                                                             .OrderBy(orderBy)
-                                                            .Skip((page - 1) * pageSize)
+                                                            .Skip(ComputeSkipCount(pageIndex, pageSize))
                                                             .Take(pageSize)
                                                             .ToArrayAsync(cancellationToken)
                                                             .ConfigureAwait(false);
@@ -64,6 +64,8 @@ namespace Candoumbe.DataAccess.Repositories
 
             return pageOfResult;
         }
+
+        private static int ComputeSkipCount(PageIndex index, PageSize pageSize) => index == 1 ? 0 : ( index - 1 ) * pageSize;
 
         /// <inheritdoc/>
         public virtual async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TResult> orderBy, CancellationToken cancellationToken = default)
@@ -76,9 +78,9 @@ namespace Candoumbe.DataAccess.Repositories
 
             if (total > 0)
             {
-                IEnumerable<TResult> results = await entries.Select(selector)
+                IReadOnlyList<TResult> results = await entries.Select(selector)
                                                             .OrderBy(orderBy)
-                                                            .Skip((page - 1) * pageSize)
+                                                            .Skip(ComputeSkipCount(page, pageSize))
                                                             .Take(pageSize)
                                                             .ToArrayAsync(cancellationToken)
                                                             .ConfigureAwait(false);
@@ -94,7 +96,7 @@ namespace Candoumbe.DataAccess.Repositories
             DbSet<TEntry> entries = Context.Set<TEntry>();
             IQueryable<TEntry> resultQuery = entries;
 
-            if (orderBy != default)
+            if (orderBy is not null)
             {
                 resultQuery = resultQuery.OrderBy(orderBy);
             }
@@ -105,8 +107,8 @@ namespace Candoumbe.DataAccess.Repositories
 
             if (total > 0)
             {
-                IEnumerable<TResult> results = await resultQuery
-                        .Skip(page < 1 ? 0 : (page - 1) * pageSize)
+                IReadOnlyList<TResult> results = await resultQuery
+                        .Skip(ComputeSkipCount(page, pageSize))
                         .Take(pageSize)
                         .Select(selector)
                         .ToArrayAsync(cancellationToken)
@@ -144,11 +146,11 @@ namespace Candoumbe.DataAccess.Repositories
             Expression<Func<IGrouping<TKey, TEntry>, TResult>> groupSelector,
             CancellationToken cancellationToken = default)
         {
-            return predicate == null
+            return predicate is null
                 ? throw new ArgumentNullException(nameof(predicate))
-                : keySelector == null
+                : keySelector is null
                 ? throw new ArgumentNullException(nameof(keySelector))
-                : groupSelector == null
+                : groupSelector is null
                 ? throw new ArgumentNullException(nameof(groupSelector))
                 : (IEnumerable<TResult>)await Context.Set<TEntry>()
                                                      .Where(predicate)
@@ -199,17 +201,17 @@ namespace Candoumbe.DataAccess.Repositories
         /// <inheritdoc/>
         public virtual async Task<Page<TEntry>> Where(Expression<Func<TEntry, bool>> predicate, IOrder<TEntry> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default)
         {
-            if (orderBy == null)
+            if (orderBy is null)
             {
                 throw new ArgumentNullException(nameof(orderBy), $"{nameof(orderBy)} expression must be set");
             }
             IQueryable<TEntry> query = Context.Set<TEntry>()
                                               .Where(predicate)
                                               .OrderBy(orderBy)
-                                              .Skip(pageSize * (page < 1 ? 1 : page - 1))
+                                              .Skip(ComputeSkipCount(page, pageSize))
                                               .Take(pageSize);
 
-            IEnumerable<TEntry> result = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+            IReadOnlyList<TEntry> result = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
             int total = await Count(predicate, cancellationToken).ConfigureAwait(false);
 
             return new Page<TEntry>(result, total, pageSize);
@@ -221,10 +223,10 @@ namespace Candoumbe.DataAccess.Repositories
             Expression<Func<TEntry, bool>> predicate,
             IOrder<TResult> orderBy,
             PageSize pageSize,
-            PageIndex page,
+            PageIndex pageIndex,
             CancellationToken cancellationToken = default)
         {
-            if (orderBy == null)
+            if (orderBy is null)
             {
                 throw new ArgumentNullException(nameof(orderBy), $"{nameof(orderBy)} expression must be set");
             }
@@ -233,14 +235,12 @@ namespace Candoumbe.DataAccess.Repositories
                 .Select(selector)
                 .OrderBy(orderBy);
 
-            IQueryable<TResult> results = query.Skip(pageSize * (page < 1 ? 1 : page - 1))
-                .Take(pageSize);
+            IQueryable<TResult> results = query.Skip(ComputeSkipCount(pageIndex, pageSize))
+                                               .Take(pageSize);
 
             //we compute both Task
-            IEnumerable<TResult> result = await results.ToArrayAsync(cancellationToken)
-                .ConfigureAwait(false);
-            int total = await Count(predicate, cancellationToken)
-                .ConfigureAwait(false);
+            IReadOnlyList<TResult> result = await results.ToArrayAsync(cancellationToken).ConfigureAwait(false);
+            int total = await Count(predicate, cancellationToken).ConfigureAwait(false);
 
             return new Page<TResult>(result, total, pageSize);
         }
@@ -250,10 +250,10 @@ namespace Candoumbe.DataAccess.Repositories
                                                                           Expression<Func<TResult, bool>> predicate,
                                                                           IOrder<TResult> orderBy,
                                                                           PageSize pageSize,
-                                                                          PageIndex page,
+                                                                          PageIndex pageIndex,
                                                                           CancellationToken cancellationToken = default)
         {
-            if (orderBy == null)
+            if (orderBy is null)
             {
                 throw new ArgumentNullException(nameof(orderBy), $"{nameof(orderBy)} expression must be set");
             }
@@ -261,11 +261,11 @@ namespace Candoumbe.DataAccess.Repositories
             IQueryable<TResult> query = entries.Select(selector)
                                                .Where(predicate)
                                                .OrderBy(orderBy)
-                                               .Skip(pageSize * (page < 1 ? 1 : page - 1))
+                                               .Skip(ComputeSkipCount(pageIndex, pageSize))
                                                .Take(pageSize);
 
             // we compute both Task
-            IEnumerable<TResult> result = await query.ToListAsync(cancellationToken)
+            IReadOnlyList<TResult> result = await query.ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
             long total = await entries.Select(selector).LongCountAsync(predicate, cancellationToken)
                 .ConfigureAwait(false);
@@ -326,7 +326,7 @@ namespace Candoumbe.DataAccess.Repositories
         public virtual async Task<Option<TEntry>> SingleOrDefault(CancellationToken cancellationToken = default)
             => (await Context.Set<TEntry>().SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false))
-                .NoneWhen(result => Equals(default, result));
+                .NoneWhen(result => result is null);
 
         /// <inheritdoc/>
         public virtual async Task<Option<TEntry>> SingleOrDefault(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
@@ -334,7 +334,7 @@ namespace Candoumbe.DataAccess.Repositories
                 .Include(includedProperties)
                 .SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false))
-                .NoneWhen(result => Equals(default, result));
+                .NoneWhen(result => result is null);
 
         /// <inheritdoc/>
         public virtual async Task<Option<TEntry>> SingleOrDefault(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)

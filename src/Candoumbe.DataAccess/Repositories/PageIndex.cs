@@ -11,7 +11,6 @@
     public record PageIndex
 #if NET7_0_OR_GREATER
        : IAdditionOperators<PageIndex, int, PageIndex>,
-         IAdditiveIdentity<PageIndex, PageIndex>,
          ISubtractionOperators<PageIndex, int, PageIndex>,
          IMinMaxValue<PageIndex>,
          IMultiplyOperators<PageIndex, int, PageIndex>,
@@ -53,15 +52,7 @@
         /// The minimum acceptable value for a <see cref="PageIndex"/>
         /// </summary>
         public static PageIndex One => From(1);
-
-        ///<inheritdoc/>
-        public static PageIndex AdditiveIdentity => Zero;
-
-        /// <summary>
-        /// The zero value for the current type
-        /// </summary>
-        public static PageIndex Zero => new PageIndex(0);
-
+        
         private PageIndex(int value) => Value = value;
 
         /// <summary>
@@ -131,8 +122,8 @@
             int result = left.Value - right;
 
             return result < 1
-                ? Zero
-                : left with { Value = left.Value - right };
+                ? One
+                : From(left.Value - right);
         }
 
 #if NET7_0_OR_GREATER
@@ -148,7 +139,7 @@
         public static PageIndex operator *(PageIndex left, int right)
             => (left.Value * right) switch
             {
-                <= 0 => Zero,
+                <= 0 => One,
                 int result => From(result)
             };
 

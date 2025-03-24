@@ -1,359 +1,345 @@
-﻿namespace Candoumbe.DataAccess.Tests.Repositories
+﻿using Candoumbe.DataAccess.Abstractions;
+using Candoumbe.DataAccess.EFStore;
+using Candoumbe.DataAccess.EFStore.UnitTests;
+using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
+using Candoumbe.DataAccess.Repositories;
+using DataFilters;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Xunit;
+using Xunit.Abstractions;
+using Xunit.Categories;
+
+namespace Candoumbe.DataAccess.Tests.Repositories;
+
+[UnitTest]
+public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHelper outputHelper)
+    : EntityFrameworkRepositoryTestsBase(databaseFixture), IClassFixture<SqliteDatabaseFixture>
 {
-    using Bogus;
-
-    using Candoumbe.DataAccess.Abstractions;
-    using Candoumbe.DataAccess.EFStore;
-    using Candoumbe.DataAccess.EFStore.UnitTests;
-    using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
-    using Candoumbe.DataAccess.Repositories;
-
-    using DataFilters;
-
-    using FluentAssertions;
-
-    using Microsoft.EntityFrameworkCore;
-
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Threading.Tasks;
-
-    using Xunit;
-    using Xunit.Categories;
-
-    [UnitTest]
-    public class ReadPageTests : EntityFrameworkRepositoryTestsBase, IClassFixture<SqliteDatabaseFixture>
+    public override async Task InitializeAsync()
     {
-        public ReadPageTests(SqliteDatabaseFixture databaseFixture) : base(databaseFixture)
-        {
-        }
+        await base.InitializeAsync();
+        await SqliteDbContext.Database.EnsureCreatedAsync();
+    }
 
-        public static IEnumerable<object[]> ReadPagesWithNoIncludesCases
+    public override async Task DisposeAsync()
+    {
+        await SqliteDbContext.Database.EnsureDeletedAsync();
+        await base.DisposeAsync();
+    }
+
+    public static TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IOrder<Hero>, Page<Hero>>
+        ReadPagesWithoutIncludesCases
+    {
+        get
         {
-            get
+            TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IOrder<Hero>, Page<Hero>> cases = new();
+
+            cases.Add(
+                [],
+                PageSize.From(10),
+                PageIndex.From(1),
+                new Order<Hero>(nameof(Hero.Name)),
+                Page<Hero>.Empty(pageSize: PageSize.From(10))
+            );
+
             {
-                yield return new object[]
-                {
-                    Enumerable.Empty<Hero>(),
+                Hero hero = new(Guid.NewGuid(), Faker.Name.FullName());
+                Acolyte acolyte = new(Guid.NewGuid(), Faker.Name.FullName());
+                Weapon weapon = new(Guid.NewGuid(), "Bow", 1);
+                acolyte.Take(weapon);
+                hero.Enrolls(acolyte);
+
+                cases.Add
+                (
+                    [hero],
                     PageSize.From(10),
                     PageIndex.From(1),
                     new Order<Hero>(nameof(Hero.Name)),
-                    (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
-                                                                 && page.Size == 10
-                                                                 && page.Total == 0
-                                                                 && page.Entries.Exactly(0) )
-                };
-
-                {
-                    Hero hero = new Hero(Guid.NewGuid(), Faker.Person.FullName);
-                    Acolyte acolyte = new Acolyte(Guid.NewGuid(), Faker.Person.FullName);
-                    Weapon weapon = new Weapon(Guid.NewGuid(), "Bow", 1);
-                    acolyte.Take(weapon);
-                    hero.Enrolls(acolyte);
-
-                    yield return new object[]
-                    {
-                        new []{hero},
-                        PageSize.From(10),
-                        PageIndex.From(1),
-                        new Order<Hero>(nameof(Hero.Name)),
-                        (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
-                                                                     && page.Size == 10
-                                                                     && page.Total == 1
-                                                                     && page.Entries.Once(h => h.Id == hero.Id
-                                                                                               && h.Acolytes.Exactly(0)))
-                    };
-                }
-
-                {
-                    Hero batman = new Hero(Guid.NewGuid(), "Batman");
-                    Acolyte robin = new Acolyte(Guid.NewGuid(), "Robin");
-                    Weapon longStick = new Weapon(Guid.NewGuid(), "Long stick", 2);
-                    robin.Take(longStick);
-                    batman.Enrolls(robin);
-
-                    Hero greenArrow = new Hero(Guid.NewGuid(), "Green Arrow");
-                    Acolyte redArrow = new Acolyte(Guid.NewGuid(), "Red Arrow");
-                    Weapon bow = new Weapon(Guid.NewGuid(), "Bow & arrow", 2);
-                    redArrow.Take(bow);
-                    greenArrow.Enrolls(robin);
-
-                    Hero wonderWoman = new Hero(Guid.NewGuid(), "Wonder Woman");
-
-                    yield return new object[]
-                    {
-                        new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(10),
-                        PageIndex.From(1),
-                        new Order<Hero>(nameof(Hero.Name)),
-                        (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
-                                                                     && page.Size == PageSize.From(10)
-                                                                     && page.Total == 3
-                                                                     && page.Entries.Exactly(3)
-                                                                     && page.Entries.Once(h => h.Id == batman.Id && h.Acolytes.Exactly(0))
-                                                                     && page.Entries.Once(h => h.Id == greenArrow.Id && h.Acolytes.Exactly(0))
-                                                                     && page.Entries.Once(h => h.Id == wonderWoman.Id && h.Acolytes.Exactly(0)))
-                    };
-
-                    yield return new object[]
-                    {
-                        new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
-                        PageIndex.From(1),
-                        new Order<Hero>(nameof(Hero.Name)),
-                        (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
-                                                                     && page.Total == 3
-                                                                     && page.Entries.Once()
-                                                                     && page.Entries.Once(h => h.Id == batman.Id && h.Acolytes.Exactly(0)))
-                    };
-
-                    yield return new object[]
-                    {
-                        new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
-                        PageIndex.From(2),
-                        new Order<Hero>(nameof(Hero.Name)),
-                        (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
-                                                                     && page.Total == 3
-                                                                     && page.Entries.Once()
-                                                                     && page.Entries.Once(h => h.Id == greenArrow.Id && h.Acolytes.Exactly(0)))
-                    };
-
-                    yield return new object[]
-                    {
-                        new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
-                        PageIndex.From(3),
-                        new Order<Hero>(nameof(Hero.Name)),
-                        (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
-                                                                     && page.Total == 3
-                                                                     && page.Entries.Once()
-                                                                     && page.Entries.Once(h => h.Id == wonderWoman.Id && h.Acolytes.Exactly(0)))
-                    };
-                }
+                    new Page<Hero>([new Hero(hero.Id, hero.Name)], 1, PageSize.From(10))
+                );
             }
-        }
 
-        [Theory]
-        [MemberData(nameof(ReadPagesWithNoIncludesCases))]
-        public async Task Given_hero_exists_and_has_an_acolyte_When_calling_ReadPage_without_including_acolytes_Then_result_should_not_have_acolyte(IEnumerable<Hero> heroes,
-                                                                                                                                                    PageSize pageSize,
-                                                                                                                                                    PageIndex pageIndex,
-                                                                                                                                                    IOrder<Hero> orderBy,
-                                                                                                                                                    Expression<Func<Page<Hero>, bool>> pageExpectation)
-        {
-            // Arrange
-            SqliteDbContext.Heroes.AddRange(heroes);
-            await SqliteDbContext.SaveChangesAsync();
-
-            DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
-            optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-            SqliteDbContext context = new SqliteDbContext(optionsBuilder.Options);
-
-            EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
-
-            // Act
-            Page<Hero> page = await repository.ReadPage(pageSize: pageSize,
-                                                        page: pageIndex,
-                                                        orderBy: orderBy,
-                                                        cancellationToken: default);
-
-            // Assert
-            page.Should().Match(pageExpectation);
-        }
-
-        public static IEnumerable<object[]> ReadPagesWithIncludesCases
-        {
-            get
             {
-                yield return new object[]
-                {
-                    Enumerable.Empty<Hero>(),
+                Hero batman = new(Guid.NewGuid(), "Batman");
+                Acolyte robin = new(Guid.NewGuid(), "Robin");
+                Weapon longStick = new(Guid.NewGuid(), "Long stick", 2);
+                robin.Take(longStick);
+                batman.Enrolls(robin);
+
+                Hero greenArrow = new(Guid.NewGuid(), "Green Arrow");
+                Acolyte redArrow = new(Guid.NewGuid(), "Red Arrow");
+                Weapon bow = new(Guid.NewGuid(), "Bow & arrow", 2);
+                redArrow.Take(bow);
+                greenArrow.Enrolls(robin);
+
+                Hero wonderWoman = new(Guid.NewGuid(), "Wonder Woman");
+
+                cases.Add
+                (
+                    [batman, greenArrow, wonderWoman],
+                    PageSize.From(2),
+                    PageIndex.From(1),
+                    new Order<Hero>(nameof(Hero.Name)),
+                    new Page<Hero>([
+                            new Hero(batman.Id, batman.Name),
+                            new Hero(greenArrow.Id, greenArrow.Name)
+                        ],
+                        3,
+                        PageSize.From(2))
+                );
+
+                cases.Add
+                (
+                    [batman, greenArrow, wonderWoman],
+                    PageSize.One,
+                    PageIndex.From(1),
+                    new Order<Hero>(nameof(Hero.Name)),
+                    new Page<Hero>([new Hero(batman.Id, batman.Name)], 3, PageSize.One)
+                );
+
+                cases.Add(
+                    [batman, greenArrow, wonderWoman],
+                    PageSize.One,
+                    PageIndex.From(2),
+                    new Order<Hero>(nameof(Hero.Name)),
+                    new Page<Hero>([new Hero(greenArrow.Id, greenArrow.Name)], 3, PageSize.One)
+                );
+
+                cases.Add(
+                    [batman, greenArrow, wonderWoman],
+                    PageSize.One,
+                    PageIndex.From(3),
+                    new Order<Hero>(nameof(Hero.Name)),
+                    new Page<Hero>([new Hero(wonderWoman.Id, wonderWoman.Name)], 3, PageSize.One)
+                );
+            }
+            return cases;
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(ReadPagesWithoutIncludesCases))]
+    public async Task
+        Given_hero_exists_and_has_an_acolyte_When_calling_ReadPage_without_including_acolytes_Then_result_should_not_have_acolyte(
+            IReadOnlyList<Hero> heroes,
+            PageSize pageSize,
+            PageIndex pageIndex,
+            IOrder<Hero> orderBy,
+            Page<Hero> expected)
+    {
+        // Arrange
+        outputHelper.WriteLine($"Heroes in database : {heroes.Jsonify()}");
+        outputHelper.WriteLine(
+            $"Request : ({nameof(pageSize)}:{pageSize}, {nameof(pageIndex)}:{pageIndex}, {nameof(orderBy)}:{orderBy.Jsonify()}, {nameof(expected)}:{expected.Jsonify()})");
+
+        SqliteDbContext.Heroes.AddRange(heroes);
+        await SqliteDbContext.SaveChangesAsync();
+
+        DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new();
+        optionsBuilder.UseSqlite(DatabaseFixture.Connection);
+        SqliteDbContext context = new(optionsBuilder.Options);
+
+        EntityFrameworkRepository<Hero, SqliteDbContext> repository = new(context);
+
+        // Act
+        Page<Hero> actual = await repository.ReadPage(pageSize: pageSize, pageIndex: pageIndex, orderBy);
+
+        // Assert
+        actual.Should().BeEquivalentTo(expected);
+    }
+
+    public static
+        TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IReadOnlyList<IncludeClause<Hero>>, IOrder<Hero>, Page<Hero>> ReadPagesWithIncludesCases
+    {
+        get
+        {
+            TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IReadOnlyList<IncludeClause<Hero>>, IOrder<Hero>,
+                Page<Hero>> cases = new();
+
+            cases.Add(
+                [],
+                PageSize.From(10),
+                PageIndex.From(1),
+                [IncludeClause<Hero>.Create(h => h.Acolytes)],
+                new Order<Hero>(nameof(Hero.Name)),
+                Page<Hero>.Empty(PageSize.From(10)));
+
+            {
+                Hero hero = new(Guid.NewGuid(), Faker.Name.FullName());
+                Acolyte acolyte = new(Guid.NewGuid(), Faker.Name.FullName());
+                Weapon weapon = new(Guid.NewGuid(), "Bow", 1);
+                acolyte.Take(weapon);
+                hero.Enrolls(acolyte);
+
+                cases.Add
+                (
+                    [hero],
                     PageSize.From(10),
                     PageIndex.From(1),
-                    new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
+                    [],
                     new Order<Hero>(nameof(Hero.Name)),
-                    (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
-                                                                 && page.Size == 10
-                                                                 && page.Total == 0
-                                                                 && page.Entries.Exactly(0) )
-                };
-
-                {
-                    Hero hero = new Hero(Guid.NewGuid(), Faker.Person.FullName);
-                    Acolyte acolyte = new Acolyte(Guid.NewGuid(), Faker.Person.FullName);
-                    Weapon weapon = new Weapon(Guid.NewGuid(), "Bow", 1);
-                    acolyte.Take(weapon);
-                    hero.Enrolls(acolyte);
-
-                    yield return new object[]
-                    {
-                        new []{hero},
-                        PageSize.From(10),
-                        PageIndex.From(1),
-                        new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
-                        new Order<Hero>(nameof(Hero.Name)),
-                        (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
-                                                                     && page.Size == 10
-                                                                     && page.Total == 1
-                                                                     && page.Entries.Once(h => h.Id == hero.Id
-                                                                                               && h.Acolytes.Exactly(hero.Acolytes.Count())))
-                    };
-                }
-
-                {
-                    Hero batman = new Hero(Guid.NewGuid(), "Batman");
-                    Acolyte robin = new Acolyte(Guid.NewGuid(), "Robin");
-                    Weapon longStick = new Weapon(Guid.NewGuid(), "Long stick", 2);
-                    robin.Take(longStick);
-                    batman.Enrolls(robin);
-
-                    Hero greenArrow = new Hero(Guid.NewGuid(), "Green Arrow");
-                    Acolyte redArrow = new Acolyte(Guid.NewGuid(), "Red Arrow");
-                    Weapon bow = new Weapon(Guid.NewGuid(), "Bow & arrow", 2);
-                    redArrow.Take(bow);
-                    greenArrow.Enrolls(robin);
-
-                    Hero wonderWoman = new Hero(Guid.NewGuid(), "Wonder Woman");
-
-                    yield return new object[]
-                    {
-                        new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(10),
-                        PageIndex.From(1),
-                        new Order<Hero>(nameof(Hero.Name)),
-                        new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
-                        (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 1
-                                                                     && page.Size == PageSize.From(10)
-                                                                     && page.Total == 3
-                                                                     && page.Entries.Exactly(3)
-                                                                     && page.Entries.Once(h => h.Id == batman.Id && h.Acolytes.Exactly(0))
-                                                                     && page.Entries.Once(h => h.Id == greenArrow.Id && h.Acolytes.Exactly(0))
-                                                                     && page.Entries.Once(h => h.Id == wonderWoman.Id && h.Acolytes.Exactly(0)))
-                    };
-
-                    yield return new object[]
-                    {
-                        new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
-                        PageIndex.From(1),
-                        new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
-                        new Order<Hero>(nameof(Hero.Name)),
-                        (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
-                                                                     && page.Total == 3
-                                                                     && page.Entries.Once()
-                                                                     && page.Entries.Once(h => h.Id == batman.Id
-                                                                                               && h.Acolytes.Once()
-                                                                                               && h.Acolytes.Once(acolyte => acolyte.Id == robin.Id)))
-                    };
-
-                    yield return new object[]
-                    {
-                        new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
-                        PageIndex.From(2),
-                        new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
-                        new Order<Hero>(nameof(Hero.Name)),
-                        (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
-                                                                     && page.Total == 3
-                                                                     && page.Entries.Once()
-                                                                     && page.Entries.Once(h => h.Id == greenArrow.Id
-                                                                                               && h.Acolytes.Once()
-                                                                                               && h.Acolytes.Once(acolyte => acolyte.Id == redArrow.Id)))
-                    };
-
-                    yield return new object[]
-                    {
-                        new []{batman, greenArrow, wonderWoman },
-                        PageSize.From(1),
-                        PageIndex.From(3),
-                        new[] { IncludeClause<Hero>.Create(h => h.Acolytes) },
-                        new Order<Hero>(nameof(Hero.Name)),
-                        (Expression<Func<Page<Hero>, bool>>)(page => page.Count == 3
-                                                                     && page.Size == PageSize.From(1)
-                                                                     && page.Total == 3
-                                                                     && page.Entries.Once()
-                                                                     && page.Entries.Once(h => h.Id == wonderWoman.Id && h.Acolytes.Exactly(0)))
-                    };
-                }
+                    new Page<Hero>(
+                        [new Hero(hero.Id, hero.Name)],
+                        1,
+                        PageSize.From(10))
+                );
             }
+
+            {
+                Hero batman = new(Guid.NewGuid(), "Batman");
+                Acolyte robin = new(Guid.NewGuid(), "Robin");
+                Weapon longStick = new(Guid.NewGuid(), "Long stick", 2);
+                robin.Take(longStick);
+                batman.Enrolls(robin);
+
+                Hero greenArrow = new(Guid.NewGuid(), "Green Arrow");
+                Acolyte redArrow = new(Guid.NewGuid(), "Red Arrow");
+                Weapon bow = new(Guid.NewGuid(), "Bow & arrow", 2);
+                redArrow.Take(bow);
+                greenArrow.Enrolls(redArrow);
+
+                Hero wonderWoman = new(Guid.NewGuid(), "Wonder Woman");
+
+                cases.Add
+                (
+                    [batman, greenArrow, wonderWoman],
+                    PageSize.From(10),
+                    PageIndex.From(1),
+                    [IncludeClause<Hero>.Create(h => h.Acolytes)],
+                    new Order<Hero>(nameof(Hero.Name)),
+                    new Page<Hero>(new[] { batman, greenArrow, wonderWoman }
+                            .Select(static h =>
+                            {
+                                Hero hero = new(h.Id, h.Name);
+                                h.Acolytes.ForEach(acolyte => hero.Enrolls(new Acolyte(acolyte.Id, acolyte.Name)));
+                                return hero;
+                            })
+                            .ToArray(),
+                        3,
+                        PageSize.From(10))
+                );
+
+                cases.Add
+                (
+                    [batman, greenArrow, wonderWoman],
+                    PageSize.One,
+                    PageIndex.From(1),
+                    [IncludeClause<Hero>.Create(h => h.Acolytes)],
+                    new Order<Hero>(nameof(Hero.Name)),
+                    new Page<Hero>(new[] { batman }.Select(static h =>
+                        {
+                            Hero hero = new(h.Id, h.Name);
+                            h.Acolytes.ForEach(acolyte => hero.Enrolls(new Acolyte(acolyte.Id, acolyte.Name)));
+                            return hero;
+                        }).ToArray(),
+                        3,
+                        PageSize.From(1))
+                );
+
+                cases.Add
+                (
+                    [batman, greenArrow, wonderWoman],
+                    PageSize.One,
+                    PageIndex.From(2),
+                    [IncludeClause<Hero>.Create(h => h.Acolytes)],
+                    new Order<Hero>(nameof(Hero.Name)),
+                    new Page<Hero>(new[] { greenArrow }.Select(h =>
+                    {
+                        Hero hero = new(h.Id, h.Name);
+                        h.Acolytes.ForEach(acolyte => hero.Enrolls(new Acolyte(acolyte.Id, acolyte.Name)));
+                        return hero;
+                    }).ToArray(), 3, PageSize.One)
+                );
+
+                cases.Add
+                (
+                    [batman, greenArrow, wonderWoman],
+                    PageSize.One,
+                    PageIndex.From(3),
+                    [IncludeClause<Hero>.Create(h => h.Acolytes)],
+                    new Order<Hero>(nameof(Hero.Name)),
+                    new Page<Hero>([wonderWoman], 3, PageSize.One)
+                );
+            }
+
+            return cases;
         }
+    }
 
-        [Theory]
-        [MemberData(nameof(ReadPagesWithNoIncludesCases))]
-        public async Task Given_hero_exists_and_has_an_acolyte_When_calling_ReadPage_without_including_acolytes_Then_result_should_have_acolytes(IEnumerable<Hero> heroes,
-                                                                                                                                                 PageSize pageSize,
-                                                                                                                                                 PageIndex pageIndex,
-                                                                                                                                                 IOrder<Hero> orderBy,
-                                                                                                                                                 Expression<Func<Page<Hero>, bool>> pageExpectation)
-        {
-            // Arrange
-            SqliteDbContext.Heroes.AddRange(heroes);
-            await SqliteDbContext.SaveChangesAsync();
+    [Theory]
+    [MemberData(nameof(ReadPagesWithIncludesCases))]
+    public async Task
+        Given_hero_exists_and_has_an_acolyte_When_calling_ReadPage_with_includes_Then_result_should_have_acolytes(
+            IReadOnlyList<Hero> heroes,
+            PageSize pageSize,
+            PageIndex pageIndex,
+            IReadOnlyList<IncludeClause<Hero>> includes,
+            IOrder<Hero> orderBy,
+            Page<Hero> expected)
+    {
+        // Arrange
+        outputHelper.WriteLine($"Heroes in database : {heroes.Jsonify()}");
+        outputHelper.WriteLine(
+            $"Request : ({nameof(pageSize)}:{pageSize}, {nameof(pageIndex)}:{pageIndex}, {nameof(expected)}:{expected.Jsonify()})");
 
-            DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
-            optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-            SqliteDbContext context = new SqliteDbContext(optionsBuilder.Options);
+        SqliteDbContext.Heroes.AddRange(heroes);
+        await SqliteDbContext.SaveChangesAsync();
 
-            EntityFrameworkRepository<Hero, SqliteDbContext> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
+        DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new();
+        optionsBuilder.UseSqlite(DatabaseFixture.Connection);
+        SqliteDbContext context = new(optionsBuilder.Options);
 
-            // Act
-            Page<Hero> page = await repository.ReadPage(pageSize,
-                                                        pageIndex,
-                                                        orderBy,
-                                                        cancellationToken: default);
+        EntityFrameworkRepository<Hero, SqliteDbContext> repository = new(context);
 
-            // Assert
-            page.Should().Match(pageExpectation);
-        }
+        // Act
+        Page<Hero> actual = await repository.ReadPage(pageSize, pageIndex, includedProperties: includes, orderBy);
+        outputHelper.WriteLine($"Actual : {actual.Jsonify()}");
 
-        [Fact]
-        public async Task Given_hero_exists_and_has_an_acolyte_When_calling_ReadPageAsync_with_including_acolytes_Then_result_should_not_have_acolyte()
-        {
-            // Arrange
-            PageSize pageSize = PageSize.From(10);
-            Hero hero = new Hero(Guid.NewGuid(), Faker.Person.FullName);
-            Acolyte acolyte = new Acolyte(Guid.NewGuid(), Faker.Person.FullName);
-            Weapon weapon = new Weapon(Guid.NewGuid(), "Bow", 1);
+        // Assert
+        actual.Should().BeEquivalentTo(expected);
+    }
 
-            acolyte.Take(weapon);
-            hero.Enrolls(acolyte);
+    [Fact]
+    public async Task
+        Given_hero_exists_and_has_an_acolyte_When_calling_ReadPageAsync_with_including_acolytes_Then_result_should_not_have_acolyte()
+    {
+        // Arrange
+        PageSize pageSize = PageSize.From(10);
+        Hero hero = new(Guid.NewGuid(), Faker.Person.FullName);
+        Acolyte acolyte = new(Guid.NewGuid(), Faker.Person.FullName);
+        Weapon weapon = new(Guid.NewGuid(), "Bow", 1);
 
-            SqliteDbContext.Heroes.Add(hero);
-            await SqliteDbContext.SaveChangesAsync();
+        acolyte.Take(weapon);
+        hero.Enrolls(acolyte);
 
-            DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
-            optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-            SqliteDbContext context = new SqliteDbContext(optionsBuilder.Options);
-            IRepository<Hero> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
+        SqliteDbContext.Heroes.Add(hero);
+        await SqliteDbContext.SaveChangesAsync();
 
-            // Act
-            Page<Hero> page = await repository.ReadPage(pageSize,
-                                                             PageIndex.From(1),
-                                                             new[]
-                                                             {
-                                                                 IncludeClause<Hero>.Create(h => h.Acolytes)
-                                                             },
-                                                             orderBy: new Order<Hero>(nameof(Hero.Id)),
-                                                             cancellationToken: default);
+        DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new();
+        optionsBuilder.UseSqlite(DatabaseFixture.Connection);
+        SqliteDbContext context = new(optionsBuilder.Options);
+        IRepository<Hero> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
 
-            // Assert
-            page.Count.Should().Be(1);
-            page.Size.Value.Should().Be(pageSize);
-            page.Entries.Should()
-                        .HaveCount(1).And
-                        .Contain(item => item.Id == hero.Id)
-                        .Which
-                        .Acolytes.Should()
-                                 .HaveSameCount(hero.Acolytes).And
-                                 .Contain(ac => ac.Id == acolyte.Id);
-        }
+        // Act
+        Page<Hero> page = await repository.ReadPage(pageSize,
+            PageIndex.From(1),
+            [IncludeClause<Hero>.Create(h => h.Acolytes)],
+            orderBy: new Order<Hero>(nameof(Hero.Id)));
+
+        // Assert
+        page.Count.Should().Be(1);
+        page.Size.Value.Should().Be(pageSize);
+        page.Entries.Should()
+            .HaveCount(1).And
+            .Contain(item => item.Id == hero.Id)
+            .Which
+            .Acolytes.Should()
+            .HaveSameCount(hero.Acolytes).And
+            .Contain(ac => ac.Id == acolyte.Id);
     }
 }

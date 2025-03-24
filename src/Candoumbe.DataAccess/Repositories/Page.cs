@@ -7,13 +7,13 @@ namespace Candoumbe.DataAccess.Repositories
     /// <summary>
     /// Helper to encapsulates a page of results.
     /// </summary>
-    /// <typeparam name="T">Type of elements the page will contains.</typeparam>
+    /// <typeparam name="T">Type of elements the page will contain.</typeparam>
     public sealed class Page<T>
     {
         /// <summary>
         /// Items of the current page
         /// </summary>
-        public IEnumerable<T> Entries { get; }
+        public IReadOnlyList<T> Entries { get; }
 
         /// <summary>
         /// Number of items the result that the current <see cref="Page{T}"/> contains
@@ -34,11 +34,11 @@ namespace Candoumbe.DataAccess.Repositories
         /// Builds a new <see cref="Page{T}"/> instances
         /// </summary>
         /// <param name="entries">Items of the current page</param>
-        /// <param name="total">Number of items</param>
+        /// <param name="total">Total number of <typeparamref name="T"/> items.</param>
         /// <param name="size">Number of items per page.</param>
-        /// <exception cref="ArgumentOutOfRangeException">if either<paramref name="total"/> or <paramref name="size"/> are negative</exception>
+        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="total"/> is <c>&lt; 0</c>.</exception>
         /// <exception cref="ArgumentNullException">if <paramref name="entries"/> is <see langword="null"/></exception>
-        public Page(IEnumerable<T> entries, long total, PageSize size)
+        public Page(IReadOnlyList<T> entries, long total, PageSize size)
         {
             if (total < 0)
             {
@@ -58,6 +58,6 @@ namespace Candoumbe.DataAccess.Repositories
         /// <summary>
         /// Gets an empty <see cref="Page{T}"/> instance.
         /// </summary>
-        public static Page<T> Empty(in PageSize pageSize) => new Page<T>(Enumerable.Empty<T>(), 0, pageSize);
+        public static Page<T> Empty(in PageSize pageSize) => new([], 0, pageSize);
     }
 }
