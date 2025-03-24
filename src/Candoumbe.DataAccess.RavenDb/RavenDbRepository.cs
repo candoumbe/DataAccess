@@ -43,7 +43,7 @@
                 .ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public virtual async Task<Page<T>> ReadPage(PageSize pageSize, PageIndex page, IEnumerable<IncludeClause<T>> includedProperties, IOrder<T> orderBy, CancellationToken ct = default)
+        public virtual async Task<Page<T>> ReadPage(PageSize pageSize, PageIndex pageIndex, IEnumerable<IncludeClause<T>> includedProperties, IOrder<T> orderBy, CancellationToken ct = default)
         {
             IRavenQueryable<T> entries = _session.Query<T>();
             int total = await entries.CountAsync(ct)
@@ -53,9 +53,9 @@
 
             if (total > 0)
             {
-                IEnumerable<T> results = await entries.Include(includedProperties)
+                IReadOnlyList<T> results = await entries.Include(includedProperties)
                                                       .OrderBy(orderBy)
-                                                      .Skip(page < 1 ? 0 : (page - 1) * pageSize)
+                                                      .Skip(pageIndex < 1 ? 0 : (pageIndex - 1) * pageSize)
                                                       .Take(pageSize)
                                                       .ToArrayAsync(ct)
                                                       .ConfigureAwait(false);
@@ -218,8 +218,8 @@
         /// <inheritdoc/>
         public Task<Page<T>> Where(Expression<Func<T, bool>> predicate, IOrder<T> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public Task<Page<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Page<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex pageIndex, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         /// <inheritdoc/>
-        public Task<Page<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<Page<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<TResult, bool>> predicate, IOrder<TResult> orderBy, PageSize pageSize, PageIndex pageIndex, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 }

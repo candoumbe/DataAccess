@@ -23,24 +23,24 @@ namespace Candoumbe.DataAccess.Abstractions
         ///     Reads all entries from the repository.
         /// </summary>
         /// <param name="pageSize">Size of the page.</param>
-        /// <param name="page">Index of the page.</param>
+        /// <param name="pageIndex">Index of the page.</param>
         /// <param name="orderBy">The order by clause to apply.</param>
         /// <param name="cancellationToken">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
-        public async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex page, IOrder<TEntry> orderBy = null, CancellationToken cancellationToken = default)
-            => await ReadPage(pageSize, page, Enumerable.Empty<IncludeClause<TEntry>>(), orderBy, cancellationToken).ConfigureAwait(false);
+        public async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex pageIndex, IOrder<TEntry> orderBy = null, CancellationToken cancellationToken = default)
+            => await ReadPage(pageSize, pageIndex, Enumerable.Empty<IncludeClause<TEntry>>(), orderBy, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         ///     Reads all entries from the repository.
         /// </summary>
         /// <param name="pageSize">Size of the page.</param>
-        /// <param name="page">Index of the page.</param>
+        /// <param name="pageIndex">Index of the page.</param>
         /// <param name="includedProperties">Properties to eagerly include for each entry.</param>
         /// <param name="orderBy">The order by clause to apply.</param>
         /// <param name="cancellationToken">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{TEntry}"/> which holds the result</returns>
         Task<Page<TEntry>> ReadPage(PageSize pageSize,
-                                              PageIndex page,
+                                              PageIndex pageIndex,
                                               IEnumerable<IncludeClause<TEntry>> includedProperties,
                                               IOrder<TEntry> orderBy = null,
                                               CancellationToken cancellationToken = default);
@@ -229,7 +229,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="predicate">filter that entries must satisfied</param>
         /// <param name="orderBy">order to apply</param>
         /// <param name="pageSize">number of items a page can holds at most</param>
-        /// <param name="page">the page of result to get.</param>
+        /// <param name="pageIndex">the page of result to get.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/>
@@ -239,7 +239,7 @@ namespace Candoumbe.DataAccess.Abstractions
                                                      Expression<Func<TEntry, bool>> predicate,
                                                      IOrder<TResult> orderBy,
                                                      PageSize pageSize,
-                                                     PageIndex page,
+                                                     PageIndex pageIndex,
                                                      CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -254,13 +254,13 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="predicate">filter that entries must satisfied</param>
         /// <param name="orderBy">order to apply</param>
         /// <param name="pageSize">number of items a page can holds at most</param>
-        /// <param name="page">the page of result to get.</param>
+        /// <param name="pageIndex">the page of result to get.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Page<TResult>> Where<TResult>(
             Expression<Func<TEntry, TResult>> selector,
             Expression<Func<TResult, bool>> predicate,
-            IOrder<TResult> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default);
+            IOrder<TResult> orderBy, PageSize pageSize, PageIndex pageIndex, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the max value of the selected element

@@ -8,8 +8,8 @@ csharp_style_expression_bodied_accessors = when_on_single_line:suggestion
 csharp_style_var_for_built_in_types = false:error
 csharp_style_var_when_type_is_apparent = false:error
 
-# IDE0065: Directive using mal placée
-csharp_using_directive_placement = inside_namespace
+# IDE0065: Directive using mal placÃ©e
+csharp_using_directive_placement = outside_namespace:warning
 
 # Indentation Options
 csharp_indent_block_contents = true:warning

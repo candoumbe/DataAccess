@@ -5,16 +5,21 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
 
     public class Hero
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
 
-        public string Name { get; set; }
+        public string Name { get; init; }
 
-        public IEnumerable<Acolyte> Acolytes => _acolytes.ToImmutableList();
+        public IReadOnlyList<Acolyte> Acolytes
+        {
+            get => _acolytes.ToImmutableList();
+            init => _acolytes = value?.ToList() ?? [];
+        }
 
-        private readonly IList<Acolyte> _acolytes;
+        private readonly List<Acolyte> _acolytes;
 
         public Hero(Guid id, string name)
         {
@@ -24,7 +29,7 @@
             }
             Id = id;
             Name = name;
-            _acolytes = new List<Acolyte>();
+            _acolytes = [];
         }
 
         public void Enrolls(Acolyte acolyte)
