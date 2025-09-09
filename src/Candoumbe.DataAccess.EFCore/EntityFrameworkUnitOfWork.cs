@@ -19,7 +19,7 @@ namespace Candoumbe.DataAccess.Abstractions
     /// </list>
     /// </summary>
     /// <typeparam name="TContext">Type of the context onto which the <see cref="EntityFrameworkUnitOfWork{TContext}"/></typeparam>
-    public class EntityFrameworkUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext, IDbContext
+    public class EntityFrameworkUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext, IStore
     {
         private readonly TContext _context;
         private readonly IRepositoryFactory _repositoryFactory;

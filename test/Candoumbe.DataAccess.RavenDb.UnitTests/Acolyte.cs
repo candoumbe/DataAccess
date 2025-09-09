@@ -1,14 +1,13 @@
-﻿namespace Candoumbe.DataAccess.EFStore.UnitTests.Entities;
-
-using Optional.Collections;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Optional.Collections;
+
+namespace Candoumbe.DataAccess.RavenDb.UnitTests;
 
 public class Acolyte
 {
-    public Guid Id { get; }
+    public string Id { get; }
 
     public string Name { get; }
 
@@ -16,7 +15,7 @@ public class Acolyte
 
     private readonly IList<Weapon> _weapons;
 
-    public Acolyte(Guid id, string name)
+    public Acolyte(string id, string name)
     {
         Id = id;
         Name = name;

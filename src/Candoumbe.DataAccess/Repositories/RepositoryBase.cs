@@ -23,16 +23,16 @@ namespace Candoumbe.DataAccess.Repositories
         where TEntry : class
     {
         /// <summary>
-        /// <see cref="IDbContext"/> which the current instance operates on.
+        /// <see cref="IStore"/> which the current instance operates on.
         /// </summary>
-        protected IDbContext Context { get; }
+        protected IStore Context { get; }
 
         /// <summary>
         /// Builds a new <see cref="RepositoryBase{TEntry}"/> that handles <typeparamref name="TEntry"/>
         /// </summary>
         /// <param name="context"></param>
         /// <exception cref="ArgumentNullException">if <paramref name="context"/> is <see langword="null"/></exception>
-        protected RepositoryBase(IDbContext context)
+        protected RepositoryBase(IStore context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
@@ -47,7 +47,7 @@ namespace Candoumbe.DataAccess.Repositories
         /// <inheritdoc/>
         public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex pageIndex, IEnumerable<IncludeClause<TEntry>> includedProperties, IOrder<TEntry> orderBy, CancellationToken cancellationToken = default)
         {
-            DbSet<TEntry> entries = Context.Set<TEntry>();
+            IContainer<TEntry> entries = Context.Set<TEntry>();
             int total = await entries.CountAsync(cancellationToken)
                                      .ConfigureAwait(false);
             Page<TEntry> pageOfResult = Page<TEntry>.Empty(pageSize);
@@ -70,7 +70,7 @@ namespace Candoumbe.DataAccess.Repositories
         /// <inheritdoc/>
         public virtual async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TResult> orderBy, CancellationToken cancellationToken = default)
         {
-            DbSet<TEntry> entries = Context.Set<TEntry>();
+            IContainer<TEntry> entries = Context.Set<TEntry>();
             int total = await entries.CountAsync(cancellationToken)
                                      .ConfigureAwait(false);
 
@@ -93,7 +93,7 @@ namespace Candoumbe.DataAccess.Repositories
         /// <inheritdoc/>
         public virtual async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TEntry> orderBy, CancellationToken cancellationToken = default)
         {
-            DbSet<TEntry> entries = Context.Set<TEntry>();
+            IContainer<TEntry> entries = Context.Set<TEntry>();
             IQueryable<TEntry> resultQuery = entries;
 
             if (orderBy is not null)
@@ -257,7 +257,7 @@ namespace Candoumbe.DataAccess.Repositories
             {
                 throw new ArgumentNullException(nameof(orderBy), $"{nameof(orderBy)} expression must be set");
             }
-            DbSet<TEntry> entries = Context.Set<TEntry>();
+            IContainer<TEntry> entries = Context.Set<TEntry>();
             IQueryable<TResult> query = entries.Select(selector)
                                                .Where(predicate)
                                                .OrderBy(orderBy)

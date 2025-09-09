@@ -9,8 +9,8 @@
         /// Creates a new repository to handle <typeparamref name="TEntity"/>.
         /// </summary>
         /// <typeparam name="TEntity">Type of entities <see cref="IRepository{TEntry}"/> will help interact with.</typeparam>
-        /// <param name="dbContext"></param>
+        /// <param name="store"></param>
         /// <returns></returns>
-        IRepository<TEntity> NewRepository<TEntity>(IDbContext dbContext) where TEntity : class;
+        IRepository<TEntity> NewRepository<TEntity>(IStore store) where TEntity : class;
     }
 }

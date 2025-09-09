@@ -1,16 +1,15 @@
-﻿namespace Candoumbe.DataAccess.EFStore.UnitTests.Entities
-{
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿namespace Candoumbe.DataAccess.EFStore.UnitTests.Entities;
 
-    public class AcolyteEntityTypeConfiguration : IEntityTypeConfiguration<Acolyte>
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+public class AcolyteEntityTypeConfiguration : IEntityTypeConfiguration<Acolyte>
+{
+    public void Configure(EntityTypeBuilder<Acolyte> builder)
     {
-        public void Configure(EntityTypeBuilder<Acolyte> builder)
-        {
-            builder.HasKey(x => x.Id);
-            builder.Property(x => x.Name);
-            builder.HasMany(x => x.Weapons)
-                   .WithOne();
-        }
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Name);
+        builder.HasMany(x => x.Weapons)
+            .WithOne();
     }
 }

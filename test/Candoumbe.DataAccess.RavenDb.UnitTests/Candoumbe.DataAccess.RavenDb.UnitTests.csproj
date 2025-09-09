@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\..\tests.props" />
+    <PropertyGroup>
+        <TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="TestContainers.RavenDb" Version="4.3.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Candoumbe.DataAccess.RavenDb\Candoumbe.DataAccess.RavenDb.csproj" />
+    </ItemGroup>
+
+</Project>

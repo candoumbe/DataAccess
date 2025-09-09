@@ -1,45 +1,39 @@
-﻿namespace Candoumbe.DataAccess.Tests.Repositories
+﻿using System.Threading.Tasks;
+using Bogus;
+using Microsoft.EntityFrameworkCore;
+using Xunit;
+
+namespace Candoumbe.DataAccess.EFStore.UnitTests;
+
+/// <summary>
+/// Base class to extend when writing unit tests for <see cref="EFStore.EntityFrameworkRepository{TEntry, TContext}"/>
+/// </summary>
+public abstract class EntityFrameworkRepositoryTestsBase : IAsyncLifetime
 {
-    using Bogus;
+    protected static readonly Faker Faker = new Faker();
+    protected SqliteDatabaseFixture DatabaseFixture { get; }
+    protected readonly SqliteStore SqliteStore;
 
-    using Candoumbe.DataAccess.EFStore.UnitTests;
-
-    using Microsoft.EntityFrameworkCore;
-
-    using System.Threading.Tasks;
-
-    using Xunit;
-
-    /// <summary>
-    /// Base class to extend when writing unit tests for <see cref="EFStore.EntityFrameworkRepository{TEntry, TContext}"/>
-    /// </summary>
-    public abstract class EntityFrameworkRepositoryTestsBase : IAsyncLifetime
+    protected EntityFrameworkRepositoryTestsBase(SqliteDatabaseFixture databaseFixture)
     {
-        protected static readonly Faker Faker = new Faker();
-        protected SqliteDatabaseFixture DatabaseFixture { get; }
-        protected readonly SqliteDbContext SqliteDbContext;
+        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new DbContextOptionsBuilder<SqliteStore>();
+        optionsBuilder.UseSqlite(databaseFixture.Connection);
+        SqliteStore = new SqliteStore(optionsBuilder.Options);
+        DatabaseFixture = databaseFixture;
+    }
 
-        protected EntityFrameworkRepositoryTestsBase(SqliteDatabaseFixture databaseFixture)
-        {
-            DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new DbContextOptionsBuilder<SqliteDbContext>();
-            optionsBuilder.UseSqlite(databaseFixture.Connection);
-            SqliteDbContext = new SqliteDbContext(optionsBuilder.Options);
-            DatabaseFixture = databaseFixture;
-        }
+    ///<inheritdoc/>
+    public virtual async Task InitializeAsync()
+    {
+        await DatabaseFixture.InitializeAsync();
+        await SqliteStore.Database.EnsureDeletedAsync();
+        await SqliteStore.Database.EnsureCreatedAsync();
+    }
 
-        ///<inheritdoc/>
-        public virtual async Task InitializeAsync()
-        {
-            await DatabaseFixture.InitializeAsync();
-            await SqliteDbContext.Database.EnsureDeletedAsync();
-            await SqliteDbContext.Database.EnsureCreatedAsync();
-        }
-
-        ///<inheritdoc/>
-        public virtual async Task DisposeAsync()
-        {
-            await DatabaseFixture.DisposeAsync();
-            await SqliteDbContext.DisposeAsync();
-        }
+    ///<inheritdoc/>
+    public virtual async Task DisposeAsync()
+    {
+        await DatabaseFixture.DisposeAsync();
+        await SqliteStore.DisposeAsync();
     }
 }
