@@ -28,7 +28,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <param name="cancellationToken">Notifies to cancel the execution of the request</param>
         /// <returns><see cref="Page{T}"/> which holds the result</returns>
         public async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex pageIndex, IOrder<TEntry> orderBy = null, CancellationToken cancellationToken = default)
-            => await ReadPage(pageSize, pageIndex, Enumerable.Empty<IncludeClause<TEntry>>(), orderBy, cancellationToken).ConfigureAwait(false);
+            => await ReadPage(pageSize, pageIndex, [], orderBy, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         ///     Reads all entries from the repository.
@@ -272,7 +272,7 @@ namespace Candoumbe.DataAccess.Abstractions
         Task<TResult> Max<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets the mininum value after applying the <paramref name="selector"/>
+        /// Gets the minimum value after applying the <paramref name="selector"/>
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="selector">The projection to make before getting the minimum</param>
@@ -284,7 +284,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// Checks if the current repository contains at least one entry
         /// </summary>
         /// <returns>
-        ///     <see langword="true"/> if the repository contains at least one element or <see langword="false"/> otherwise
+        ///     <see langword="true"/> if the repository contains at least one element or <see langword="false"/> otherwise.
         /// </returns>
         Task<bool> Any(CancellationToken cancellationToken = default);
 
@@ -333,7 +333,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
 #if !NETSTANDARD2_0
         public async Task<TEntry> Single(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
-            => await Single(predicate, Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken)
+            => await Single(predicate, [], cancellationToken)
                     .ConfigureAwait(false);
 #else
         Task<TEntry> Single(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
@@ -453,7 +453,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <returns>The first entry or <see langword="null"/> if there's no entry.</returns>
 #if !NETSTANDARD2_0
         public async Task<Option<TEntry>> FirstOrDefault(CancellationToken cancellationToken = default)
-            => await FirstOrDefault(Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
+            => await FirstOrDefault([], cancellationToken).ConfigureAwait(false);
 #else
         Task<Option<TEntry>> FirstOrDefault(CancellationToken cancellationToken = default);
 #endif
@@ -466,7 +466,7 @@ namespace Candoumbe.DataAccess.Abstractions
         Task<Option<TEntry>> FirstOrDefault(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellation = default);
 
         /// <summary>
-        /// Gets the first entry of the repository that fullfill the specified <paramref name="predicate"/>
+        /// Gets the first entry of the repository that fulfill the specified <paramref name="predicate"/>
         /// </summary>
         /// <param name="predicate"></param>
         /// <param name="cancellationToken"></param>
@@ -475,7 +475,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <see langword="null"/></exception>
 #if !NETSTANDARD2_0
         public async Task<TEntry> First(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
-           => await First(predicate, Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
+           => await First(predicate, [], cancellationToken).ConfigureAwait(false);
 #else
         Task<TEntry> First(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 #endif
@@ -501,7 +501,7 @@ namespace Candoumbe.DataAccess.Abstractions
         /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <see langword="null"/></exception>
 #if !NETSTANDARD2_0
         async Task<Option<TEntry>> FirstOrDefault(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
-            => await FirstOrDefault(predicate, Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
+            => await FirstOrDefault(predicate, [], cancellationToken).ConfigureAwait(false);
 #else
         Task<Option<TEntry>> FirstOrDefault(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default);
 #endif

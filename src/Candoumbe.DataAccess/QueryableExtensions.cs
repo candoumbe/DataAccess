@@ -30,7 +30,7 @@ namespace Candoumbe.DataAccess
                 queryExpression = Expression.Call(
                     typeof(EntityFrameworkQueryableExtensions),
                     nameof(EntityFrameworkQueryableExtensions.Include),
-                    new Type[] { entries.ElementType, includeClause.Expression.ReturnType },
+                    [entries.ElementType, includeClause.Expression.ReturnType],
                     entries.Expression, includeClause.Expression
                 );
             }

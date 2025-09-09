@@ -18,7 +18,7 @@
     /// Base class for creating a datastore specialized class.
     /// </summary>
     /// <typeparam name="TContext">Type of the datastore that will be created.</typeparam>
-    public abstract class DataStore<TContext> : DbContext, IDbContext where TContext : DbContext
+    public abstract class DataStore<TContext> : DbContext, IStore where TContext : DbContext
     {
         /// <summary>
         /// Usual size for the "normal" text
@@ -60,10 +60,13 @@
                            .IsConcurrencyToken();
                 }
 
-                if (entity.ClrType.IsAssignableToGenericType(typeof(IEntity<>)))
+                bool implementsIEntity = entity.ClrType
+                    .GetInterfaces()
+                    .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntity<>));
+                if (implementsIEntity)
                 {
                     builder.Entity(entity.Name)
-                                .HasKey(nameof(IEntity<object>.Id));
+                           .HasKey(nameof(IEntity<object>.Id));
                 }
             }
         }
@@ -101,9 +104,10 @@
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             IEnumerable<EntityEntry> entities = GetModifiedEntities();
-            entities
-                .AsParallel()
-                .ForEach(UpdateModifiedEntry);
+            foreach (EntityEntry entry in entities)
+            {
+                UpdateModifiedEntry(entry);
+            }
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
@@ -112,7 +116,10 @@
         {
             IEnumerable<EntityEntry> entities = GetModifiedEntities();
 
-            entities.ForEach(UpdateModifiedEntry);
+            foreach (EntityEntry entry in entities)
+            {
+                UpdateModifiedEntry(entry);
+            }
 
             return await base.SaveChangesAsync(true, ct)
                 .ConfigureAwait(false);
@@ -124,5 +131,22 @@
         public override async Task<int> SaveChangesAsync(CancellationToken ct = default) =>
             await SaveChangesAsync(true, ct)
                 .ConfigureAwait(false);
+
+        // Explicit implementation to adapt EF Core DbSet<T> to IContainer<T>
+        IContainer<T> IStore.Set<T>() where T : class => new QueryableContainer<T>(base.Set<T>());
+
+        private sealed class QueryableContainer<T> : IContainer<T> where T : class
+        {
+            private readonly IQueryable<T> _queryable;
+            public QueryableContainer(IQueryable<T> queryable)
+            {
+                _queryable = queryable ?? throw new ArgumentNullException(nameof(queryable));
+            }
+            public Type ElementType => _queryable.ElementType;
+            public System.Linq.Expressions.Expression Expression => _queryable.Expression;
+            public IQueryProvider Provider => _queryable.Provider;
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => ((System.Collections.IEnumerable)_queryable).GetEnumerator();
+            public IEnumerator<T> GetEnumerator() => _queryable.GetEnumerator();
+        }
     }
 }

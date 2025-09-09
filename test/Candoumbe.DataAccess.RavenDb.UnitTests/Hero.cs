@@ -1,15 +1,14 @@
-﻿namespace Candoumbe.DataAccess.EFStore.UnitTests.Entities;
-
-using Optional.Collections;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Optional.Collections;
+
+namespace Candoumbe.DataAccess.RavenDb.UnitTests;
 
 public class Hero
 {
-    public Guid Id { get; init; }
+    public string Id { get; init; }
 
     public string Name { get; init; }
 
@@ -21,7 +20,7 @@ public class Hero
 
     private readonly List<Acolyte> _acolytes;
 
-    public Hero(Guid id, string name)
+    public Hero(string id, string name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -34,15 +33,12 @@ public class Hero
 
     public void Enrolls(Acolyte acolyte)
     {
-        if (acolyte is null)
-        {
-            throw new ArgumentNullException(nameof(acolyte));
-        }
+        ArgumentNullException.ThrowIfNull(acolyte);
 
         _acolytes.Add(acolyte);
     }
 
-    public void Dismiss(Guid acolyteId)
+    public void Dismiss(string acolyteId)
     {
         _acolytes.SingleOrNone(acc => acc.Id == acolyteId)
             .MatchSome(acolyte => _acolytes.Remove(acolyte));

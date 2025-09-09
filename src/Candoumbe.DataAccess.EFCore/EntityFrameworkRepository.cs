@@ -13,13 +13,13 @@
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Entity Framework implementation of <see cref="RepositoryBase{TEntry}"/> on top of <see cref="IDbContext"/>.
+    /// Entity Framework implementation of <see cref="RepositoryBase{TEntry}"/> on top of <see cref="IStore"/>.
     /// </summary>
     /// <typeparam name="TEntry">Type of elements that the repository will handle</typeparam>
     /// <typeparam name="TContext">Type of the context the repository will u</typeparam>
     public class EntityFrameworkRepository<TEntry, TContext> : RepositoryBase<TEntry>
         where TEntry : class
-        where TContext : DbContext, IDbContext
+        where TContext : DbContext, IStore
     {
         /// <summary>
         /// Builds a new <see cref="EntityFrameworkRepository{TEntry, TContext}"/> instance.
@@ -33,14 +33,14 @@
         public override Task<TEntry> Create(TEntry entry, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(Context.Set<TEntry>().Add(entry).Entity);
+            return Task.FromResult(((TContext)Context).Set<TEntry>().Add(entry).Entity);
         }
 
         /// <inheritdoc/>
         public override Task<IEnumerable<TEntry>> Create(IEnumerable<TEntry> entries, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            Context.Set<TEntry>().AddRange(entries);
+            ((TContext)Context).Set<TEntry>().AddRange(entries);
 
             return Task.FromResult(entries);
         }
@@ -51,7 +51,7 @@
             IAsyncEnumerable<TEntry> entries = Context.Set<TEntry>().Where(predicate).AsAsyncEnumerable();
             await foreach (TEntry item in entries.WithCancellation(cancellationToken))
             {
-                Context.Set<TEntry>().Remove(item);
+                ((TContext)Context).Set<TEntry>().Remove(item);
             }
         }
     }

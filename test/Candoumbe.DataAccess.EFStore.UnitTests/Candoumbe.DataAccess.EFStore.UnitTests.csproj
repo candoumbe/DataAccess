@@ -21,6 +21,10 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
+    
+    <ItemGroup>
+        <PackageReference Include="TestContainers.RavenDb" Version="4.3.0"/>
+    </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Candoumbe.DataAccess.EFCore\Candoumbe.DataAccess.EFStore.csproj" />

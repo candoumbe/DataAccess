@@ -1,20 +1,18 @@
-﻿using Candoumbe.DataAccess.Abstractions;
-using Candoumbe.DataAccess.EFStore;
-using Candoumbe.DataAccess.EFStore.UnitTests;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Candoumbe.DataAccess.Abstractions;
 using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
 using Candoumbe.DataAccess.Repositories;
 using DataFilters;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
-namespace Candoumbe.DataAccess.Tests.Repositories;
+namespace Candoumbe.DataAccess.EFStore.UnitTests;
 
 [UnitTest]
 public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHelper outputHelper)
@@ -23,12 +21,12 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        await SqliteDbContext.Database.EnsureCreatedAsync();
+        await SqliteStore.Database.EnsureCreatedAsync();
     }
 
     public override async Task DisposeAsync()
     {
-        await SqliteDbContext.Database.EnsureDeletedAsync();
+        await SqliteStore.Database.EnsureDeletedAsync();
         await base.DisposeAsync();
     }
 
@@ -137,14 +135,14 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
         outputHelper.WriteLine(
             $"Request : ({nameof(pageSize)}:{pageSize}, {nameof(pageIndex)}:{pageIndex}, {nameof(orderBy)}:{orderBy.Jsonify()}, {nameof(expected)}:{expected.Jsonify()})");
 
-        SqliteDbContext.Heroes.AddRange(heroes);
-        await SqliteDbContext.SaveChangesAsync();
+        SqliteStore.Heroes.AddRange(heroes);
+        await SqliteStore.SaveChangesAsync();
 
-        DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new();
+        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new();
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-        SqliteDbContext context = new(optionsBuilder.Options);
+        SqliteStore context = new(optionsBuilder.Options);
 
-        EntityFrameworkRepository<Hero, SqliteDbContext> repository = new(context);
+        EntityFrameworkRepository<Hero, SqliteStore> repository = new(context);
 
         // Act
         Page<Hero> actual = await repository.ReadPage(pageSize: pageSize, pageIndex: pageIndex, orderBy);
@@ -287,14 +285,14 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
         outputHelper.WriteLine(
             $"Request : ({nameof(pageSize)}:{pageSize}, {nameof(pageIndex)}:{pageIndex}, {nameof(expected)}:{expected.Jsonify()})");
 
-        SqliteDbContext.Heroes.AddRange(heroes);
-        await SqliteDbContext.SaveChangesAsync();
+        SqliteStore.Heroes.AddRange(heroes);
+        await SqliteStore.SaveChangesAsync();
 
-        DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new();
+        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new();
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-        SqliteDbContext context = new(optionsBuilder.Options);
+        SqliteStore context = new(optionsBuilder.Options);
 
-        EntityFrameworkRepository<Hero, SqliteDbContext> repository = new(context);
+        EntityFrameworkRepository<Hero, SqliteStore> repository = new(context);
 
         // Act
         Page<Hero> actual = await repository.ReadPage(pageSize, pageIndex, includedProperties: includes, orderBy);
@@ -317,13 +315,13 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
         acolyte.Take(weapon);
         hero.Enrolls(acolyte);
 
-        SqliteDbContext.Heroes.Add(hero);
-        await SqliteDbContext.SaveChangesAsync();
+        SqliteStore.Heroes.Add(hero);
+        await SqliteStore.SaveChangesAsync();
 
-        DbContextOptionsBuilder<SqliteDbContext> optionsBuilder = new();
+        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new();
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-        SqliteDbContext context = new(optionsBuilder.Options);
-        IRepository<Hero> repository = new EntityFrameworkRepository<Hero, SqliteDbContext>(context);
+        SqliteStore context = new(optionsBuilder.Options);
+        IRepository<Hero> repository = new EntityFrameworkRepository<Hero, SqliteStore>(context);
 
         // Act
         Page<Hero> page = await repository.ReadPage(pageSize,

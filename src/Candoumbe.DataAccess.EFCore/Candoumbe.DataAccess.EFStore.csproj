@@ -1,11 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="../../core.props" />
-  <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Candoumbe.DataAccess\Candoumbe.DataAccess.csproj" />
-  </ItemGroup>
+    <Import Project="../../core.props"/>
+    <PropertyGroup>
+        <TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
+    </PropertyGroup>
+    <Choose>
+        <When Condition="'$(TargetFramework)' == 'net8.0'">
+            <ItemGroup>
+                <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.14"/>
+            </ItemGroup>
+        </When>
+        <Otherwise>
+            <ItemGroup>
+                <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3"/>
+            </ItemGroup>
+        </Otherwise>
+    </Choose>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Candoumbe.DataAccess\Candoumbe.DataAccess.csproj"/>
+    </ItemGroup>
 
 </Project>

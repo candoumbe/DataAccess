@@ -10,7 +10,7 @@
     /// Defines a unit of work factory wrapper around Entity Framework
     /// </summary>
     public class EntityFrameworkUnitOfWorkFactory<TContext> : UnitOfWorkFactory
-        where TContext : DbContext, IDbContext
+        where TContext : DbContext, IStore
     {
         private readonly IRepositoryFactory _repositoryFactory;
 
