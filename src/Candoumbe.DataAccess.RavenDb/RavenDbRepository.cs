@@ -22,7 +22,10 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
 {
     private readonly IAsyncDocumentSession _session;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Builds a new <see cref="RavenDbRepository{T}"/> instance.
+    /// </summary>
+    /// <param name="session">The underlying session that the repository will use to interact with documents.</param>
     public RavenDbRepository(IAsyncDocumentSession session)
     {
         _session = session;
@@ -84,7 +87,7 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
     /// <inheritdoc/>
     public async Task Clear(CancellationToken ct = default)
     {
-        IAsyncEnumerable<T> elements = RavenQueryableExtensions.AsAsyncEnumerable(_session.Query<T>());
+        IAsyncEnumerable<T> elements = _session.Query<T>().AsAsyncEnumerable();
         await foreach (T item in elements.WithCancellation(ct))
         {
             _session.Delete(item);
@@ -145,7 +148,6 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
     public async Task<T> First(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties,
         CancellationToken cancellationToken = default)
         => await _session.Query<T>()
-            .Include(includedProperties)
             .FirstAsync(predicate, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
