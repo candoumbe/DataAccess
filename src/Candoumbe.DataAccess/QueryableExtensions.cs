@@ -1,41 +1,40 @@
 ﻿using System;
 using System.Linq;
 
-namespace Candoumbe.DataAccess
+namespace Candoumbe.DataAccess;
+
+using Candoumbe.DataAccess.Repositories;
+
+using Microsoft.EntityFrameworkCore;
+
+using System.Collections.Generic;
+using System.Linq.Expressions;
+
+/// <summary>
+/// Contains utility methods for Queryable
+/// </summary>
+public static class QueryableExtensions
 {
-    using Candoumbe.DataAccess.Repositories;
-
-    using Microsoft.EntityFrameworkCore;
-
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-
     /// <summary>
-    /// Contains utility methods for Queryable
+    /// Include a list of properties in a strongly type manner.
     /// </summary>
-    public static class QueryableExtensions
+    /// <typeparam name="T">Type of the <see cref="IQueryable{T}"/> items</typeparam>
+    /// <param name="entries"></param>
+    /// <param name="includes">List of properties to include in the result</param>
+    /// <returns></returns>
+    public static IQueryable<T> Include<T>(this IQueryable<T> entries, IEnumerable<IncludeClause<T>> includes)
     {
-        /// <summary>
-        /// Include a list of properties in a strongly type manner.
-        /// </summary>
-        /// <typeparam name="T">Type of the <see cref="IQueryable{T}"/> items</typeparam>
-        /// <param name="entries"></param>
-        /// <param name="includes">List of properties to include in the result</param>
-        /// <returns></returns>
-        public static IQueryable<T> Include<T>(this IQueryable<T> entries, IEnumerable<IncludeClause<T>> includes)
+        Expression queryExpression = entries.Expression;
+        foreach (IncludeClause<T> includeClause in includes)
         {
-            Expression queryExpression = entries.Expression;
-            foreach (IncludeClause<T> includeClause in includes)
-            {
-                queryExpression = Expression.Call(
-                    typeof(EntityFrameworkQueryableExtensions),
-                    nameof(EntityFrameworkQueryableExtensions.Include),
-                    [entries.ElementType, includeClause.Expression.ReturnType],
-                    entries.Expression, includeClause.Expression
-                );
-            }
-
-            return (IQueryable<T>)entries.Provider.CreateQuery(queryExpression);
+            queryExpression = Expression.Call(
+                                              typeof(EntityFrameworkQueryableExtensions),
+                                              nameof(EntityFrameworkQueryableExtensions.Include),
+                                              [entries.ElementType, includeClause.Expression.ReturnType],
+                                              entries.Expression, includeClause.Expression
+                                             );
         }
+
+        return (IQueryable<T>)entries.Provider.CreateQuery(queryExpression);
     }
 }

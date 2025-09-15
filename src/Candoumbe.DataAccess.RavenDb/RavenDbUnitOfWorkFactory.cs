@@ -1,32 +1,31 @@
-﻿namespace Candoumbe.DataAccess.RavenDb
+﻿namespace Candoumbe.DataAccess.RavenDb;
+
+using Candoumbe.DataAccess.Abstractions;
+
+using Raven.Client.Documents;
+
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+
+/// <summary>
+/// Raven Db implementation of <see cref="IUnitOfWork"/>
+/// </summary>
+public class RavenDbUnitOfWorkFactory : IUnitOfWorkFactory
 {
-    using Candoumbe.DataAccess.Abstractions;
+    private readonly IDocumentStore _store;
 
-    using Raven.Client.Documents;
-
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
+    private readonly IDictionary<string, object> _repositories;
 
     /// <summary>
-    /// Raven Db implementation of <see cref="IUnitOfWork"/>
+    /// Builds a new <see cref="RavenDbUnitOfWorkFactory"/> instance;
     /// </summary>
-    public class RavenDbUnitOfWorkFactory : IUnitOfWorkFactory
+    /// <param name="store"></param>
+    public RavenDbUnitOfWorkFactory(IDocumentStore store)
     {
-        private readonly IDocumentStore _store;
-
-        private readonly IDictionary<string, object> _repositories;
-
-        /// <summary>
-        /// Builds a new <see cref="RavenDbUnitOfWorkFactory"/> instance;
-        /// </summary>
-        /// <param name="store"></param>
-        public RavenDbUnitOfWorkFactory(IDocumentStore store)
-        {
-            _store = store;
-            _repositories = new ConcurrentDictionary<string, object>();
-        }
-
-        /// <inheritdoc/>
-        public IUnitOfWork NewUnitOfWork() => new RavenDbUnitOfWork(_store.OpenAsyncSession());
+        _store = store;
+        _repositories = new ConcurrentDictionary<string, object>();
     }
+
+    /// <inheritdoc/>
+    public IUnitOfWork NewUnitOfWork() => new RavenDbUnitOfWork(_store.OpenAsyncSession());
 }
