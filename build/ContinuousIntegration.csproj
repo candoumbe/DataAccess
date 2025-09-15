@@ -10,7 +10,7 @@
     <NukeTelemetryVersion>1</NukeTelemetryVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Candoumbe.Pipelines" Version="0.13.0-rc.39" />
+    <PackageReference Include="Candoumbe.Pipelines" Version="0.13.4" />
     <PackageReference Include="CodecovUploader" Version="0.8.0" />
   </ItemGroup>
   <ItemGroup>
