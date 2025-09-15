@@ -1,12 +1,12 @@
-namespace Candoumbe.DataAccess.Abstractions;
-
-using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Candoumbe.DataAccess.Abstractions;
+using Microsoft.EntityFrameworkCore;
+
+namespace Candoumbe.DataAccess.EFStore;
 
 /// <summary>
 /// <para>

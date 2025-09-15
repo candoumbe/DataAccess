@@ -1,23 +1,14 @@
-﻿namespace Candoumbe.DataAccess.Tests.Repositories;
-
+﻿using System;
 using Bogus;
-
 using Candoumbe.DataAccess.Repositories;
-
 using FluentAssertions;
-
 using FsCheck;
 using FsCheck.Fluent;
 using FsCheck.Xunit;
-
-using System;
-
 using Xunit;
 using Xunit.Categories;
 
-#if NET7_0_OR_GREATER
-using System.Diagnostics;
-#endif
+namespace Candoumbe.DataAccess.UnitTests.Repositories;
 
 [UnitTest]
 public class PageIndexTests
@@ -36,7 +27,7 @@ public class PageIndexTests
             .Which.Message.Should().MatchEquivalentOf("'?*' cannot be less than 1 *");
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(Generators.Generators)])]
     public void Given_an_initial_PageIndex_When_incrementing_by_positive_integer_Then_the_resulting_PageIndex_should_be_incremented_by_one(PageIndex pageIndex)
     {
         // Arrange
@@ -49,7 +40,7 @@ public class PageIndexTests
         actual.Should().Be(expected);
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(Generators.Generators)])]
     public void Given_unchecked_and_an_initial_PageIndex_When_subtracting_any_integer_Then_the_resulting_PageIndex_should_be_within_min_and_max(PageIndex index, int value)
     {
         // Arrange
@@ -71,7 +62,7 @@ public class PageIndexTests
         actual.Should().Be(PageIndex.MaxValue);
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(Generators.Generators)])]
     public void Given_a_PageIndex_and_a_value_When_calling_lt_operator_Then_PageIndex_lt_value_should_be_the_same_as_PageIndex_dot_Value_lt_value(PageIndex pageIndex, int right)
     {
         // Arrange
@@ -84,7 +75,7 @@ public class PageIndexTests
         actual.Should().Be(expected);
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(Generators.Generators)])]
     public void Given_a_PageIndex_and_a_value_When_calling_gt_operator_Then_PageIndex_lt_value_should_be_the_same_as_PageIndex_dot_Value_gt_value(PageIndex pageIndex, int right)
     {
         // Arrange
@@ -97,7 +88,7 @@ public class PageIndexTests
         actual.Should().Be(expected);
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(Generators.Generators)])]
     public void Given_a_PageIndex_and_a_value_When_calling_lte_operator_Then_PageIndex_lt_value_should_be_the_same_as_PageIndex_dot_Value_lte_value(PageIndex pageIndex, int right)
     {
         // Arrange
@@ -110,7 +101,7 @@ public class PageIndexTests
         actual.Should().Be(expected);
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(Generators.Generators)])]
     public void Given_a_PageIndex_and_a_value_When_calling_gte_operator_Then_PageIndex_lt_value_should_be_the_same_as_PageIndex_dot_Value_gte_value(PageIndex pageIndex, int right)
     {
         // Arrange
@@ -123,15 +114,15 @@ public class PageIndexTests
         actual.Should().Be(expected);
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(Generators.Generators)])]
     public Property Given_a_PageIndex_and_a_value_When_calling_eq_operator_Then_PageIndex_lt_value_should_be_the_same_as_PageIndex_dot_Value_eq_value(PageIndex pageIndex, int right)
         => (pageIndex.Value == right == (pageIndex == right)).ToProperty();
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(Generators.Generators)])]
     public void Given_a_PageIndex_and_a_value_When_calling_neq_operator_Then_PageIndex_lt_value_should_be_the_same_as_PageIndex_dot_Value_neq_value(PageIndex pageIndex, int right)
         => (pageIndex.Value != right == (pageIndex != right)).ToProperty();
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(Generators.Generators)])]
     public void Given_unchecked_environment_and_a_PageIndex_When_multiplying_by_an_integer_Then_result_should_stay_withing_min_an_max_PageIndex_ranges(PageIndex initialValue, int right)
     {
         // Act
@@ -141,7 +132,7 @@ public class PageIndexTests
         actual.Value.Should().BeInRange(PageIndex.MinValue, PageIndex.MaxValue);
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(Generators.Generators)])]
     public void Given_a_PageIndex_When_summing_with_an_integer_Then_result_should_stay_within_min_an_max_PageIndex_ranges(PageIndex initialValue, int right)
     {
         // Act

@@ -1,12 +1,9 @@
-﻿namespace Candoumbe.DataAccess.Tests.Repositories;
-
+﻿using System;
 using Candoumbe.DataAccess.Repositories;
-
 using FluentAssertions;
-
-using System;
-
 using Xunit;
+
+namespace Candoumbe.DataAccess.UnitTests.Repositories;
 
 public class SearchTests
 {

@@ -1,18 +1,13 @@
-﻿namespace Candoumbe.DataAccess.Tests.Repositories;
-
+﻿using System;
 using Candoumbe.DataAccess.Repositories;
-
 using FluentAssertions;
-
 using FsCheck;
 using FsCheck.Xunit;
-
-using System;
-using System.Linq;
-
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
+
+namespace Candoumbe.DataAccess.UnitTests.Repositories;
 
 [UnitTest]
 public class PageTests
@@ -75,7 +70,7 @@ public class PageTests
             .BeEquivalentTo(nameof(Page<object>.Total));
     }
 
-    [Property(Arbitrary = [typeof(Generators)])]
+    [Property(Arbitrary = [typeof(Generators.Generators)])]
     public void CheckPageCount(NonNegativeInt total, PageSize pageSize)
     {
         // Arrange 

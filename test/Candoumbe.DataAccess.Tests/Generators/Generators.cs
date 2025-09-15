@@ -1,11 +1,8 @@
-﻿namespace Candoumbe.DataAccess.Tests;
-
-using Candoumbe.DataAccess.Repositories;
-
+﻿using Candoumbe.DataAccess.Repositories;
 using FsCheck;
 using FsCheck.Fluent;
 
-using System.Linq;
+namespace Candoumbe.DataAccess.UnitTests.Generators;
 
 /// <summary>
 /// Generators for FsCheck
