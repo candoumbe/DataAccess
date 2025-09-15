@@ -56,7 +56,7 @@ public class FirstTests(RavenDbDatabaseFixture fixture) : IClassFixture<RavenDbD
 
         // Assert
         actual.Acolytes.Should()
-            .BeEmpty("No instruction were defined to automatically include the acolytes property");
+            .NotBeEmpty("no instruction were defined to automatically include the acolytes property but in a document with an acolyte, the acolytes property should be included");
     }
 
     [Fact]
