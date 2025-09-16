@@ -19,13 +19,8 @@ public abstract class Entity<TKey, TEntry> : BaseEntity<TKey>
     /// <summary>
     /// Builds a new <see cref="Entity{TKey, TEntry}"/> instance.
     /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="id"/> is default</exception>
     protected Entity(TKey id)
     {
-        if (Equals(id, default))
-        {
-            throw new ArgumentOutOfRangeException(nameof(id));
-        }
         _id = id;
     }
 }

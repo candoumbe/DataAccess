@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Candoumbe.DataAccess.Abstractions;
 using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
 using Candoumbe.DataAccess.Repositories;
-using DataFilters;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -30,18 +29,18 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
         await base.DisposeAsync();
     }
 
-    public static TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IOrder<Hero>, Page<Hero>>
+    public static TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IOrderSpecification<Hero>, Page<Hero>>
         ReadPagesWithoutIncludesCases
     {
         get
         {
-            TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IOrder<Hero>, Page<Hero>> cases = new();
+            TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IOrderSpecification<Hero>, Page<Hero>> cases = new();
 
             cases.Add(
                 [],
                 PageSize.From(10),
                 PageIndex.From(1),
-                new Order<Hero>(nameof(Hero.Name)),
+                new SingleOrderSpecification<Hero>(h => h.Name),
                 Page<Hero>.Empty(pageSize: PageSize.From(10))
             );
 
@@ -57,7 +56,7 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
                     [hero],
                     PageSize.From(10),
                     PageIndex.From(1),
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     new Page<Hero>([new Hero(hero.Id, hero.Name)], 1, PageSize.From(10))
                 );
             }
@@ -82,7 +81,7 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
                     [batman, greenArrow, wonderWoman],
                     PageSize.From(2),
                     PageIndex.From(1),
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     new Page<Hero>([
                             new Hero(batman.Id, batman.Name),
                             new Hero(greenArrow.Id, greenArrow.Name)
@@ -96,7 +95,7 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
                     [batman, greenArrow, wonderWoman],
                     PageSize.One,
                     PageIndex.From(1),
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     new Page<Hero>([new Hero(batman.Id, batman.Name)], 3, PageSize.One)
                 );
 
@@ -104,7 +103,7 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
                     [batman, greenArrow, wonderWoman],
                     PageSize.One,
                     PageIndex.From(2),
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     new Page<Hero>([new Hero(greenArrow.Id, greenArrow.Name)], 3, PageSize.One)
                 );
 
@@ -112,7 +111,7 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
                     [batman, greenArrow, wonderWoman],
                     PageSize.One,
                     PageIndex.From(3),
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     new Page<Hero>([new Hero(wonderWoman.Id, wonderWoman.Name)], 3, PageSize.One)
                 );
             }
@@ -127,7 +126,7 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
             IReadOnlyList<Hero> heroes,
             PageSize pageSize,
             PageIndex pageIndex,
-            IOrder<Hero> orderBy,
+            IOrderSpecification<Hero> orderBy,
             Page<Hero> expected)
     {
         // Arrange
@@ -152,19 +151,18 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
     }
 
     public static
-        TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IReadOnlyList<IncludeClause<Hero>>, IOrder<Hero>, Page<Hero>> ReadPagesWithIncludesCases
+        TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IReadOnlyList<IncludeClause<Hero>>, IOrderSpecification<Hero>, Page<Hero>> ReadPagesWithIncludesCases
     {
         get
         {
-            TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IReadOnlyList<IncludeClause<Hero>>, IOrder<Hero>,
-                Page<Hero>> cases = new();
+            TheoryData<IReadOnlyList<Hero>, PageSize, PageIndex, IReadOnlyList<IncludeClause<Hero>>, IOrderSpecification<Hero>, Page<Hero>> cases = new();
 
             cases.Add(
                 [],
                 PageSize.From(10),
                 PageIndex.From(1),
                 [IncludeClause<Hero>.Create(h => h.Acolytes)],
-                new Order<Hero>(nameof(Hero.Name)),
+                new SingleOrderSpecification<Hero>(h => h.Name),
                 Page<Hero>.Empty(PageSize.From(10)));
 
             {
@@ -180,11 +178,11 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
                     PageSize.From(10),
                     PageIndex.From(1),
                     [],
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     new Page<Hero>(
-                        [new Hero(hero.Id, hero.Name)],
-                        1,
-                        PageSize.From(10))
+                                   [new Hero(hero.Id, hero.Name)],
+                                   1,
+                                   PageSize.From(10))
                 );
             }
 
@@ -209,17 +207,17 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
                     PageSize.From(10),
                     PageIndex.From(1),
                     [IncludeClause<Hero>.Create(h => h.Acolytes)],
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     new Page<Hero>(new[] { batman, greenArrow, wonderWoman }
-                            .Select(static h =>
-                            {
-                                Hero hero = new(h.Id, h.Name);
-                                h.Acolytes.ForEach(acolyte => hero.Enrolls(new Acolyte(acolyte.Id, acolyte.Name)));
-                                return hero;
-                            })
-                            .ToArray(),
-                        3,
-                        PageSize.From(10))
+                                       .Select(static h =>
+                                               {
+                                                   Hero hero = new(h.Id, h.Name);
+                                                   h.Acolytes.ForEach(acolyte => hero.Enrolls(new Acolyte(acolyte.Id, acolyte.Name)));
+                                                   return hero;
+                                               })
+                                       .ToArray(),
+                                   3,
+                                   PageSize.From(10))
                 );
 
                 cases.Add
@@ -228,15 +226,15 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
                     PageSize.One,
                     PageIndex.From(1),
                     [IncludeClause<Hero>.Create(h => h.Acolytes)],
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     new Page<Hero>(new[] { batman }.Select(static h =>
-                        {
-                            Hero hero = new(h.Id, h.Name);
-                            h.Acolytes.ForEach(acolyte => hero.Enrolls(new Acolyte(acolyte.Id, acolyte.Name)));
-                            return hero;
-                        }).ToArray(),
-                        3,
-                        PageSize.From(1))
+                                                           {
+                                                               Hero hero = new(h.Id, h.Name);
+                                                               h.Acolytes.ForEach(acolyte => hero.Enrolls(new Acolyte(acolyte.Id, acolyte.Name)));
+                                                               return hero;
+                                                           }).ToArray(),
+                                   3,
+                                   PageSize.From(1))
                 );
 
                 cases.Add
@@ -245,13 +243,13 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
                     PageSize.One,
                     PageIndex.From(2),
                     [IncludeClause<Hero>.Create(h => h.Acolytes)],
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     new Page<Hero>(new[] { greenArrow }.Select(h =>
-                    {
-                        Hero hero = new(h.Id, h.Name);
-                        h.Acolytes.ForEach(acolyte => hero.Enrolls(new Acolyte(acolyte.Id, acolyte.Name)));
-                        return hero;
-                    }).ToArray(), 3, PageSize.One)
+                                                               {
+                                                                   Hero hero = new(h.Id, h.Name);
+                                                                   h.Acolytes.ForEach(acolyte => hero.Enrolls(new Acolyte(acolyte.Id, acolyte.Name)));
+                                                                   return hero;
+                                                               }).ToArray(), 3, PageSize.One)
                 );
 
                 cases.Add
@@ -260,7 +258,7 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
                     PageSize.One,
                     PageIndex.From(3),
                     [IncludeClause<Hero>.Create(h => h.Acolytes)],
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     new Page<Hero>([wonderWoman], 3, PageSize.One)
                 );
             }
@@ -272,12 +270,11 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
     [Theory]
     [MemberData(nameof(ReadPagesWithIncludesCases))]
     public async Task
-        Given_hero_exists_and_has_an_acolyte_When_calling_ReadPage_with_includes_Then_result_should_have_acolytes(
-            IReadOnlyList<Hero> heroes,
-            PageSize pageSize,
-            PageIndex pageIndex,
-            IReadOnlyList<IncludeClause<Hero>> includes,
-            IOrder<Hero> orderBy,
+        Given_hero_exists_and_has_an_acolyte_When_calling_ReadPage_with_includes_Then_result_should_have_acolytes(IReadOnlyList<Hero> heroes,
+                                                                                                                  PageSize pageSize,
+                                                                                                                  PageIndex pageIndex,
+                                                                                                                  IReadOnlyList<IncludeClause<Hero>> includes,
+                                                                                                                  IOrderSpecification<Hero> orderBy,
             Page<Hero> expected)
     {
         // Arrange
@@ -325,9 +322,9 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
 
         // Act
         Page<Hero> page = await repository.ReadPage(pageSize,
-            PageIndex.From(1),
-            [IncludeClause<Hero>.Create(h => h.Acolytes)],
-            orderBy: new Order<Hero>(nameof(Hero.Id)));
+                                                    PageIndex.From(1),
+                                                    [IncludeClause<Hero>.Create(h => h.Acolytes)],
+                                                    orderBy: new SingleOrderSpecification<Hero>(h => h.Id));
 
         // Assert
         page.Count.Should().Be(1);

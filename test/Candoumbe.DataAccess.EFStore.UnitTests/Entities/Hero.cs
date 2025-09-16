@@ -1,11 +1,10 @@
 ﻿namespace Candoumbe.DataAccess.EFStore.UnitTests.Entities;
 
-using Optional.Collections;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Optional.Collections;
 
 public class Hero
 {

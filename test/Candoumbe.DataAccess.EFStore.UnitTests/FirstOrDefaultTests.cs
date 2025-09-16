@@ -41,7 +41,7 @@ public class FirstOrDefaultTests : EntityFrameworkRepositoryTestsBase, IClassFix
 
         // Assert
         maybeHero.Match(
-            hero => hero.Acolytes.Should()
+            h => h.Acolytes.Should()
                 .BeEmpty("No instruction were defined to automatically include the acolytes property"),
 #if NET7_0_OR_GREATER
             () => throw new UnreachableException($"'{nameof(EntityFrameworkRepository<Hero, SqliteStore>.FirstOrDefault)}' must return the entity when it exists")

@@ -1,19 +1,14 @@
-namespace Candoumbe.DataAccess.Repositories;
-
-using Candoumbe.DataAccess.Abstractions;
-
-using DataFilters;
-
-using Microsoft.EntityFrameworkCore;
-
-using Optional;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Candoumbe.DataAccess.Abstractions;
+using Microsoft.EntityFrameworkCore;
+using Optional;
+
+namespace Candoumbe.DataAccess.Repositories;
 
 /// <summary>
 /// Repository base class
@@ -41,11 +36,11 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     public virtual async Task Clear(CancellationToken cancellationToken = default) => await Delete(_ => true, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex pageIndex, IOrder<TEntry> orderBy, CancellationToken cancellationToken = default)
+    public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex pageIndex, IOrderSpecification<TEntry> orderBy, CancellationToken cancellationToken = default)
         => await ReadPage(pageSize, pageIndex, [], orderBy, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex pageIndex, IEnumerable<IncludeClause<TEntry>> includedProperties, IOrder<TEntry> orderBy, CancellationToken cancellationToken = default)
+    public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex pageIndex, IEnumerable<IncludeClause<TEntry>> includedProperties, IOrderSpecification<TEntry> orderBy, CancellationToken cancellationToken = default)
     {
         IContainer<TEntry> entries = Context.Set<TEntry>();
         int total = await entries.CountAsync(cancellationToken)
@@ -68,7 +63,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     private static int ComputeSkipCount(PageIndex index, PageSize pageSize) => index == 1 ? 0 : ( index - 1 ) * pageSize;
 
     /// <inheritdoc/>
-    public virtual async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TResult> orderBy, CancellationToken cancellationToken = default)
+    public virtual async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrderSpecification<TResult> orderBy, CancellationToken cancellationToken = default)
     {
         IContainer<TEntry> entries = Context.Set<TEntry>();
         int total = await entries.CountAsync(cancellationToken)
@@ -91,7 +86,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public virtual async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrder<TEntry> orderBy, CancellationToken cancellationToken = default)
+    public virtual async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrderSpecification<TEntry> orderBy, CancellationToken cancellationToken = default)
     {
         IContainer<TEntry> entries = Context.Set<TEntry>();
         IQueryable<TEntry> resultQuery = entries;
@@ -166,7 +161,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
 
     /// <inheritdoc/>
     public virtual async Task<IEnumerable<TEntry>> Where(Expression<Func<TEntry, bool>> predicate,
-                                                         IOrder<TEntry> orderBy = null,
+                                                         IOrderSpecification<TEntry> orderBy = null,
                                                          IEnumerable<IncludeClause<TEntry>> includedProperties = null,
                                                          CancellationToken cancellationToken = default)
         => await Where(item => item, predicate, orderBy, includedProperties, cancellationToken)
@@ -175,7 +170,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     /// <inheritdoc/>
     public virtual async Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                                    Expression<Func<TEntry, bool>> predicate,
-                                                                   IOrder<TResult> orderBy = null,
+                                                                   IOrderSpecification<TResult> orderBy = null,
                                                                    IEnumerable<IncludeClause<TEntry>> includedProperties = null,
                                                                    CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>()
@@ -189,7 +184,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     /// <inheritdoc/>
     public virtual async Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                                    Expression<Func<TResult, bool>> predicate,
-                                                                   IOrder<TResult> orderBy = null,
+                                                                   IOrderSpecification<TResult> orderBy = null,
                                                                    CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>()
                .Select(selector)
@@ -199,7 +194,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
                .ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<Page<TEntry>> Where(Expression<Func<TEntry, bool>> predicate, IOrder<TEntry> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default)
+    public virtual async Task<Page<TEntry>> Where(Expression<Func<TEntry, bool>> predicate, IOrderSpecification<TEntry> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default)
     {
         if (orderBy is null)
         {
@@ -221,7 +216,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     public virtual async Task<Page<TResult>> Where<TResult>(
         Expression<Func<TEntry, TResult>> selector,
         Expression<Func<TEntry, bool>> predicate,
-        IOrder<TResult> orderBy,
+        IOrderSpecification<TResult> orderBy,
         PageSize pageSize,
         PageIndex pageIndex,
         CancellationToken cancellationToken = default)
@@ -230,7 +225,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
         {
             throw new ArgumentNullException(nameof(orderBy), $"{nameof(orderBy)} expression must be set");
         }
-        IOrderedQueryable<TResult> query = Context.Set<TEntry>()
+        IQueryable<TResult> query = Context.Set<TEntry>()
             .Where(predicate)
             .Select(selector)
             .OrderBy(orderBy);
@@ -238,7 +233,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
         IQueryable<TResult> results = query.Skip(ComputeSkipCount(pageIndex, pageSize))
             .Take(pageSize);
 
-        //we compute both Task
+        //we compute both values
         IReadOnlyList<TResult> result = await results.ToArrayAsync(cancellationToken).ConfigureAwait(false);
         int total = await Count(predicate, cancellationToken).ConfigureAwait(false);
 
@@ -248,7 +243,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     /// <inheritdoc/>
     public virtual async Task<Page<TResult>> Where<TResult>(Expression<Func<TEntry, TResult>> selector,
                                                             Expression<Func<TResult, bool>> predicate,
-                                                            IOrder<TResult> orderBy,
+                                                            IOrderSpecification<TResult> orderBy,
                                                             PageSize pageSize,
                                                             PageIndex pageIndex,
                                                             CancellationToken cancellationToken = default)
@@ -458,7 +453,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, IOrder<TResult> orderBy, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TResult, bool>> predicate, IOrderSpecification<TResult> orderBy, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         return Context.Set<TEntry>()
@@ -469,7 +464,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, IOrder<TResult> orderBy, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, Expression<Func<TEntry, bool>> predicate, IOrderSpecification<TResult> orderBy, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         return Context.Set<TEntry>()

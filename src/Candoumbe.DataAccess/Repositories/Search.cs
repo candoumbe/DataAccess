@@ -1,6 +1,6 @@
-﻿namespace Candoumbe.DataAccess.Repositories;
+﻿using Candoumbe.DataAccess.Abstractions;
 
-using DataFilters;
+namespace Candoumbe.DataAccess.Repositories;
 
 /// <summary>
 /// Wraps criteria to search elements
@@ -11,10 +11,10 @@ public class Search<T> where T : class
     /// <summary>
     /// Filter to apply
     /// </summary>
-    public IFilter Filter { get; set; }
+    public IFilterSpecification<T> Filter { get; set; }
 
     /// <summary>
-    /// <see cref="IOrder{T}"/> that can be applied to the result of the search.
+    /// <see cref="IOrderSpecification{T}"/> that can be applied to the result of the search.
     /// </summary>
-    public IOrder<T> Order { get; set; }
+    public IOrderSpecification<T> Order { get; set; }
 }

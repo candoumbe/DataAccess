@@ -27,6 +27,7 @@
     </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Candoumbe.DataAccess.Abstractions\Candoumbe.DataAccess.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\Candoumbe.DataAccess.EFCore\Candoumbe.DataAccess.EFStore.csproj" />
   </ItemGroup>
 

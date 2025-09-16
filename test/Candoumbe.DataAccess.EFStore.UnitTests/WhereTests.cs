@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Candoumbe.DataAccess.Abstractions;
 using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
 using Candoumbe.DataAccess.Repositories;
-using DataFilters;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -34,7 +34,7 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
                 (Expression<Func<Hero, bool>>)( hero => hero.Name == "Superman" ),
                 PageSize.From(10),
                 PageIndex.From(1),
-                new Order<Hero>(nameof(Hero.Name)),
+                new SingleOrderSpecification<Hero>(h => h.Name),
                 (Expression<Func<Page<Hero>, bool>>)( page => page.Count == 1
                                                               && page.Size == 10
                                                               && page.Total == 0
@@ -54,13 +54,13 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
                     (Expression<Func<Hero, bool>>)( h => h.Id == hero.Id ),
                     PageSize.From(10),
                     PageIndex.From(1),
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     (Expression<Func<Page<Hero>, bool>>)( page => page.Count == 1
                                                                   && page.Size == PageSize.From(10)
                                                                   && page.Total == 1
                                                                   && page.Entries.Once()
                                                                   && page.Entries.Once(h => h.Id == hero.Id
-                                                                      && h.Acolytes.Exactly(0)) )
+                                                                                            && h.Acolytes.Exactly(0)) )
                 };
             }
 
@@ -86,7 +86,7 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
                         h.Id == batman.Id || h.Id == greenArrow.Id || h.Id == wonderWoman.Id ),
                     PageSize.From(10),
                     PageIndex.From(1),
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     (Expression<Func<Page<Hero>, bool>>)( page => page.Count == 1
                                                                   && page.Size == PageSize.From(10)
                                                                   && page.Total == 3
@@ -107,13 +107,13 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
                     (Expression<Func<Hero, bool>>)( h => h.Id == batman.Id ),
                     PageSize.One,
                     PageIndex.From(1),
-                    new Order<Hero>(nameof(Hero.Name)),
+                    new SingleOrderSpecification<Hero>(h => h.Name),
                     (Expression<Func<Page<Hero>, bool>>)( page => page.Count == 1
                                                                   && page.Size == PageSize.One
                                                                   && page.Total == 1
                                                                   && page.Entries.Once()
                                                                   && page.Entries.Once(h =>
-                                                                      h.Id == batman.Id && h.Acolytes.Exactly(0)) )
+                                                                                           h.Id == batman.Id && h.Acolytes.Exactly(0)) )
                 };
 
                 yield return new object[]
@@ -122,13 +122,13 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
                     (Expression<Func<Hero, bool>>)( h => h.Id == batman.Id || h.Id == greenArrow.Id ),
                     PageSize.One,
                     PageIndex.From(2),
-                    new Order<Hero>(nameof(Hero.Name), OrderDirection.Descending),
+                    new SingleOrderSpecification<Hero>(h => h.Name, OrderDirection.Descending),
                     (Expression<Func<Page<Hero>, bool>>)( page => page.Count == 2
                                                                   && page.Size == PageSize.One
                                                                   && page.Total == 2
                                                                   && page.Entries.Once()
                                                                   && page.Entries.Once(h =>
-                                                                      h.Id == batman.Id && h.Acolytes.Exactly(0)) )
+                                                                                           h.Id == batman.Id && h.Acolytes.Exactly(0)) )
                 };
             }
         }
@@ -142,7 +142,7 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
             Expression<Func<Hero, bool>> predicate,
             PageSize pageSize,
             PageIndex pageIndex,
-            IOrder<Hero> orderBy,
+            IOrderSpecification<Hero> orderBy,
             Expression<Func<Page<Hero>, bool>> pageExpectation)
     {
         // Arrange

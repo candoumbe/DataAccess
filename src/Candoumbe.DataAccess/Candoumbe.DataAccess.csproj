@@ -10,8 +10,12 @@
 
   
   <ItemGroup>
-    <PackageReference Include="Datafilters.Expressions" Version="0.12.0" />
     <PackageReference Include="NodaTime" Version="3.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.14" />
+  </ItemGroup>
+
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Candoumbe.DataAccess.Abstractions\Candoumbe.DataAccess.Abstractions.csproj" />
   </ItemGroup>
 </Project>

@@ -1,10 +1,9 @@
 ﻿namespace Candoumbe.DataAccess.EFStore.UnitTests.Entities;
 
-using Optional.Collections;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Optional.Collections;
 
 public class Acolyte
 {
