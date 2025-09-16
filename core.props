@@ -37,17 +37,14 @@
   </Choose>
 
   <ItemGroup>
-    <PackageReference Include="Optional" />
-    <PackageReference Include="Candoumbe.MiscUtilities" />
     <PackageReference Include="Roslynator.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' != 'netstandard1.3'">
-    <PackageReference Include="Ardalis.GuardClauses" />
-  </ItemGroup>
   <ItemGroup Condition="'$(IsTestProject)' == 'false' and '$(MSBuildProjectName)' != '_build'">
+    <PackageReference Include="Optional" />
+    <PackageReference Include="Candoumbe.MiscUtilities" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>
