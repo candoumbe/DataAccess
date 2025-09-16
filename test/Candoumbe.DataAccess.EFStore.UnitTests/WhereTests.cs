@@ -31,7 +31,7 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
             yield return new object[]
             {
                 Enumerable.Empty<Hero>(),
-                (Expression<Func<Hero, bool>>)( hero => hero.Name == "Superman" ),
+                new FilterSpecification<Hero>( hero => hero.Name == "Superman" ),
                 PageSize.From(10),
                 PageIndex.From(1),
                 new SingleOrderSpecification<Hero>(h => h.Name),
@@ -51,7 +51,7 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
                 yield return new object[]
                 {
                     new[] { hero },
-                    (Expression<Func<Hero, bool>>)( h => h.Id == hero.Id ),
+                    new FilterSpecification<Hero>( h => h.Id == hero.Id ),
                     PageSize.From(10),
                     PageIndex.From(1),
                     new SingleOrderSpecification<Hero>(h => h.Name),
@@ -82,8 +82,9 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
                 yield return new object[]
                 {
                     new[] { batman, greenArrow, wonderWoman },
-                    (Expression<Func<Hero, bool>>)( h =>
-                        h.Id == batman.Id || h.Id == greenArrow.Id || h.Id == wonderWoman.Id ),
+                    new FilterSpecification<Hero>( h => h.Id == batman.Id
+                                                        || h.Id == greenArrow.Id
+                                                        || h.Id == wonderWoman.Id ),
                     PageSize.From(10),
                     PageIndex.From(1),
                     new SingleOrderSpecification<Hero>(h => h.Name),
@@ -104,7 +105,7 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
                 yield return new object[]
                 {
                     new[] { batman, greenArrow, wonderWoman },
-                    (Expression<Func<Hero, bool>>)( h => h.Id == batman.Id ),
+                    new FilterSpecification<Hero>( h => h.Id == batman.Id ),
                     PageSize.One,
                     PageIndex.From(1),
                     new SingleOrderSpecification<Hero>(h => h.Name),
@@ -119,7 +120,8 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
                 yield return new object[]
                 {
                     new[] { batman, greenArrow, wonderWoman },
-                    (Expression<Func<Hero, bool>>)( h => h.Id == batman.Id || h.Id == greenArrow.Id ),
+                    new OrFilterSpecification<Hero>( left: new FilterSpecification<Hero>(h => h.Id == batman.Id),
+                                                    right: new FilterSpecification<Hero>(h => h.Id == greenArrow.Id)),
                     PageSize.One,
                     PageIndex.From(2),
                     new SingleOrderSpecification<Hero>(h => h.Name, OrderDirection.Descending),
@@ -127,8 +129,7 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
                                                                   && page.Size == PageSize.One
                                                                   && page.Total == 2
                                                                   && page.Entries.Once()
-                                                                  && page.Entries.Once(h =>
-                                                                                           h.Id == batman.Id && h.Acolytes.Exactly(0)) )
+                                                                  && page.Entries.Once(h => h.Id == batman.Id && h.Acolytes.Exactly(0)) )
                 };
             }
         }
@@ -139,7 +140,7 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
     public async Task
         Given_hero_exists_and_has_an_acolyte_When_calling_Where_without_including_acolytes_Then_result_should_not_have_acolyte(
             IEnumerable<Hero> heroes,
-            Expression<Func<Hero, bool>> predicate,
+            IFilterSpecification<Hero> predicate,
             PageSize pageSize,
             PageIndex pageIndex,
             IOrderSpecification<Hero> orderBy,
@@ -157,7 +158,7 @@ public class WhereTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
             new EntityFrameworkRepository<Hero, SqliteStore>(context);
 
         // Act
-        Page<Hero> page = await repository.Where(predicate: predicate,
+        Page<Hero> page = await repository.Where(predicate,
             orderBy: orderBy,
             pageSize: pageSize,
             page: pageIndex);

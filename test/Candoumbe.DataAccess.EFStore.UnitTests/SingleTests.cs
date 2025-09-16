@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Candoumbe.DataAccess.Abstractions;
 using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
 using Candoumbe.DataAccess.Repositories;
 using FluentAssertions;
@@ -34,8 +35,10 @@ public class SingleTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sql
         SqliteStore context = new SqliteStore(optionsBuilder.Options);
         EntityFrameworkRepository<Hero, SqliteStore> repository = new EntityFrameworkRepository<Hero, SqliteStore>(context);
 
+        FilterSpecification<Hero> filter = new(x => x.Id == hero.Id);
+
         // Act
-        Hero actual = await repository.Single(x => x.Id == hero.Id, default);
+        Hero actual = await repository.Single(filter);
 
         // Assert
         actual.Acolytes.Should()
@@ -59,15 +62,15 @@ public class SingleTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sql
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
         SqliteStore context = new SqliteStore(optionsBuilder.Options);
         EntityFrameworkRepository<Hero, SqliteStore> repository = new EntityFrameworkRepository<Hero, SqliteStore>(context);
+        FilterSpecification<Hero> filter = new(x => x.Id == hero.Id);
 
         // Act
-        Hero actual = await repository.Single(x => x.Id == hero.Id,
-            new[] { IncludeClause<Hero>.Create(x => x.Acolytes.Where(item => item.Name == acolyte.Name)) },
-            default);
+        Hero actual = await repository.Single(filter,
+                                              [IncludeClause<Hero>.Create(x => x.Acolytes.Where(item => item.Name == acolyte.Name))]);
 
         // Assert
         actual.Acolytes.Should()
-            .HaveSameCount(hero.Acolytes, $"'{nameof(Hero.Acolytes)}' was explicitely included").And
+            .HaveSameCount(hero.Acolytes, $"'{nameof(Hero.Acolytes)}' was explicitly included").And
             .OnlyContain(acolyteActual => acolyteActual.Name == acolyte.Name);
     }
 }

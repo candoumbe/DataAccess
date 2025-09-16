@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Candoumbe.DataAccess.Abstractions;
 using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
 using Candoumbe.DataAccess.Repositories;
 using FluentAssertions;
@@ -23,21 +25,22 @@ public class FirstOrDefaultTests : EntityFrameworkRepositoryTestsBase, IClassFix
     public async Task Given_hero_exists_and_has_an_acolyte_When_calling_FirstOrDefaultAsync_without_including_acolytes_Then_result_should_not_have_acolyte()
     {
         // Arrange
-        Hero hero = new Hero(Guid.NewGuid(), Faker.Person.FullName);
-        Acolyte acolyte = new Acolyte(Guid.NewGuid(), Faker.Person.FullName);
+        Hero hero = new(Guid.NewGuid(), Faker.Person.FullName);
+        Acolyte acolyte = new(Guid.NewGuid(), Faker.Person.FullName);
 
         hero.Enrolls(acolyte);
 
         SqliteStore.Heroes.Add(hero);
         await SqliteStore.SaveChangesAsync();
 
-        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new DbContextOptionsBuilder<SqliteStore>();
+        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new();
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-        SqliteStore context = new SqliteStore(optionsBuilder.Options);
-        EntityFrameworkRepository<Hero, SqliteStore> repository = new EntityFrameworkRepository<Hero, SqliteStore>(context);
+        SqliteStore context = new(optionsBuilder.Options);
+        EntityFrameworkRepository<Hero, SqliteStore> repository = new(context);
+        FilterSpecification<Hero> expression = new(x => x.Id == hero.Id);
 
         // Act
-        Option<Hero> maybeHero = await repository.FirstOrDefault(x => x.Id == hero.Id, cancellationToken: default);
+        Option<Hero> maybeHero = await repository.FirstOrDefault(expression);
 
         // Assert
         maybeHero.Match(
@@ -55,24 +58,24 @@ public class FirstOrDefaultTests : EntityFrameworkRepositoryTestsBase, IClassFix
     public async Task Given_hero_exists_and_has_an_acolyte_When_calling_FirstOrDefaultAsync_with_including_acolytes_Then_result_should_not_have_acolyte()
     {
         // Arrange
-        Hero hero = new Hero(Guid.NewGuid(), Faker.Person.FullName);
-        Acolyte acolyte = new Acolyte(Guid.NewGuid(), Faker.Person.FullName);
-        Weapon weapon = new Weapon(Guid.NewGuid(), "Bow", 1);
+        Hero hero = new(Guid.NewGuid(), Faker.Person.FullName);
+        Acolyte acolyte = new(Guid.NewGuid(), Faker.Person.FullName);
+        Weapon weapon = new(Guid.NewGuid(), "Bow", 1);
         acolyte.Take(weapon);
         hero.Enrolls(acolyte);
 
         SqliteStore.Heroes.Add(hero);
         await SqliteStore.SaveChangesAsync();
 
-        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new DbContextOptionsBuilder<SqliteStore>();
+        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new();
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-        SqliteStore context = new SqliteStore(optionsBuilder.Options);
-        EntityFrameworkRepository<Hero, SqliteStore> repository = new EntityFrameworkRepository<Hero, SqliteStore>(context);
+        SqliteStore context = new(optionsBuilder.Options);
+        EntityFrameworkRepository<Hero, SqliteStore> repository = new(context);
+        FilterSpecification<Hero> predicate = new(x => x.Id == hero.Id);
 
         // Act
-        Option<Hero> maybeHero = await repository.FirstOrDefault(x => x.Id == hero.Id,
-            new[] { IncludeClause<Hero>.Create(x => x.Acolytes.Where(item => item.Name == acolyte.Name)) },
-            default);
+        Option<Hero> maybeHero = await repository.FirstOrDefault(predicate,
+                                                                 [IncludeClause<Hero>.Create(x => x.Acolytes.Where(item => item.Name == acolyte.Name))]);
 
         // Assert
         maybeHero.Match(

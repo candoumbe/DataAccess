@@ -300,8 +300,7 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
     }
 
     [Fact]
-    public async Task
-        Given_hero_exists_and_has_an_acolyte_When_calling_ReadPageAsync_with_including_acolytes_Then_result_should_not_have_acolyte()
+    public async Task Given_hero_exists_and_has_an_acolyte_When_calling_ReadPageAsync_with_including_acolytes_Then_result_should_not_have_acolyte()
     {
         // Arrange
         PageSize pageSize = PageSize.From(10);
@@ -330,10 +329,9 @@ public class ReadPageTests(SqliteDatabaseFixture databaseFixture, ITestOutputHel
         page.Count.Should().Be(1);
         page.Size.Value.Should().Be(pageSize);
         page.Entries.Should()
-            .HaveCount(1).And
-            .Contain(item => item.Id == hero.Id)
-            .Which
-            .Acolytes.Should()
+            .HaveCount(1)
+            .And.Contain(item => item.Id == hero.Id)
+            .Which.Acolytes.Should()
             .HaveSameCount(hero.Acolytes).And
             .Contain(ac => ac.Id == acolyte.Id);
     }

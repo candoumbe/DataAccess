@@ -46,9 +46,9 @@ public class EntityFrameworkRepository<TEntry, TContext> : RepositoryBase<TEntry
     }
 
     /// <inheritdoc/>
-    public override async Task Delete(Expression<Func<TEntry, bool>> predicate, CancellationToken cancellationToken = default)
+    public override async Task Delete(IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
     {
-        IAsyncEnumerable<TEntry> entries = Context.Set<TEntry>().Where(predicate).AsAsyncEnumerable();
+        IAsyncEnumerable<TEntry> entries = Context.Set<TEntry>().Where(predicate.Filter).AsAsyncEnumerable();
         await foreach (TEntry item in entries.WithCancellation(cancellationToken))
         {
             ((TContext)Context).Set<TEntry>().Remove(item);

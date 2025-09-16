@@ -6,10 +6,7 @@ using Bogus;
 using Candoumbe.DataAccess.Abstractions;
 using Candoumbe.DataAccess.Repositories;
 using FluentAssertions;
-using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
-using Raven.Client.ServerWide;
-using Raven.Client.ServerWide.Operations;
 using Xunit;
 using Xunit.Categories;
 
@@ -50,9 +47,10 @@ public class FirstTests(RavenDbDatabaseFixture fixture) : IClassFixture<RavenDbD
         }
 
         IRepository<Hero> repository = new RavenDbRepository<Hero>(_session);
+        FilterSpecification<Hero> predicate = new(x => x.Id == hero.Id);
 
         // Act
-        Hero actual = await repository.First(predicate: x => x.Id == hero.Id, cancellationToken: CancellationToken.None);
+        Hero actual = await repository.First(predicate, cancellationToken: CancellationToken.None);
 
         // Assert
         actual.Acolytes.Should()
@@ -76,9 +74,10 @@ public class FirstTests(RavenDbDatabaseFixture fixture) : IClassFixture<RavenDbD
         }
 
         RavenDbRepository<Hero> repository = new(_session);
+        FilterSpecification<Hero> predicate = new(x => x.Id == hero.Id);
 
         // Act
-        Hero actual = await repository.First(predicate: x => x.Id == hero.Id,
+        Hero actual = await repository.First(predicate,
                                              includedProperties: [ IncludeClause<Hero>.Create(x => x.Acolytes.Select(item => item.Id)) ]);
 
         // Assert
@@ -104,9 +103,11 @@ public class FirstTests(RavenDbDatabaseFixture fixture) : IClassFixture<RavenDbD
         }
 
         RavenDbRepository<Hero> repository = new(_session);
+        FilterSpecification<Hero> predicate = new(x => x.Id == hero.Id);
 
         // Act
-        string actual = await repository.First(predicate: x => x.Id == hero.Id, selector: x => x.Name, cancellationToken: CancellationToken.None);
+        string actual = await repository.First(selector: x => x.Name,
+                                               predicate);
 
         // Assert
         actual.Should().Be(acolyte.Name);

@@ -25,9 +25,7 @@ public class SearchTests
         public Henchman Henchman { get; set; }
     }
 
-    public class Henchman : SuperHero
-    {
-    }
+    public class Henchman : SuperHero;
 
     /// <summary>
     /// Constructor builds a valid instance

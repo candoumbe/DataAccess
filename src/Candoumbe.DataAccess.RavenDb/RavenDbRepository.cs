@@ -31,18 +31,18 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
     }
 
     /// <inheritdoc/>
-    public async Task<bool> All(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+    public async Task<bool> All(IFilterSpecification<T> predicate, CancellationToken cancellationToken = default)
     {
-        var negated = Expression.Lambda<Func<T, bool>>(Expression.Not(predicate.Body), predicate.Parameters);
+        Expression<Func<T, bool>> negated = Expression.Lambda<Func<T, bool>>(Expression.Not(predicate.Filter.Body), predicate.Filter.Parameters);
         bool anyNegated = await _session.Query<T>().Where(negated).AnyAsync(cancellationToken).ConfigureAwait(false);
         return !anyNegated;
     }
 
     /// <inheritdoc/>
     public async Task<bool> All<TResult>(Expression<Func<T, TResult>> selector,
-        Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default)
+        IFilterSpecification<TResult> predicate, CancellationToken cancellationToken = default)
     {
-        var negated = Expression.Lambda<Func<TResult, bool>>(Expression.Not(predicate.Body), predicate.Parameters);
+        Expression<Func<TResult, bool>> negated = Expression.Lambda<Func<TResult, bool>>(Expression.Not(predicate.Filter.Body), predicate.Filter.Parameters);
         bool anyNegated = await _session.Query<T>()
             .Select(selector)
             .Where(negated)
@@ -52,8 +52,11 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
     }
 
     /// <inheritdoc/>
-    public virtual async Task<Page<T>> ReadPage(PageSize pageSize, PageIndex pageIndex,
-        IEnumerable<IncludeClause<T>> includedProperties, IOrderSpecification<T> orderBy, CancellationToken ct = default)
+    public virtual async Task<Page<T>> ReadPage(PageSize pageSize,
+                                                PageIndex pageIndex,
+                                                IEnumerable<IncludeClause<T>> includedProperties,
+                                                IOrderSpecification<T> orderBy,
+                                                CancellationToken ct = default)
     {
         IRavenQueryable<T> entries = _session.Query<T>();
         int total = await entries.CountAsync(ct)
@@ -80,7 +83,7 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
         => await _session.Query<T>().AnyAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public Task<bool> Any(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) =>
+    public Task<bool> Any(IFilterSpecification<T> predicate, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException();
 
     /// <inheritdoc/>
@@ -103,8 +106,8 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
     /// <param name="predicate"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<int> Count(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
-        => await _session.Query<T>().CountAsync(predicate, cancellationToken).ConfigureAwait(false);
+    public async Task<int> Count(IFilterSpecification<T> predicate, CancellationToken cancellationToken = default)
+        => await _session.Query<T>().CountAsync(predicate.Filter, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
     public async Task<T> Create(T entry, CancellationToken cancellationToken = default)
@@ -122,7 +125,7 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
     }
 
     /// <inheritdoc/>
-    public async Task Delete(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+    public async Task Delete(IFilterSpecification<T> predicate, CancellationToken ct = default)
     {
         IAsyncEnumerable<T> entriesToDelete = Stream(predicate, ct);
 
@@ -144,16 +147,16 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
             .FirstAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public async Task<T> First(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties,
+    public async Task<T> First(IFilterSpecification<T> predicate, IEnumerable<IncludeClause<T>> includedProperties,
         CancellationToken cancellationToken = default)
         => await _session.Query<T>()
-            .FirstAsync(predicate, cancellationToken).ConfigureAwait(false);
+            .FirstAsync(predicate.Filter, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
     public async Task<TResult> First<TResult>(Expression<Func<T, TResult>> selector,
-        Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        IFilterSpecification<T> predicate, CancellationToken cancellationToken = default)
         => await _session.Query<T>()
-            .Where(predicate)
+            .Where(predicate.Filter)
             .Select(selector)
             .FirstAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -164,18 +167,18 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
         => ( await _session.Query<T>().FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false) ).SomeNotNull();
 
     /// <inheritdoc/>
-    public Task<Option<T>> FirstOrDefault(Expression<Func<T, bool>> predicate,
+    public Task<Option<T>> FirstOrDefault(IFilterSpecification<T> predicate,
         CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
 
     /// <inheritdoc/>
-    public Task<Option<T>> FirstOrDefault(Expression<Func<T, bool>> predicate,
+    public Task<Option<T>> FirstOrDefault(IFilterSpecification<T> predicate,
         IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
 
     /// <inheritdoc/>
     public Task<Option<TResult>> FirstOrDefault<TResult>(Expression<Func<T, TResult>> selector,
-        Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) =>
+        IFilterSpecification<T> predicate, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException();
 
     /// <inheritdoc/>
@@ -207,15 +210,15 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
     public Task<T> Single(CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <inheritdoc/>
-    public Task<T> Single(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) =>
+    public Task<T> Single(IFilterSpecification<T> predicate, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException();
 
     /// <inheritdoc/>
-    public Task<T> Single(Expression<Func<T, bool>> predicate, IEnumerable<IncludeClause<T>> includedProperties,
+    public Task<T> Single(IFilterSpecification<T> predicate, IEnumerable<IncludeClause<T>> includedProperties,
         CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <inheritdoc/>
-    public Task<TResult> Single<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>> predicate,
+    public Task<TResult> Single<TResult>(Expression<Func<T, TResult>> selector, IFilterSpecification<T> predicate,
         CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <inheritdoc/>
@@ -227,77 +230,84 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
         CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <inheritdoc/>
-    public Task<Option<T>> SingleOrDefault(Expression<Func<T, bool>> predicate,
+    public Task<Option<T>> SingleOrDefault(IFilterSpecification<T> predicate,
         CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <inheritdoc/>
-    public Task<Option<T>> SingleOrDefault(Expression<Func<T, bool>> predicate,
+    public Task<Option<T>> SingleOrDefault(IFilterSpecification<T> predicate,
         IEnumerable<IncludeClause<T>> includedProperties, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException();
 
     /// <inheritdoc/>
     public Task<Option<TResult>> SingleOrDefault<TResult>(Expression<Func<T, TResult>> selector,
-        Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) =>
+        IFilterSpecification<T> predicate, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException();
 
     /// <inheritdoc/>
     public Task<Option<TResult>> SingleOrDefault<TResult>(Expression<Func<T, TResult>> selector,
-        Expression<Func<TResult, bool>> predicate, CancellationToken cancellationToken = default) =>
+        IFilterSpecification<TResult> predicate, CancellationToken cancellationToken = default) =>
         throw new NotImplementedException();
 
     /// <inheritdoc/>
-    public IAsyncEnumerable<T> Stream(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+    public IAsyncEnumerable<T> Stream(IFilterSpecification<T> predicate, CancellationToken ct = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
     public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<T, TResult>> selector,
-        Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        IFilterSpecification<T> predicate, CancellationToken ct = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public Task<IEnumerable<T>> Where(Expression<Func<T, bool>> predicate, CancellationToken ct = default) =>
+    public Task<IEnumerable<T>> Where(IFilterSpecification<T> predicate, CancellationToken ct = default) =>
         throw new NotImplementedException();
 
     /// <inheritdoc/>
     public Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector,
-        Expression<Func<T, bool>> predicate, CancellationToken ct = default) => throw new NotImplementedException();
+        IFilterSpecification<T> predicate, CancellationToken ct = default) => throw new NotImplementedException();
 
     /// <inheritdoc/>
-    public Task<IEnumerable<TResult>> Where<TKey, TResult>(Expression<Func<T, bool>> predicate,
+    public Task<IEnumerable<TResult>> Where<TKey, TResult>(IFilterSpecification<T> predicate,
         Expression<Func<T, TKey>> keySelector, Expression<Func<IGrouping<TKey, T>, TResult>> groupSelector,
         CancellationToken ct = default) => throw new NotImplementedException();
 
     /// <inheritdoc/>
-    public Task<IEnumerable<T>> Where(Expression<Func<T, bool>> predicate, IOrderSpecification<T> orderBy = null,
+    public Task<IEnumerable<T>> Where(IFilterSpecification<T> predicate, IOrderSpecification<T> orderBy = null,
         IEnumerable<IncludeClause<T>> includedProperties = null, CancellationToken ct = default) =>
         throw new NotImplementedException();
 
     /// <inheritdoc/>
     public Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector,
-        Expression<Func<T, bool>> predicate, IOrderSpecification<TResult> orderBy = null,
+        IFilterSpecification<T> predicate, IOrderSpecification<TResult> orderBy = null,
         IEnumerable<IncludeClause<T>> includedProperties = null, CancellationToken ct = default) =>
         throw new NotImplementedException();
 
     /// <inheritdoc/>
     public Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector,
-        Expression<Func<TResult, bool>> predicate, IOrderSpecification<TResult> orderBy = null,
+                                                     IFilterSpecification<TResult> predicate,
+                                                     IOrderSpecification<TResult> orderBy = null,
         CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <inheritdoc/>
-    public Task<Page<T>> Where(Expression<Func<T, bool>> predicate, IOrderSpecification<T> orderBy, PageSize pageSize,
+    public Task<Page<T>> Where(IFilterSpecification<T> predicate, IOrderSpecification<T> orderBy, PageSize pageSize,
         PageIndex page, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <inheritdoc/>
     public Task<Page<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector,
-        Expression<Func<T, bool>> predicate, IOrderSpecification<TResult> orderBy, PageSize pageSize, PageIndex pageIndex,
+                                              IFilterSpecification<T> predicate,
+                                              IOrderSpecification<TResult> orderBy,
+                                              PageSize pageSize,
+                                              PageIndex pageIndex,
         CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <inheritdoc/>
     public Task<Page<TResult>> Where<TResult>(Expression<Func<T, TResult>> selector,
-        Expression<Func<TResult, bool>> predicate, IOrderSpecification<TResult> orderBy, PageSize pageSize, PageIndex pageIndex,
+                                              IFilterSpecification<TResult> predicate,
+                                              IOrderSpecification<TResult> orderBy,
+                                              PageSize pageSize,
+                                              PageIndex pageIndex,
         CancellationToken cancellationToken = default) => throw new NotImplementedException();
 }

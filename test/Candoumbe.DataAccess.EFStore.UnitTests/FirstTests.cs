@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Candoumbe.DataAccess.Abstractions;
 using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
 using Candoumbe.DataAccess.Repositories;
 using FluentAssertions;
@@ -11,12 +12,8 @@ using Xunit.Categories;
 namespace Candoumbe.DataAccess.EFStore.UnitTests;
 
 [UnitTest]
-public class FirstTests : EntityFrameworkRepositoryTestsBase, IClassFixture<SqliteDatabaseFixture>
+public class FirstTests(SqliteDatabaseFixture databaseFixture) : EntityFrameworkRepositoryTestsBase(databaseFixture), IClassFixture<SqliteDatabaseFixture>
 {
-    public FirstTests(SqliteDatabaseFixture databaseFixture) : base(databaseFixture)
-    {
-    }
-
     [Fact]
     public async Task Given_hero_exists_and_has_an_acolyte_When_calling_First_without_including_acolytes_Then_result_should_not_have_acolyte()
     {
@@ -33,9 +30,10 @@ public class FirstTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
         SqliteStore context = new SqliteStore(optionsBuilder.Options);
         EntityFrameworkRepository<Hero, SqliteStore> repository = new EntityFrameworkRepository<Hero, SqliteStore>(context);
+        FilterSpecification<Hero> filter = new(x => x.Id == hero.Id);
 
         // Act
-        Hero actual = await repository.First(predicate: x => x.Id == hero.Id, cancellationToken: default);
+        Hero actual = await repository.First(filter);
 
         // Assert
         actual.Acolytes.Should()
@@ -59,11 +57,11 @@ public class FirstTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
         SqliteStore context = new SqliteStore(optionsBuilder.Options);
         EntityFrameworkRepository<Hero, SqliteStore> repository = new EntityFrameworkRepository<Hero, SqliteStore>(context);
+        FilterSpecification<Hero> predicate = new(x => x.Id == hero.Id);
 
         // Act
-        Hero actual = await repository.First(predicate: x => x.Id == hero.Id,
-            includedProperties: new[] { IncludeClause<Hero>.Create(x => x.Acolytes.Where(item => item.Name == acolyte.Name)) },
-            cancellationToken: default);
+        Hero actual = await repository.First(predicate,
+                                             includedProperties: [IncludeClause<Hero>.Create(x => x.Acolytes.Where(item => item.Name == acolyte.Name))]);
 
         // Assert
         actual.Acolytes.Should()
@@ -88,11 +86,11 @@ public class FirstTests : EntityFrameworkRepositoryTestsBase, IClassFixture<Sqli
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
         SqliteStore context = new SqliteStore(optionsBuilder.Options);
         EntityFrameworkRepository<Hero, SqliteStore> repository = new EntityFrameworkRepository<Hero, SqliteStore>(context);
+        FilterSpecification<Hero> predicate = new(x => x.Id == hero.Id);
 
         // Act
-        string actual = await repository.First(predicate: x => x.Id == hero.Id,
-            selector: x => x.Name,
-            cancellationToken: default);
+        string actual = await repository.First(selector: x => x.Name,
+                                               predicate);
 
         // Assert
         actual.Should().Be(acolyte.Name);
