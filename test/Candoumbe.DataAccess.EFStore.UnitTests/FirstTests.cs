@@ -18,18 +18,18 @@ public class FirstTests(SqliteDatabaseFixture databaseFixture) : EntityFramework
     public async Task Given_hero_exists_and_has_an_acolyte_When_calling_First_without_including_acolytes_Then_result_should_not_have_acolyte()
     {
         // Arrange
-        Hero hero = new Hero(Guid.NewGuid(), Faker.Person.FullName);
-        Acolyte acolyte = new Acolyte(Guid.NewGuid(), Faker.Person.FullName);
+        Hero hero = new(Guid.NewGuid(), Faker.Person.FullName);
+        Acolyte acolyte = new(Guid.NewGuid(), Faker.Person.FullName);
 
         hero.Enrolls(acolyte);
 
         SqliteStore.Heroes.Add(hero);
         await SqliteStore.SaveChangesAsync();
 
-        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new DbContextOptionsBuilder<SqliteStore>();
+        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new();
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-        SqliteStore context = new SqliteStore(optionsBuilder.Options);
-        EntityFrameworkRepository<Hero, SqliteStore> repository = new EntityFrameworkRepository<Hero, SqliteStore>(context);
+        SqliteStore context = new(optionsBuilder.Options);
+        EntityFrameworkRepository<Hero, SqliteStore> repository = new(context);
         FilterSpecification<Hero> filter = new(x => x.Id == hero.Id);
 
         // Act
@@ -44,19 +44,19 @@ public class FirstTests(SqliteDatabaseFixture databaseFixture) : EntityFramework
     public async Task Given_hero_exists_and_has_an_acolyte_When_calling_First_with_including_acolytes_Then_result_should_not_have_acolyte()
     {
         // Arrange
-        Hero hero = new Hero(Guid.NewGuid(), Faker.Person.FullName);
-        Acolyte acolyte = new Acolyte(Guid.NewGuid(), Faker.Person.FullName);
-        Weapon weapon = new Weapon(Guid.NewGuid(), "Bow", 1);
+        Hero hero = new(Guid.NewGuid(), Faker.Person.FullName);
+        Acolyte acolyte = new(Guid.NewGuid(), Faker.Person.FullName);
+        Weapon weapon = new(Guid.NewGuid(), "Bow", 1);
         acolyte.Take(weapon);
         hero.Enrolls(acolyte);
 
         SqliteStore.Heroes.Add(hero);
         await SqliteStore.SaveChangesAsync();
 
-        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new DbContextOptionsBuilder<SqliteStore>();
+        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new();
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-        SqliteStore context = new SqliteStore(optionsBuilder.Options);
-        EntityFrameworkRepository<Hero, SqliteStore> repository = new EntityFrameworkRepository<Hero, SqliteStore>(context);
+        SqliteStore context = new(optionsBuilder.Options);
+        EntityFrameworkRepository<Hero, SqliteStore> repository = new(context);
         FilterSpecification<Hero> predicate = new(x => x.Id == hero.Id);
 
         // Act
@@ -73,24 +73,25 @@ public class FirstTests(SqliteDatabaseFixture databaseFixture) : EntityFramework
     public async Task Given_hero_exists_and_has_an_acolyte_When_calling_First_with_selector_Then_result_match_expectation()
     {
         // Arrange
-        Hero hero = new Hero(Guid.NewGuid(), Faker.Person.FullName);
-        Acolyte acolyte = new Acolyte(Guid.NewGuid(), Faker.Person.FullName);
-        Weapon weapon = new Weapon(Guid.NewGuid(), "Bow", 1);
+        Hero hero = new(Guid.NewGuid(), Faker.Person.FullName);
+        Acolyte acolyte = new(Guid.NewGuid(), Faker.Person.FullName);
+        Weapon weapon = new(Guid.NewGuid(), "Bow", 1);
         acolyte.Take(weapon);
         hero.Enrolls(acolyte);
 
         SqliteStore.Heroes.Add(hero);
         await SqliteStore.SaveChangesAsync();
 
-        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new DbContextOptionsBuilder<SqliteStore>();
+        DbContextOptionsBuilder<SqliteStore> optionsBuilder = new();
         optionsBuilder.UseSqlite(DatabaseFixture.Connection);
-        SqliteStore context = new SqliteStore(optionsBuilder.Options);
-        EntityFrameworkRepository<Hero, SqliteStore> repository = new EntityFrameworkRepository<Hero, SqliteStore>(context);
+        SqliteStore context = new(optionsBuilder.Options);
+        EntityFrameworkRepository<Hero, SqliteStore> repository = new(context);
+
         FilterSpecification<Hero> predicate = new(x => x.Id == hero.Id);
+        SelectSpecification<Hero, string> selector = new(x => x.Name);
 
         // Act
-        string actual = await repository.First(selector: x => x.Name,
-                                               predicate);
+        string actual = await repository.First(selector, predicate);
 
         // Assert
         actual.Should().Be(acolyte.Name);

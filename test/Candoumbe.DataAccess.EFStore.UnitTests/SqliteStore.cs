@@ -16,10 +16,16 @@ public class SqliteStore : DbContext, IStore
 
     public DbSet<Weapon> Weapons { get; set; }
 
-    public SqliteStore(DbContextOptions<SqliteStore> options) : base(options) { }
+    public IQueryable<T> Query<T>() where T : class => Set<T>();
 
-    ///<inheritdoc/>
-    public IContainer<T> Set<T>() where T : class => new EfContainer<T>(base.Set<T>());
+    /// <inheritdoc />
+    IContainer<T> IStore.Set<T>() => new EfContainer<T>(Set<T>());
+
+    /// <summary>
+    /// Builds a new instance of <see cref="SqliteStore"/>.
+    /// </summary>
+    /// <param name="options"></param>
+    public SqliteStore(DbContextOptions<SqliteStore> options) : base(options) { }
 
     ///<inheritdoc/>
     protected override void OnModelCreating(ModelBuilder modelBuilder)

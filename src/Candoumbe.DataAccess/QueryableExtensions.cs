@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using Candoumbe.DataAccess.Abstractions;
 using Candoumbe.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -47,4 +48,16 @@ public static class QueryableExtensions
             OrderDirection.Ascending => current.OrderBy(order.Expression),
             _                        => current.OrderByDescending(order.Expression)
         });
+
+    /// <summary>
+    /// Applies a projection to a queryable.
+    /// </summary>
+    /// <param name="entries"></param>
+    /// <param name="selector">The projection to apply</param>
+    /// <typeparam name="TFrom"></typeparam>
+    /// <typeparam name="TTo"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException">if <paramref name="selector"/> is <see langword="null"/></exception>
+    public static IQueryable<TTo> Select<TFrom, TTo>(this IQueryable<TFrom> entries, IProjectionSpecification<TFrom, TTo> selector)
+        => entries.Select(selector.Expression);
 }

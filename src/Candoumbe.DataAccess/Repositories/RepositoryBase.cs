@@ -37,11 +37,18 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     public virtual async Task Clear(CancellationToken cancellationToken = default) => await Delete(AlwaysTrueSpecification<TEntry>.Instance, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex pageIndex, IOrderSpecification<TEntry> orderBy, CancellationToken cancellationToken = default)
+    public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize,
+                                                     PageIndex pageIndex,
+                                                     IOrderSpecification<TEntry> orderBy,
+                                                     CancellationToken cancellationToken = default)
         => await ReadPage(pageSize, pageIndex, [], orderBy, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize, PageIndex pageIndex, IEnumerable<IncludeClause<TEntry>> includedProperties, IOrderSpecification<TEntry> orderBy, CancellationToken cancellationToken = default)
+    public virtual async Task<Page<TEntry>> ReadPage(PageSize pageSize,
+                                                     PageIndex pageIndex,
+                                                     IEnumerable<IncludeClause<TEntry>> includedProperties,
+                                                     IOrderSpecification<TEntry> orderBy,
+                                                     CancellationToken cancellationToken = default)
     {
         IContainer<TEntry> entries = Context.Set<TEntry>();
         int total = await entries.CountAsync(cancellationToken)
@@ -61,10 +68,15 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
         return pageOfResult;
     }
 
-    private static int ComputeSkipCount(PageIndex index, PageSize pageSize) => index == 1 ? 0 : ( index - 1 ) * pageSize;
+    private static int ComputeSkipCount(PageIndex index,
+                                        PageSize pageSize) => index == 1 ? 0 : ( index - 1 ) * pageSize;
 
     /// <inheritdoc/>
-    public virtual async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrderSpecification<TResult> orderBy, CancellationToken cancellationToken = default)
+    public virtual async Task<Page<TResult>> ReadPage<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                               PageSize pageSize,
+                                                               PageIndex page,
+                                                               IOrderSpecification<TResult> orderBy,
+                                                               CancellationToken cancellationToken = default)
     {
         IContainer<TEntry> entries = Context.Set<TEntry>();
         int total = await entries.CountAsync(cancellationToken)
@@ -87,7 +99,11 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public virtual async Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector, PageSize pageSize, PageIndex page, IOrderSpecification<TEntry> orderBy, CancellationToken cancellationToken = default)
+    public virtual async Task<Page<TResult>> ReadPage<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                               PageSize pageSize,
+                                                               PageIndex page,
+                                                               IOrderSpecification<TEntry> orderBy,
+                                                               CancellationToken cancellationToken = default)
     {
         IContainer<TEntry> entries = Context.Set<TEntry>();
         IQueryable<TEntry> resultQuery = entries;
@@ -120,15 +136,19 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public virtual async Task<IEnumerable<TResult>> ReadAll<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default)
+    public virtual async Task<IEnumerable<TResult>> ReadAll<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                                     CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>().Select(selector)
                .ToArrayAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<IEnumerable<TEntry>> ReadAll(CancellationToken cancellationToken = default) => await ReadAll(item => item, cancellationToken).ConfigureAwait(false);
+    public virtual async Task<IEnumerable<TEntry>> ReadAll(CancellationToken cancellationToken = default)
+        => await ReadAll(IdentityProjectionSpecification<TEntry>.Instance, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<TEntry, TResult>> selector, IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<IEnumerable<TResult>> Where<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                                   IFilterSpecification<TEntry> predicate,
+                                                                   CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>()
                .Where(predicate.Filter)
                .Select(selector)
@@ -157,19 +177,20 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public virtual async Task<IEnumerable<TEntry>> Where(IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
-        => await Where(item => item, predicate, cancellationToken).ConfigureAwait(false);
+    public virtual async Task<IEnumerable<TEntry>> Where(IFilterSpecification<TEntry> predicate,
+                                                         CancellationToken cancellationToken = default)
+        => await Where(IdentityProjectionSpecification<TEntry>.Instance, predicate, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
     public virtual async Task<IEnumerable<TEntry>> Where(IFilterSpecification<TEntry> predicate,
                                                          IOrderSpecification<TEntry> orderBy = null,
                                                          IEnumerable<IncludeClause<TEntry>> includedProperties = null,
                                                          CancellationToken cancellationToken = default)
-        => await Where(item => item, predicate, orderBy, includedProperties, cancellationToken)
+        => await Where(IdentityProjectionSpecification<TEntry>.Instance, predicate, orderBy, includedProperties, cancellationToken)
                .ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<TEntry, TResult>> selector,
+    public virtual async Task<IEnumerable<TResult>> Where<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                                                    IFilterSpecification<TEntry> predicate,
                                                                    IOrderSpecification<TResult> orderBy = null,
                                                                    IEnumerable<IncludeClause<TEntry>> includedProperties = null,
@@ -183,7 +204,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
                .ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<TEntry, TResult>> selector,
+    public virtual async Task<IEnumerable<TResult>> Where<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                                                    IFilterSpecification<TResult> predicate,
                                                                    IOrderSpecification<TResult> orderBy = null,
                                                                    CancellationToken cancellationToken = default)
@@ -195,7 +216,11 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
                .ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<Page<TEntry>> Where(IFilterSpecification<TEntry> predicate, IOrderSpecification<TEntry> orderBy, PageSize pageSize, PageIndex page, CancellationToken cancellationToken = default)
+    public virtual async Task<Page<TEntry>> Where(IFilterSpecification<TEntry> predicate,
+                                                  IOrderSpecification<TEntry> orderBy,
+                                                  PageSize pageSize,
+                                                  PageIndex page,
+                                                  CancellationToken cancellationToken = default)
     {
         if (orderBy is null)
         {
@@ -215,7 +240,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
 
     /// <inheritdoc/>
     public virtual async Task<Page<TResult>> Where<TResult>(
-        Expression<Func<TEntry, TResult>> selector,
+        IProjectionSpecification<TEntry, TResult> selector,
         IFilterSpecification<TEntry> predicate,
         IOrderSpecification<TResult> orderBy,
         PageSize pageSize,
@@ -242,7 +267,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public virtual async Task<Page<TResult>> Where<TResult>(Expression<Func<TEntry, TResult>> selector,
+    public virtual async Task<Page<TResult>> Where<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                                             IFilterSpecification<TResult> predicate,
                                                             IOrderSpecification<TResult> orderBy,
                                                             PageSize pageSize,
@@ -276,15 +301,18 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
         => await Context.Set<TEntry>().AnyAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<TResult> Max<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default)
-        => await Context.Set<TEntry>().MaxAsync(selector, cancellationToken).ConfigureAwait(false);
+    public virtual async Task<TResult> Max<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                    CancellationToken cancellationToken = default)
+        => await Context.Set<TEntry>().MaxAsync(selector.Expression, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<TResult> Min<TResult>(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default)
-        => await Context.Set<TEntry>().MinAsync(selector, cancellationToken).ConfigureAwait(false);
+    public virtual async Task<TResult> Min<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                    CancellationToken cancellationToken = default)
+        => await Context.Set<TEntry>().MinAsync(selector.Expression, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<bool> Any(IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> Any(IFilterSpecification<TEntry> predicate,
+                                        CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>().AnyAsync(predicate.Filter, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
@@ -292,7 +320,8 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
         => await Context.Set<TEntry>().CountAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<int> Count(IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<int> Count(IFilterSpecification<TEntry> predicate,
+                                         CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>().CountAsync(predicate.Filter, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
@@ -300,7 +329,8 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
         => await Context.Set<TEntry>().SingleAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<TEntry> Single(IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntry> Single(IFilterSpecification<TEntry> predicate,
+                                             CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>().SingleAsync(predicate.Filter, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
@@ -311,7 +341,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
                .ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<TResult> Single<TResult>(Expression<Func<TEntry, TResult>> selector,
+    public virtual async Task<TResult> Single<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                                        IFilterSpecification<TEntry> predicate,
                                                        CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>().Where(predicate.Filter).Select(selector)
@@ -325,7 +355,8 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
             .NoneWhen(result => result is null);
 
     /// <inheritdoc/>
-    public virtual async Task<Option<TEntry>> SingleOrDefault(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
+    public virtual async Task<Option<TEntry>> SingleOrDefault(IEnumerable<IncludeClause<TEntry>> includedProperties,
+                                                              CancellationToken cancellationToken = default)
         => (await Context.Set<TEntry>()
                 .Include(includedProperties)
                 .SingleOrDefaultAsync(cancellationToken)
@@ -333,10 +364,11 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
             .NoneWhen(result => result is null);
 
     /// <inheritdoc/>
-    public virtual async Task<Option<TEntry>> SingleOrDefault(IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<Option<TEntry>> SingleOrDefault(IFilterSpecification<TEntry> predicate,
+                                                              CancellationToken cancellationToken = default)
         => (await Context.Set<TEntry>().SingleOrDefaultAsync(predicate.Filter, cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => Equals(default, result));
+            .NoneWhen(result => result is null);
 
     /// <inheritdoc/>
     public virtual async Task<Option<TEntry>> SingleOrDefault(IFilterSpecification<TEntry> predicate,
@@ -346,47 +378,52 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
                 .Include(includedProperties)
                 .SingleOrDefaultAsync(predicate.Filter, cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => Equals(default, result));
+            .NoneWhen(result => result is null);
 
     /// <inheritdoc/>
-    public virtual async Task<Option<TResult>> SingleOrDefault<TResult>(Expression<Func<TEntry, TResult>> selector,
+    public virtual async Task<Option<TResult>> SingleOrDefault<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                                                         IFilterSpecification<TEntry> predicate,
                                                                         CancellationToken cancellationToken = default)
         => (await Context.Set<TEntry>().Where(predicate.Filter)
                 .Select(selector)
                 .SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => Equals(default, result));
+            .NoneWhen(result => result is null);
 
     /// <inheritdoc/>
-    public virtual async Task<Option<TResult>> SingleOrDefault<TResult>(Expression<Func<TEntry, TResult>> selector,
+    public virtual async Task<Option<TResult>> SingleOrDefault<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                                                         IFilterSpecification<TResult> predicate,
                                                                         CancellationToken cancellationToken = default)
         => (await Context.Set<TEntry>()
                 .Select(selector)
                 .SingleOrDefaultAsync(predicate.Filter, cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => Equals(default, result));
+            .NoneWhen(result => result is null);
 
     /// <inheritdoc/>
     public virtual async Task<TEntry> First(CancellationToken cancellationToken = default)
         => await First(AlwaysTrueSpecification<TEntry>.Instance, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<TEntry> First(IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntry> First(IFilterSpecification<TEntry> predicate,
+                                            CancellationToken cancellationToken = default)
         => await First(predicate, Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<TEntry> First(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntry> First(IEnumerable<IncludeClause<TEntry>> includedProperties,
+                                            CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>().Include(includedProperties).FirstAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<TEntry> First(IFilterSpecification<TEntry> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntry> First(IFilterSpecification<TEntry> predicate,
+                                            IEnumerable<IncludeClause<TEntry>> includedProperties,
+                                            CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>().Include(includedProperties)
                .FirstAsync(predicate.Filter, cancellationToken)
                .ConfigureAwait(false);
     /// <inheritdoc/>
-    public virtual async Task<Option<TEntry>> FirstOrDefault(IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellation = default)
+    public virtual async Task<Option<TEntry>> FirstOrDefault(IEnumerable<IncludeClause<TEntry>> includedProperties,
+                                                             CancellationToken cancellation = default)
         => (await Context.Set<TEntry>().Include(includedProperties)
                 .FirstOrDefaultAsync(cancellation)
                 .ConfigureAwait(false))
@@ -396,13 +433,16 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     public virtual async Task<Option<TEntry>> FirstOrDefault(CancellationToken cancellationToken = default)
         => await FirstOrDefault(Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
     /// <inheritdoc/>
-    public virtual async Task<Option<TEntry>> FirstOrDefault(IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<Option<TEntry>> FirstOrDefault(IFilterSpecification<TEntry> predicate,
+                                                             CancellationToken cancellationToken = default)
         => (await Context.Set<TEntry>().FirstOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false))
             .NoneWhen(result => Equals(default, result));
 
     /// <inheritdoc/>
-    public virtual async Task<TResult> First<TResult>(Expression<Func<TEntry, TResult>> selector, IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<TResult> First<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                      IFilterSpecification<TEntry> predicate,
+                                                      CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>()
                .Where(predicate.Filter)
                .Select(selector)
@@ -410,7 +450,9 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
                .ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<Option<TResult>> FirstOrDefault<TResult>(Expression<Func<TEntry, TResult>> selector, IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<Option<TResult>> FirstOrDefault<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                                       IFilterSpecification<TEntry> predicate,
+                                                                       CancellationToken cancellationToken = default)
         => (await Context.Set<TEntry>()
                 .Where(predicate.Filter)
                 .Select(selector)
@@ -419,23 +461,29 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
             .NoneWhen(result => Equals(default, result));
 
     /// <inheritdoc/>
-    public virtual async Task<Option<TEntry>> FirstOrDefault(IFilterSpecification<TEntry> predicate, IEnumerable<IncludeClause<TEntry>> includedProperties, CancellationToken cancellationToken = default)
+    public virtual async Task<Option<TEntry>> FirstOrDefault(IFilterSpecification<TEntry> predicate,
+                                                             IEnumerable<IncludeClause<TEntry>> includedProperties,
+                                                             CancellationToken cancellationToken = default)
         => (await Context.Set<TEntry>().Include(includedProperties)
                 .FirstOrDefaultAsync(predicate.Filter, cancellationToken)
                 .ConfigureAwait(false))
             .NoneWhen(result => Equals(null, result));
 
     /// <inheritdoc/>
-    public abstract Task<TEntry> Create(TEntry entry, CancellationToken cancellationToken = default);
+    public abstract Task<TEntry> Create(TEntry entry,
+                                        CancellationToken cancellationToken = default);
 
     /// <inheritdoc/>
-    public abstract Task Delete(IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default);
+    public abstract Task Delete(IFilterSpecification<TEntry> predicate,
+                                CancellationToken cancellationToken = default);
 
     /// <inheritdoc/>
-    public abstract Task<IEnumerable<TEntry>> Create(IEnumerable<TEntry> entries, CancellationToken cancellationToken = default);
+    public abstract Task<IEnumerable<TEntry>> Create(IEnumerable<TEntry> entries,
+                                                     CancellationToken cancellationToken = default);
 
     /// <inheritdoc/>
-    public IAsyncEnumerable<TEntry> Stream(IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<TEntry> Stream(IFilterSpecification<TEntry> predicate,
+                                           CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         return Context.Set<TEntry>()
@@ -444,7 +492,9 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, IFilterSpecification<TResult> predicate, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<TResult> Stream<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                     IFilterSpecification<TResult> predicate,
+                                                     CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         return Context.Set<TEntry>()
@@ -454,7 +504,10 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, IFilterSpecification<TResult> predicate, IOrderSpecification<TResult> orderBy, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<TResult> Stream<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                     IFilterSpecification<TResult> predicate,
+                                                     IOrderSpecification<TResult> orderBy,
+                                                     CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         return Context.Set<TEntry>()
@@ -465,7 +518,10 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, IFilterSpecification<TEntry> predicate, IOrderSpecification<TResult> orderBy, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<TResult> Stream<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                     IFilterSpecification<TEntry> predicate,
+                                                     IOrderSpecification<TResult> orderBy,
+                                                     CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         return Context.Set<TEntry>()
@@ -476,7 +532,9 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector, IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<TResult> Stream<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                     IFilterSpecification<TEntry> predicate,
+                                                     CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         return Context.Set<TEntry>()
@@ -486,13 +544,16 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     }
 
     /// <inheritdoc/>
-    public virtual async Task<bool> All(IFilterSpecification<TEntry> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> All(IFilterSpecification<TEntry> predicate,
+                                        CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>()
                .AllAsync(predicate.Filter, cancellationToken)
                .ConfigureAwait(false);
 
     /// <inheritdoc/>
-    public virtual async Task<bool> All<TResult>(Expression<Func<TEntry, TResult>> selector, IFilterSpecification<TResult> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> All<TResult>(IProjectionSpecification<TEntry, TResult> selector,
+                                                 IFilterSpecification<TResult> predicate,
+                                                 CancellationToken cancellationToken = default)
         => await Context.Set<TEntry>()
                .Select(selector)
                .AllAsync(predicate.Filter, cancellationToken)

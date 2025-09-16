@@ -42,7 +42,7 @@ public class FirstTests(RavenDbDatabaseFixture fixture) : IClassFixture<RavenDbD
         hero.Enrolls(acolyte);
         using (IAsyncDocumentSession session = fixture.Store.OpenAsyncSession())
         {
-            await session.StoreAsync(hero, hero.Id.ToString());
+            await session.StoreAsync(hero, hero.Id);
             await session.SaveChangesAsync();
         }
 
@@ -104,9 +104,10 @@ public class FirstTests(RavenDbDatabaseFixture fixture) : IClassFixture<RavenDbD
 
         RavenDbRepository<Hero> repository = new(_session);
         FilterSpecification<Hero> predicate = new(x => x.Id == hero.Id);
+        SelectSpecification<Hero, string> selector = new(h => h.Name);
 
         // Act
-        string actual = await repository.First(selector: x => x.Name,
+        string actual = await repository.First(selector,
                                                predicate);
 
         // Assert

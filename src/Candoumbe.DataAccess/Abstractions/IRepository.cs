@@ -59,7 +59,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
     /// <param name="cancellationToken">Notifies to cancel the execution of the request</param>
     /// <returns><see cref="Page{T}"/> which holds the result</returns>
-    Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<Page<TResult>> ReadPage<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                           PageSize pageSize,
                                           PageIndex page,
                                           IOrderSpecification<TResult> orderBy = null,
@@ -75,7 +75,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="orderBy">The order by clause to apply BEFORE <paramref name="selector"/>.</param>
     /// <param name="cancellationToken">Notifies to cancel the execution of the request</param>
     /// <returns><see cref="Page{T}"/> which holds the result</returns>
-    Task<Page<TResult>> ReadPage<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<Page<TResult>> ReadPage<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                           PageSize pageSize,
                                           PageIndex page,
                                           IOrderSpecification<TEntry> orderBy = null,
@@ -95,8 +95,8 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="selector">projection to apply before retrieving the result.</param>
     /// <param name="cancellationToken">Token to abort running the query.</param>
     /// <returns></returns>
-    [Obsolete($@"Use ""{nameof(Stream)}(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default)"" method instead")]
-    Task<IEnumerable<TResult>> ReadAll<TResult>(Expression<Func<TEntry, TResult>> selector,
+    [Obsolete($@"Use ""{nameof(Stream)}(IProjectionSpecification<TEntry, TResult> selector, CancellationToken cancellationToken = default)"" method instead")]
+    Task<IEnumerable<TResult>> ReadAll<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                                 CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -105,7 +105,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="predicate">Filter the entries to retrieve</param>
     /// <param name="cancellationToken"></param>
     /// <returns><see cref="IEnumerable{T}"/></returns>
-    [Obsolete($@"Use ""{nameof(Stream)}(Expression<Func<TEntry, TResult>> selector, CancellationToken cancellationToken = default)"" method instead")]
+    [Obsolete($@"Use ""{nameof(Stream)}(IProjectionSpecification<TEntry, TResult> selector, CancellationToken cancellationToken = default)"" method instead")]
     Task<IEnumerable<TEntry>> Where(IFilterSpecification<TEntry> predicate,
                                     CancellationToken cancellationToken = default);
 
@@ -127,7 +127,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <remarks>
     /// This method requires the underlying datastore to remain opened.
     /// </remarks>
-    IAsyncEnumerable<TResult> Stream<TResult>(Expression<Func<TEntry, TResult>> selector,
+    IAsyncEnumerable<TResult> Stream<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                               IFilterSpecification<TEntry> predicate,
                                               CancellationToken cancellationToken = default);
 
@@ -139,7 +139,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="predicate"></param>
     /// <param name="cancellationToken">Notifies to cancel the execution of the request</param>
     /// <returns><see cref="IEnumerable{T}"/></returns>
-    Task<IEnumerable<TResult>> Where<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<IEnumerable<TResult>> Where<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                               IFilterSpecification<TEntry> predicate,
                                               CancellationToken cancellationToken = default);
 
@@ -186,7 +186,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="cancellationToken">Notifies to cancel the execution of the request</param>
     /// <returns>Collection of <typeparamref name="TResult"/> </returns>
     Task<IEnumerable<TResult>> Where<TResult>(
-        Expression<Func<TEntry, TResult>> selector,
+        IProjectionSpecification<TEntry, TResult> selector,
         IFilterSpecification<TEntry> predicate,
         IOrderSpecification<TResult> orderBy = null,
         IEnumerable<IncludeClause<TEntry>> includedProperties = null,
@@ -205,7 +205,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<IEnumerable<TResult>> Where<TResult>(
-        Expression<Func<TEntry, TResult>> selector,
+        IProjectionSpecification<TEntry, TResult> selector,
         IFilterSpecification<TResult> predicate,
         IOrderSpecification<TResult> orderBy = null,
         CancellationToken cancellationToken = default);
@@ -243,7 +243,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/>
     ///  or <paramref name="orderBy"/> is <see langword="null"/>.
     /// </exception>
-    Task<Page<TResult>> Where<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<Page<TResult>> Where<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                        IFilterSpecification<TEntry> predicate,
                                        IOrderSpecification<TResult> orderBy,
                                        PageSize pageSize,
@@ -265,7 +265,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="pageIndex">the page of results to get.</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Page<TResult>> Where<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<Page<TResult>> Where<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                        IFilterSpecification<TResult> predicate,
                                        IOrderSpecification<TResult> orderBy,
                                        PageSize pageSize,
@@ -279,7 +279,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="selector"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<TResult> Max<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<TResult> Max<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -289,7 +289,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="selector">The projection to make before getting the minimum</param>
     /// <param name="cancellationToken"></param>
     /// <returns>The minimum value</returns>
-    Task<TResult> Min<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<TResult> Min<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -376,7 +376,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <returns>The entry that matches <paramref name="predicate"/>.</returns>
     /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
     /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/> is <see langword="null"/></exception>
-    Task<TResult> Single<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<TResult> Single<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                   IFilterSpecification<TEntry> predicate,
                                   CancellationToken cancellationToken = default);
 
@@ -435,7 +435,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <returns>The entry that matches <paramref name="predicate"/> or <see langword="null"/> if no matches found</returns>
     /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
     /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/> is <see langword="null"/></exception>
-    Task<Option<TResult>> SingleOrDefault<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<Option<TResult>> SingleOrDefault<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                                    IFilterSpecification<TEntry> predicate,
                                                    CancellationToken cancellationToken = default);
 
@@ -452,7 +452,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <returns>The entry that matches <paramref name="predicate"/> or <see langword="null"/> if no matches found</returns>
     /// <exception cref="InvalidOperationException">if no entry or more than one entry matches <paramref name="predicate"/>.</exception>
     /// <exception cref="ArgumentNullException">if either <paramref name="selector"/> or <paramref name="predicate"/> is <see langword="null"/></exception>
-    Task<Option<TResult>> SingleOrDefault<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<Option<TResult>> SingleOrDefault<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                                    IFilterSpecification<TResult> predicate,
                                                    CancellationToken cancellationToken = default);
 
@@ -572,7 +572,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="cancellationToken"></param>
     /// <returns>The entry that matches <paramref name="predicate"/>.</returns>
     /// <exception cref="InvalidOperationException">if the repository is empty or no entry matches <paramref name="predicate"/></exception>
-    Task<TResult> First<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<TResult> First<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                  IFilterSpecification<TEntry> predicate,
                                  CancellationToken cancellationToken = default);
 
@@ -584,7 +584,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="predicate">Filter to match</param>
     /// <param name="cancellationToken"></param>
     /// <returns>The entry that matches <paramref name="predicate"/> or <see langword="null"/> if no entry found.</returns>
-    Task<Option<TResult>> FirstOrDefault<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<Option<TResult>> FirstOrDefault<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                                   IFilterSpecification<TEntry> predicate,
                                                   CancellationToken cancellationToken = default);
 
@@ -622,7 +622,7 @@ public interface IRepository<TEntry> where TEntry : class
     /// <param name="predicate">predicate to evaluate all the entries against</param>
     /// <param name="cancellationToken"></param>
     /// <returns><see langword="true"/> if all entries statifies the <paramref name="predicate"/> and <see langword="false"/> otherwise</returns>
-    Task<bool> All<TResult>(Expression<Func<TEntry, TResult>> selector,
+    Task<bool> All<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                             IFilterSpecification<TResult> predicate,
                             CancellationToken cancellationToken = default);
 }
