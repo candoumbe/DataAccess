@@ -1,0 +1,33 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Candoumbe.MiscUtilities" Version="0.14.0" />
+    <PackageVersion Include="Candoumbe.Pipelines" Version="0.13.0-rc.39" />
+    <PackageVersion Include="CodecovUploader" Version="0.8.0" />
+    <PackageVersion Include="coverlet.msbuild" Version="6.0.3" />
+    <PackageVersion Include="FluentAssertions" Version="7.0.0" />
+    <PackageVersion Include="FsCheck.XUnit" Version="3.0.0-rc3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.3" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="Moq" Version="4.20.71" />
+    <PackageVersion Include="NodaTime" Version="3.2.0" />
+    <PackageVersion Include="NodaTime.Bogus" Version="3.0.2" />
+    <PackageVersion Include="Optional" Version="4.0.0" />
+    <PackageVersion Include="RavenDB.Client" Version="6.2.2" />
+    <PackageVersion Include="Roslynator.Analyzers" Version="4.12.10" />
+    <PackageVersion Include="TestContainers.RavenDb" Version="4.3.0" />
+    <PackageVersion Include="xunit.categories" Version="2.0.8" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsTestProject)' == 'false'">
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'netstandard1.3'">
+    <PackageVersion Include="Ardalis.GuardClauses" Version="5.0.0" />
+  </ItemGroup>
+</Project>

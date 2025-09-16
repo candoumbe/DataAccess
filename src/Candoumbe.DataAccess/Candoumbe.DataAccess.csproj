@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\core.props" />
   <PropertyGroup>
@@ -10,8 +10,8 @@
 
   
   <ItemGroup>
-    <PackageReference Include="NodaTime" Version="3.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.14" />
+    <PackageReference Include="NodaTime" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
 
   

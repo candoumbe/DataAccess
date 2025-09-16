@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="../../core.props" />
   <PropertyGroup>
@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RavenDB.Client" Version="6.2.2" />
+    <PackageReference Include="RavenDB.Client" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Candoumbe.DataAccess\Candoumbe.DataAccess.csproj" />

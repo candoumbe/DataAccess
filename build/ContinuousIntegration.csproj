@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,8 +10,8 @@
     <NukeTelemetryVersion>1</NukeTelemetryVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Candoumbe.Pipelines" Version="0.13.0-rc.39" />
-    <PackageReference Include="CodecovUploader" Version="0.8.0" />
+    <PackageReference Include="Candoumbe.Pipelines" />
+    <PackageReference Include="CodecovUploader" />
   </ItemGroup>
   <ItemGroup>
     <PackageDownload Include="GitVersion.Tool" Version="[5.11.1]" />

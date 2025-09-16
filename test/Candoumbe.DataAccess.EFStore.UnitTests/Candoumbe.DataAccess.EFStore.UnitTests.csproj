@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\tests.props" />
   <PropertyGroup>
@@ -10,20 +10,20 @@
   <Choose>
      <When Condition="'$(TargetFramework)' == 'net8.0'">
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.14" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.14" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.3" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
       </ItemGroup>
     </Otherwise>
   </Choose>
     
     <ItemGroup>
-        <PackageReference Include="TestContainers.RavenDb" Version="4.3.0"/>
+        <PackageReference Include="TestContainers.RavenDb" />
     </ItemGroup>
 
   <ItemGroup>
