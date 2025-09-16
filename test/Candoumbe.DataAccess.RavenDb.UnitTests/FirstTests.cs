@@ -18,7 +18,7 @@ namespace Candoumbe.DataAccess.RavenDb.UnitTests;
 [UnitTest]
 public class FirstTests(RavenDbDatabaseFixture fixture) : IClassFixture<RavenDbDatabaseFixture>, IAsyncLifetime
 {
-    private static readonly Faker Faker = new();
+    private static readonly Faker s_faker = new();
     private IAsyncDocumentSession _session;
 
     /// <inheritdoc />
@@ -39,8 +39,8 @@ public class FirstTests(RavenDbDatabaseFixture fixture) : IClassFixture<RavenDbD
     public async Task Given_hero_exists_and_has_an_acolyte_When_calling_First_without_including_acolytes_Then_result_should_not_have_acolyte()
     {
         // Arrange
-        Hero hero = new Hero(Guid.NewGuid().ToString(), Faker.Name.FullName());
-        Acolyte acolyte = new Acolyte(Guid.NewGuid().ToString(), Faker.Name.FullName());
+        Hero hero = new Hero(Guid.NewGuid().ToString(), s_faker.Name.FullName());
+        Acolyte acolyte = new Acolyte(Guid.NewGuid().ToString(), s_faker.Name.FullName());
 
         hero.Enrolls(acolyte);
         using (IAsyncDocumentSession session = fixture.Store.OpenAsyncSession())
@@ -63,8 +63,8 @@ public class FirstTests(RavenDbDatabaseFixture fixture) : IClassFixture<RavenDbD
     public async Task Given_hero_exists_and_has_an_acolyte_When_calling_First_with_including_acolytes_Then_result_should_not_have_acolyte()
     {
         // Arrange
-        Hero hero = new Hero(Guid.NewGuid().ToString(), Faker.Person.FullName);
-        Acolyte acolyte = new Acolyte(Guid.NewGuid().ToString(), Faker.Person.FullName);
+        Hero hero = new Hero(Guid.NewGuid().ToString(), s_faker.Person.FullName);
+        Acolyte acolyte = new Acolyte(Guid.NewGuid().ToString(), s_faker.Person.FullName);
         Weapon weapon = new Weapon(Guid.NewGuid(), "Bow", 1);
         acolyte.Take(weapon);
         hero.Enrolls(acolyte);
@@ -79,7 +79,7 @@ public class FirstTests(RavenDbDatabaseFixture fixture) : IClassFixture<RavenDbD
 
         // Act
         Hero actual = await repository.First(predicate: x => x.Id == hero.Id,
-                                             includedProperties: [ IncludeClause<Hero>.Create(x => x.Acolytes.Select(x => x.Id)) ]);
+                                             includedProperties: [ IncludeClause<Hero>.Create(x => x.Acolytes.Select(item => item.Id)) ]);
 
         // Assert
         actual.Acolytes.Should()
@@ -91,8 +91,8 @@ public class FirstTests(RavenDbDatabaseFixture fixture) : IClassFixture<RavenDbD
     public async Task Given_hero_exists_and_has_an_acolyte_When_calling_First_with_selector_Then_result_match_expectation()
     {
         // Arrange
-        Hero hero = new Hero(Guid.NewGuid().ToString(), Faker.Person.FullName);
-        Acolyte acolyte = new Acolyte(Guid.NewGuid().ToString(), Faker.Person.FullName);
+        Hero hero = new Hero(Guid.NewGuid().ToString(), s_faker.Person.FullName);
+        Acolyte acolyte = new Acolyte(Guid.NewGuid().ToString(), s_faker.Person.FullName);
         Weapon weapon = new Weapon(Guid.NewGuid(), "Bow", 1);
         acolyte.Take(weapon);
         hero.Enrolls(acolyte);

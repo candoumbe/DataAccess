@@ -127,11 +127,11 @@ public class Build : EnhancedNukeBuild,
 
     ///<inheritdoc/>
     IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects
-        => Projects.Select(projectName => new MutationProjectConfiguration(Solution.GetProject(projectName),
+        => s_projects.Select(projectName => new MutationProjectConfiguration(Solution.GetProject(projectName),
                                                                            this.Get<IUnitTest>().UnitTestsProjects.Where(csproj => csproj.Name == $"{projectName}.UnitTests")));
 
     ///<inheritdoc/>
     bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
 
-    private static readonly string[] Projects = ["Candoumbe.DataAccess", "Candoumbe.DataAccess.EFCore", "Candoumbe.DataAccess.RavenDb"];
+    private static readonly string[] s_projects = ["Candoumbe.DataAccess", "Candoumbe.DataAccess.EFCore", "Candoumbe.DataAccess.RavenDb"];
 }

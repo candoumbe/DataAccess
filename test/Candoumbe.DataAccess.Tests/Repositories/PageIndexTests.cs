@@ -13,7 +13,7 @@ namespace Candoumbe.DataAccess.UnitTests.Repositories;
 [UnitTest]
 public class PageIndexTests
 {
-    private static readonly Faker Faker = new();
+    private static readonly Faker s_faker = new();
 
     [Property]
     public void Given_input_is_negative_When_calling_From_Then_ArgumentOutOfRangeException_should_be_thrown(NonNegativeInt value)
