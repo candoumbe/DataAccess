@@ -117,8 +117,16 @@ public class Build : EnhancedNukeBuild,
 
     ///<inheritdoc/>
     IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects
-        => Projects.Select(projectName => new MutationProjectConfiguration(Solution.GetProject(projectName),
-                                                                           this.Get<IUnitTest>().UnitTestsProjects.Where(csproj => csproj.Name == $"{projectName}.UnitTests")));
+        =>
+        [
+            ..Projects.Select(projectName => new MutationProjectConfiguration(sourceProject: Solution.AllProjects.Single(csproj => string.Equals(csproj.Name, projectName, StringComparison.InvariantCultureIgnoreCase)),
+                                                                              testProjects: projectName switch
+                                                                              {
+                                                                                  "DataFilters" => Solution.AllProjects.Where(csproj => csproj.Name.EndsWith(".UnitTests")),
+                                                                                  _             => Solution.AllProjects.Where(csproj => string.Equals(csproj.Name, $"{projectName}.UnitTests"))
+                                                                              },
+                                                                              configurationFile: this.Get<IHaveTestDirectory>().TestDirectory / $"{projectName}.UnitTests" / "stryker-config.json"))
+        ];
 
     ///<inheritdoc/>
     bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
