@@ -480,3 +480,4 @@ $RECYCLE.BIN/
 .qodo
 # Jetbrains Rider config file
 /.idea
+/**/*/StrykerOutput/
