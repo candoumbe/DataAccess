@@ -6,7 +6,6 @@
   <ItemGroup>
     <PackageVersion Include="Candoumbe.MiscUtilities" Version="0.14.0" />
     <PackageVersion Include="Candoumbe.Pipelines" Version="1.2.1" />
-    <PackageVersion Include="CodecovUploader" Version="0.8.0" />
     <PackageVersion Include="coverlet.msbuild" Version="6.0.3" />
     <PackageVersion Include="FluentAssertions" Version="7.0.0" />
     <PackageVersion Include="FsCheck.XUnit" Version="3.0.0-rc3" />

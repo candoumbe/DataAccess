@@ -11,9 +11,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Candoumbe.Pipelines" />
-    <PackageReference Include="CodecovUploader" />
   </ItemGroup>
   <ItemGroup>
+    <PackageDownload Include="CodecovUploader" Version="[0.8.0]" />
     <PackageDownload Include="GitVersion.Tool" Version="[5.11.1]" />
     <PackageDownload Include="ReportGenerator" Version="[5.1.13]" />
   </ItemGroup>
