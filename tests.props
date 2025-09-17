@@ -12,5 +12,6 @@
     <PackageReference Include="coverlet.msbuild" />
     <PackageReference Include="Moq" />
     <PackageReference Include="NodaTime.Bogus" />
+    <PackageReference Include="FakeItEasy"/>
   </ItemGroup>
 </Project>

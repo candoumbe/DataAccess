@@ -3,7 +3,7 @@
     /// <summary>
     /// Defines the contract of a factory that builds <see cref="IRepository{TEntry}"/>s.
     /// </summary>
-    public interface IRepositoryFactory<TContext> where TContext : IDbContext
+    public interface IRepositoryFactory<TContext> where TContext : IStore
     {
         /// <summary>
         /// Creates a new <see cref="IRepository{TEntry}"/> that can handle <typeparamref name="TEntity"/>.

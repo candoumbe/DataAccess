@@ -1,19 +1,17 @@
-﻿namespace Candoumbe.DataAccess.EFStore.UnitTests
+﻿
+using Candoumbe.DataAccess.Abstractions;
+using Microsoft.EntityFrameworkCore;
+
+namespace Candoumbe.DataAccess.EFStore.UnitTests;
+
+public class FakeDbContext : DbContext
 {
-    using Candoumbe.DataAccess.Abstractions;
+    public DbSet<Dummy> Dummies { get; set; }
+}
 
-    using Microsoft.EntityFrameworkCore;
+public class Dummy
+{
+    public int Id { get; set; }
 
-    public class FakeDbContext : DbContext, IDbContext
-    {
-
-        public DbSet<Dummy> Dummies { get; set; }
-    }
-
-    public class Dummy
-    {
-        public int Id { get; set; }
-
-        public string Name { get; set; }
-    }
+    public string Name { get; set; }
 }
