@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Candoumbe.MiscUtilities" Version="0.14.0" />
-    <PackageVersion Include="Candoumbe.Pipelines" Version="0.13.0-rc.39" />
+    <PackageVersion Include="Candoumbe.Pipelines" Version="1.2.1" />
     <PackageVersion Include="CodecovUploader" Version="0.8.0" />
     <PackageVersion Include="coverlet.msbuild" Version="6.0.3" />
     <PackageVersion Include="FluentAssertions" Version="7.0.0" />

@@ -16,7 +16,9 @@ using Nuke.Common.Tools.GitHub;
 [GitHubActions("integration", GitHubActionsImage.Ubuntu2204,
                   AutoGenerate = true,
                   FetchDepth = 0,
-                  InvokedTargets = [nameof(IUnitTest.Compile), nameof(IUnitTest.UnitTests), nameof(IPack.Pack), nameof(IPushNugetPackages.Publish)
+                  InvokedTargets =
+                  [
+                      nameof(IUnitTest.Compile), nameof(IUnitTest.UnitTests), nameof(IPack.Pack), nameof(IPushNugetPackages.Publish)
                   ],
                   CacheKeyFiles =
                   [
@@ -29,7 +31,7 @@ using Nuke.Common.Tools.GitHub;
                   EnableGitHubToken = true,
                   ImportSecrets =
                   [
-                      nameof(NugetApiKey),
+                      nameof(IPushNugetPackages.NuGetApiKey),
                       nameof(IReportCoverage.CodecovToken)
                   ],
                   PublishArtifacts = true,
@@ -56,7 +58,7 @@ using Nuke.Common.Tools.GitHub;
                   EnableGitHubToken = true,
                   ImportSecrets =
                   [
-                      nameof(NugetApiKey),
+                      nameof(IPushNugetPackages.NuGetApiKey),
                       nameof(IReportCoverage.CodecovToken)
                   ],
                   PublishArtifacts = true,
@@ -77,7 +79,7 @@ public class Build : EnhancedNukeBuild,
     IRestore,
     IUnitTest,
     IMutationTest,
-    IReportCoverage,
+    IReportUnitTestCoverage,
     IPushNugetPackages,
     ICreateGithubRelease,
     IGitFlowWithPullRequest
@@ -87,37 +89,25 @@ public class Build : EnhancedNukeBuild,
     ///<inheritdoc/>
     Solution IHaveSolution.Solution => Solution;
 
-    IEnumerable<AbsolutePath> IClean.DirectoriesToDelete => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
-        .Concat(this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj"));
+    IEnumerable<AbsolutePath> IClean.DirectoriesToDelete =>
+    [
+        ..this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj"),
+        .. this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj")
+    ];
 
-    /// <summary>
-    /// Token used to interact with GitHub API
-    /// </summary>
-    [Parameter("Token used to interact with Nuget API")] [Secret]
-    public readonly string NugetApiKey;
-
-
-    /// Support plugins are available for:
-    ///   - JetBrains ReSharper        https://nuke.build/resharper
-    ///   - JetBrains Rider            https://nuke.build/rider
-    ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
-    ///   - Microsoft VSCode           https://nuke.build/vscode
-    public static int Main() => Execute<Build>(x => ( (ICompile)x ).Compile);
+    public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);
 
     ///<inheritdoc/>
     IEnumerable<AbsolutePath> IPack.PackableProjects => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobFiles("**/*.csproj");
 
-
     ///<inheritdoc/>
     IEnumerable<PushNugetPackageConfiguration> IPushNugetPackages.PublishConfigurations =>
     [
-        new NugetPushConfiguration(
-                                   apiKey: NugetApiKey,
+        new NugetPushConfiguration(apiKey: this.Get<IPushNugetPackages>()?.NuGetApiKey,
                                    source: new Uri("https://api.nuget.org/v3/index.json"),
-                                   canBeUsed: () => NugetApiKey is not null
+                                   canBeUsed: () => this is IPushNugetPackages { NuGetApiKey : not null }
                                   ),
-        new GitHubPushNugetConfiguration(
-                                         githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
+        new GitHubPushNugetConfiguration(githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
                                          source: new Uri($"https://nuget.pkg.github.com/{this.Get<IHaveGitHubRepository>().GitRepository.GetGitHubOwner()}/index.json"),
                                          canBeUsed: () => this is ICreateGithubRelease { GitHubToken: not null })
     ];
@@ -133,8 +123,10 @@ public class Build : EnhancedNukeBuild,
     ///<inheritdoc/>
     bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
 
-    private string[] Projects => [ .. Solution.AllProjects
-                                                  .Where(x => this.Get<IHaveSourceDirectory>().SourceDirectory.Contains(x.Path))
-                                                  .Select(x => x.Name)
+    private string[] Projects =>
+    [
+        .. Solution.AllProjects
+            .Where(x => this.Get<IHaveSourceDirectory>().SourceDirectory.Contains(x.Path))
+            .Select(x => x.Name)
     ];
 }
