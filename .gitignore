@@ -399,6 +399,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+.idea/
 
 ##
 ## Visual studio for Mac
@@ -475,9 +476,12 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+#Nuke directory for temporary files
 /.nuke/temp
 
+# Qodo
 .qodo
-# Jetbrains Rider config file
-/.idea
-/**/*/StrykerOutput/
+
+# Stryker
+**/*/StrykerOutput
