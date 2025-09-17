@@ -20,7 +20,7 @@ public class FilterSpecification<T> : IFilterSpecification<T>
     }
 
     /// <summary>
-    /// Implicit conversion from <see cref="FilterSpecification{T}"/> to <see cref="Expression{Func{T, bool}}"/>.
+    /// Implicit conversion from <see cref="FilterSpecification{T}"/> to <see cref="Expression{T}"/>.
     /// </summary>
     /// <param name="specification"></param>
     /// <returns></returns>

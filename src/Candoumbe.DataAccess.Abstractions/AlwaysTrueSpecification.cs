@@ -22,15 +22,3 @@ public class AlwaysTrueSpecification<T> : IFilterSpecification<T>
     /// </summary>
     public static AlwaysTrueSpecification<T> Instance => new();
 }
-
-
-public class NotSpecification<T> : IFilterSpecification<T>
-{
-    /// <inheritdoc />
-    public Expression<Func<T, bool>> Filter { get; }
-
-    public NotSpecification(IFilterSpecification<T> specification)
-    {
-        Filter = Expression.Lambda<Func<T, bool>>(Expression.Not(specification.Filter.Body), specification.Filter.Parameters);
-    }
-}
