@@ -114,17 +114,12 @@ public class Build : EnhancedNukeBuild,
 
     ///<inheritdoc/>
     IEnumerable<Project> IUnitTest.UnitTestsProjects => this.Get<IHaveSolution>().Solution.GetAllProjects("*.UnitTests");
-
     ///<inheritdoc/>
     IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects
         =>
         [
             ..Projects.Select(projectName => new MutationProjectConfiguration(sourceProject: Solution.AllProjects.Single(csproj => string.Equals(csproj.Name, projectName, StringComparison.InvariantCultureIgnoreCase)),
-                                                                              testProjects: projectName switch
-                                                                              {
-                                                                                  "DataFilters" => Solution.AllProjects.Where(csproj => csproj.Name.EndsWith(".UnitTests")),
-                                                                                  _             => Solution.AllProjects.Where(csproj => string.Equals(csproj.Name, $"{projectName}.UnitTests"))
-                                                                              },
+                                                                              testProjects: Solution.AllProjects.Where(csproj => string.Equals(csproj.Name, $"{projectName}.UnitTests")),
                                                                               configurationFile: this.Get<IHaveTestDirectory>().TestDirectory / $"{projectName}.UnitTests" / "stryker-config.json"))
         ];
 

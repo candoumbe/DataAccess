@@ -22,7 +22,7 @@ namespace Candoumbe.DataAccess.EFStore;
 public class EntityFrameworkUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext, IStore
 {
     private readonly TContext _context;
-    private readonly IRepositoryFactory _repositoryFactory;
+    private readonly IRepositoryFactory<TContext> _repositoryFactory;
     private readonly IDictionary<Type, object> _repositories;
     private bool _disposed;
 
@@ -31,7 +31,7 @@ public class EntityFrameworkUnitOfWork<TContext> : IUnitOfWork where TContext : 
     /// </summary>
     /// <param name="context">instance of <typeparamref name="TContext"/> that the current <see cref="EntityFrameworkUnitOfWork{TContext}"/> will wrap</param>
     /// <param name="repositoryFactory"></param>
-    public EntityFrameworkUnitOfWork(TContext context, IRepositoryFactory repositoryFactory)
+    public EntityFrameworkUnitOfWork(TContext context, IRepositoryFactory<TContext> repositoryFactory)
     {
         _context = context;
         _repositoryFactory = repositoryFactory;
@@ -44,7 +44,7 @@ public class EntityFrameworkUnitOfWork<TContext> : IUnitOfWork where TContext : 
     {
         IRepository<TEntry> repository;
         // Checks if the Dictionary Key contains the Type class
-        if (!_repositories.TryGetValue(typeof(TEntry), out object value))
+        if (_repositories.TryGetValue(typeof(TEntry), out object value))
         {
             repository = value as IRepository<TEntry>;
         }

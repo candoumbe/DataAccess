@@ -12,7 +12,7 @@ using System;
 public class EntityFrameworkUnitOfWorkFactory<TContext> : UnitOfWorkFactory
     where TContext : DbContext, IStore
 {
-    private readonly IRepositoryFactory _repositoryFactory;
+    private readonly IRepositoryFactory<TContext> _repositoryFactory;
 
     /// <summary>
     /// Options used to create the unit of work instances
@@ -31,7 +31,7 @@ public class EntityFrameworkUnitOfWorkFactory<TContext> : UnitOfWorkFactory
     /// <param name="contextGenerator">Function to call to create new <typeparamref name="TContext"/> instances.</param>
     /// <param name="repositoryFactory">A factory that will be used to build repositories</param>
     /// <exception cref="ArgumentNullException">if either <paramref name="contextGenerator"/> or <paramref name="repositoryFactory"/> is <see langword="null"/>.</exception>
-    public EntityFrameworkUnitOfWorkFactory(DbContextOptions<TContext> options, Func<DbContextOptions<TContext>, TContext> contextGenerator, IRepositoryFactory repositoryFactory)
+    public EntityFrameworkUnitOfWorkFactory(DbContextOptions<TContext> options, Func<DbContextOptions<TContext>, TContext> contextGenerator, IRepositoryFactory<TContext> repositoryFactory)
     {
         Options = options;
         ContextGenerator = contextGenerator ?? throw new ArgumentNullException(nameof(contextGenerator));
