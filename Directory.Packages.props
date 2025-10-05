@@ -17,7 +17,7 @@
     <PackageVersion Include="Moq" Version="4.20.71"/>
     <PackageVersion Include="NodaTime" Version="3.2.2"/>
     <PackageVersion Include="NodaTime.Bogus" Version="3.0.2"/>
-    <PackageVersion Include="RavenDB.Client" Version="6.2.2"/>
+    <PackageVersion Include="RavenDB.Client" Version="6.2.10"/>
     <PackageVersion Include="Roslynator.Analyzers" Version="4.12.10"/>
     <PackageVersion Include="TestContainers.RavenDb" Version="4.3.0"/>
     <PackageVersion Include="xunit.categories" Version="2.0.8"/>
