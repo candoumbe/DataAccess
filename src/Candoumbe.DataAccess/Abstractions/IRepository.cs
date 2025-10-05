@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Candoumbe.DataAccess.Repositories;
-using Optional;
+using Ultimately;
 
 namespace Candoumbe.DataAccess.Abstractions;
 

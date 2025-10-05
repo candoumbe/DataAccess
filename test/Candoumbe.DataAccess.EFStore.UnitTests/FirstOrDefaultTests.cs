@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Candoumbe.DataAccess.Abstractions;
 using Candoumbe.DataAccess.EFStore.UnitTests.Entities;
 using Candoumbe.DataAccess.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Optional;
+using Ultimately;
 using Xunit;
 using Xunit.Categories;
 
@@ -47,9 +46,9 @@ public class FirstOrDefaultTests : EntityFrameworkRepositoryTestsBase, IClassFix
             h => h.Acolytes.Should()
                 .BeEmpty("No instruction were defined to automatically include the acolytes property"),
 #if NET7_0_OR_GREATER
-            () => throw new UnreachableException($"'{nameof(EntityFrameworkRepository<Hero, SqliteStore>.FirstOrDefault)}' must return the entity when it exists")
+            _ => throw new UnreachableException($"'{nameof(EntityFrameworkRepository<Hero, SqliteStore>.FirstOrDefault)}' must return the entity when it exists")
 #else
-                () => throw new NotSupportedException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.FirstOrDefault)}' must return the entity when it exists")
+                _ => throw new NotSupportedException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.FirstOrDefault)}' must return the entity when it exists")
 #endif
         );
     }
@@ -79,13 +78,13 @@ public class FirstOrDefaultTests : EntityFrameworkRepositoryTestsBase, IClassFix
 
         // Assert
         maybeHero.Match(
-            hero => hero.Acolytes.Should()
-                .HaveSameCount(hero.Acolytes, $"'{nameof(Hero.Acolytes)}' was explicitely included").And
+            h => h.Acolytes.Should()
+                .HaveSameCount(h.Acolytes, $"'{nameof(Hero.Acolytes)}' was explicitely included").And
                 .OnlyContain(acolyteActual => acolyteActual.Name == acolyte.Name),
 #if NET7_0_OR_GREATER
-            () => throw new UnreachableException($"'{nameof(EntityFrameworkRepository<Hero, SqliteStore>.FirstOrDefault)}' must return the entity when it exists")
+            _ => throw new UnreachableException($"'{nameof(EntityFrameworkRepository<Hero, SqliteStore>.FirstOrDefault)}' must return the entity when it exists")
 #else
-                () => throw new NotSupportedException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.FirstOrDefault)}' must return the entity when it exists")
+                _ => throw new NotSupportedException($"'{nameof(EntityFrameworkRepository<Hero, SqliteDbContext>.FirstOrDefault)}' must return the entity when it exists")
 #endif
         );
     }

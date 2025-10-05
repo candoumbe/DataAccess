@@ -43,8 +43,19 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(IsTestProject)' == 'false' and '$(MSBuildProjectName)' != '_build'">
-    <PackageReference Include="Optional" />
     <PackageReference Include="Candoumbe.MiscUtilities" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
+  <Choose>
+    <When Condition="'$(TargetFramework)' == 'netstandard2.0'">
+      <ItemGroup>
+        <PackageReference Include="Optional" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="Ultimately" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
 </Project>
