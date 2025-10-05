@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Optional.Collections;
+using Ultimately.Collections;
 
 namespace Candoumbe.DataAccess.RavenDb.UnitTests;
 

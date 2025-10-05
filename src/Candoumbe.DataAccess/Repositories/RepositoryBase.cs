@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Candoumbe.DataAccess.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Optional;
+using Ultimately;
 
 namespace Candoumbe.DataAccess.Repositories;
 
@@ -352,7 +352,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     public virtual async Task<Option<TEntry>> SingleOrDefault(CancellationToken cancellationToken = default)
         => (await Context.Set<TEntry>().SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => result is null);
+            .NoneWhen(result => result is null, "No entry found");
 
     /// <inheritdoc/>
     public virtual async Task<Option<TEntry>> SingleOrDefault(IEnumerable<IncludeClause<TEntry>> includedProperties,
@@ -361,14 +361,14 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
                 .Include(includedProperties)
                 .SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => result is null);
+            .NoneWhen(result => result is null, "No entry found");
 
     /// <inheritdoc/>
     public virtual async Task<Option<TEntry>> SingleOrDefault(IFilterSpecification<TEntry> predicate,
                                                               CancellationToken cancellationToken = default)
         => (await Context.Set<TEntry>().SingleOrDefaultAsync(predicate.Filter, cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => result is null);
+            .NoneWhen(result => result is null, "No entry found");
 
     /// <inheritdoc/>
     public virtual async Task<Option<TEntry>> SingleOrDefault(IFilterSpecification<TEntry> predicate,
@@ -378,7 +378,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
                 .Include(includedProperties)
                 .SingleOrDefaultAsync(predicate.Filter, cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => result is null);
+            .NoneWhen(result => result is null, "No entry found");
 
     /// <inheritdoc/>
     public virtual async Task<Option<TResult>> SingleOrDefault<TResult>(IProjectionSpecification<TEntry, TResult> selector,
@@ -388,7 +388,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
                 .Select(selector)
                 .SingleOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => result is null);
+            .NoneWhen(result => result is null, "No entry found");
 
     /// <inheritdoc/>
     public virtual async Task<Option<TResult>> SingleOrDefault<TResult>(IProjectionSpecification<TEntry, TResult> selector,
@@ -398,7 +398,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
                 .Select(selector)
                 .SingleOrDefaultAsync(predicate.Filter, cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => result is null);
+            .NoneWhen(result => result is null, "No entry found");
 
     /// <inheritdoc/>
     public virtual async Task<TEntry> First(CancellationToken cancellationToken = default)
@@ -407,7 +407,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
     /// <inheritdoc/>
     public virtual async Task<TEntry> First(IFilterSpecification<TEntry> predicate,
                                             CancellationToken cancellationToken = default)
-        => await First(predicate, Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
+        => await First(predicate, [], cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc/>
     public virtual async Task<TEntry> First(IEnumerable<IncludeClause<TEntry>> includedProperties,
@@ -427,18 +427,17 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
         => (await Context.Set<TEntry>().Include(includedProperties)
                 .FirstOrDefaultAsync(cancellation)
                 .ConfigureAwait(false))
-            .NoneWhen(result => Equals(default, result));
+            .NoneWhen(result => result is null, "No entry found");
 
     /// <inheritdoc/>
     public virtual async Task<Option<TEntry>> FirstOrDefault(CancellationToken cancellationToken = default)
-        => await FirstOrDefault(Enumerable.Empty<IncludeClause<TEntry>>(), cancellationToken).ConfigureAwait(false);
+        => await FirstOrDefault([], cancellationToken).ConfigureAwait(false);
     /// <inheritdoc/>
     public virtual async Task<Option<TEntry>> FirstOrDefault(IFilterSpecification<TEntry> predicate,
                                                              CancellationToken cancellationToken = default)
         => (await Context.Set<TEntry>().FirstOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => Equals(default, result));
-
+            .NoneWhen(result => result is null, "No entry found");
     /// <inheritdoc/>
     public virtual async Task<TResult> First<TResult>(IProjectionSpecification<TEntry, TResult> selector,
                                                       IFilterSpecification<TEntry> predicate,
@@ -458,7 +457,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
                 .Select(selector)
                 .FirstOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => Equals(default, result));
+            .NoneWhen(result => result is null, "No entry found");
 
     /// <inheritdoc/>
     public virtual async Task<Option<TEntry>> FirstOrDefault(IFilterSpecification<TEntry> predicate,
@@ -467,7 +466,7 @@ public abstract class RepositoryBase<TEntry> : IRepository<TEntry>
         => (await Context.Set<TEntry>().Include(includedProperties)
                 .FirstOrDefaultAsync(predicate.Filter, cancellationToken)
                 .ConfigureAwait(false))
-            .NoneWhen(result => Equals(null, result));
+            .NoneWhen(result => result is null, "No entry found");
 
     /// <inheritdoc/>
     public abstract Task<TEntry> Create(TEntry entry,

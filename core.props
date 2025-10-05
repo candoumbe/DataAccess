@@ -43,7 +43,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(IsTestProject)' == 'false' and '$(MSBuildProjectName)' != '_build'">
-    <PackageReference Include="Optional" />
+    <PackageReference Include="Ultimately" />
     <PackageReference Include="Candoumbe.MiscUtilities" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>

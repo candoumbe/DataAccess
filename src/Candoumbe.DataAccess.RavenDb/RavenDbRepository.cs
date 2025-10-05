@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Candoumbe.DataAccess.Abstractions;
 using Candoumbe.DataAccess.Repositories;
-using Optional;
+using Ultimately;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
 using Raven.Client.Documents.Session;
@@ -164,7 +164,7 @@ public class RavenDbRepository<T> : IRepository<T> where T : class
     /// <inheritdoc/>
     public async Task<Option<T>> FirstOrDefault(IEnumerable<IncludeClause<T>> includedProperties,
         CancellationToken cancellationToken = default)
-        => ( await _session.Query<T>().FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false) ).SomeNotNull();
+        => ( await _session.Query<T>().FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false) ).SomeNotNull("Expected element not found.");
 
     /// <inheritdoc/>
     public Task<Option<T>> FirstOrDefault(IFilterSpecification<T> predicate,

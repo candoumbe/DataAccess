@@ -1,6 +1,4 @@
-﻿
-using Candoumbe.DataAccess.Abstractions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Candoumbe.DataAccess.EFStore.UnitTests;
 
