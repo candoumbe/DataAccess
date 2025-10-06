@@ -21,7 +21,7 @@
     <PackageVersion Include="Roslynator.Analyzers" Version="4.14.1"/>
     <PackageVersion Include="TestContainers.RavenDb" Version="4.7.0"/>
     <PackageVersion Include="xunit.categories" Version="3.0.1"/>
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0"/>
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5"/>
   </ItemGroup>
   <Choose>
     <When Condition="'$(TargetFramework)' == 'netstandard2.0'">
