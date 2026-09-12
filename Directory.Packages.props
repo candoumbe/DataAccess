@@ -10,9 +10,9 @@
     <PackageVersion Include="FakeItEasy" Version="9.0.1"/>
     <PackageVersion Include="FluentAssertions" Version="7.2.2"/>
     <PackageVersion Include="FsCheck.XUnit" Version="3.4.0"/>
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.20"/>
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.20"/>
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.20"/>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.12"/>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12"/>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.12"/>
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.0"/>
     <PackageVersion Include="Moq" Version="4.20.71"/>
     <PackageVersion Include="NodaTime" Version="3.3.4"/>
@@ -38,6 +38,6 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup Condition="'$(IsTestProject)' == 'false'">
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0"/>
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401"/>
   </ItemGroup>
 </Project>
